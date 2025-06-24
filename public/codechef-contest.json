@@ -1,107 +1,144 @@
 [
   {
     "contest": "START191A",
-    "division": "Division 1",
+    "division": "Scorable Problems for Division 1",
     "problems": [
       {
-        "code": "PROB1A",
-        "url": "https://www.codechef.com/problems/PROB1A"
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "215",
+        "accuracy": "67.71"
       },
       {
-        "code": "PROB2A",
-        "url": "https://www.codechef.com/problems/PROB2A"
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "205",
+        "accuracy": "59.77"
       },
       {
-        "code": "PROB3A",
-        "url": "https://www.codechef.com/problems/PROB3A"
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "202",
+        "accuracy": "33.66"
+      },
+      {
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "104",
+        "accuracy": "19.55"
+      },
+      {
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "35",
+        "accuracy": "27.61"
+      },
+      {
+        "name": "XOR Shortest Path",
+        "url": "https://www.codechef.com/problems/XORSPATH",
+        "code": "XORSPATH",
+        "submissions": "14",
+        "accuracy": "21.88"
       }
     ]
   },
   {
     "contest": "START191B",
-    "division": "Division 2",
+    "division": "Scorable Problems for Division 2",
     "problems": [
       {
-        "code": "PROB1B",
-        "url": "https://www.codechef.com/problems/PROB1B"
+        "name": "Add to get GCD",
+        "url": "https://www.codechef.com/problems/ADDGCD",
+        "code": "ADDGCD",
+        "submissions": "1835",
+        "accuracy": "42.78"
       },
       {
-        "code": "PROB2B",
-        "url": "https://www.codechef.com/problems/PROB2B"
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "1809",
+        "accuracy": "49.8"
       },
       {
-        "code": "PROB3B",
-        "url": "https://www.codechef.com/problems/PROB3B"
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "1174",
+        "accuracy": "27.19"
       },
       {
-        "code": "PROB4B",
-        "url": "https://www.codechef.com/problems/PROB4B"
-      }
-    ]
-  },
-  {
-    "contest": "START191C",
-    "division": "Division 3",
-    "problems": [
-      {
-        "code": "PROB1C",
-        "url": "https://www.codechef.com/problems/PROB1C"
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "1086",
+        "accuracy": "44.03"
       },
       {
-        "code": "PROB2C",
-        "url": "https://www.codechef.com/problems/PROB2C"
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "201",
+        "accuracy": "15.33"
       },
       {
-        "code": "PROB3C",
-        "url": "https://www.codechef.com/problems/PROB3C"
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "41",
+        "accuracy": "26.63"
       },
       {
-        "code": "PROB4C",
-        "url": "https://www.codechef.com/problems/PROB4C"
-      },
-      {
-        "code": "PROB5C",
-        "url": "https://www.codechef.com/problems/PROB5C"
+        "name": "XOR Shortest Path",
+        "url": "https://www.codechef.com/problems/XORSPATH",
+        "code": "XORSPATH",
+        "submissions": "6",
+        "accuracy": "13.46"
       }
     ]
   },
   {
     "contest": "START192A",
-    "division": "Division 1",
+    "division": "Scorable Problems for Division 1",
     "problems": [
       {
-        "code": "PROB1A2",
-        "url": "https://www.codechef.com/problems/PROB1A2"
+        "name": "Sample Problem A",
+        "url": "https://www.codechef.com/problems/SAMPLE1A",
+        "code": "SAMPLE1A",
+        "submissions": "150",
+        "accuracy": "75.50"
       },
       {
-        "code": "PROB2A2",
-        "url": "https://www.codechef.com/problems/PROB2A2"
-      },
-      {
-        "code": "PROB3A2",
-        "url": "https://www.codechef.com/problems/PROB3A2"
+        "name": "Sample Problem B",
+        "url": "https://www.codechef.com/problems/SAMPLE2A",
+        "code": "SAMPLE2A",
+        "submissions": "120",
+        "accuracy": "60.25"
       }
     ]
   },
   {
     "contest": "START192B",
-    "division": "Division 2",
+    "division": "Scorable Problems for Division 2",
     "problems": [
       {
-        "code": "PROB1B2",
-        "url": "https://www.codechef.com/problems/PROB1B2"
+        "name": "Sample Problem C",
+        "url": "https://www.codechef.com/problems/SAMPLE1B",
+        "code": "SAMPLE1B",
+        "submissions": "800",
+        "accuracy": "55.75"
       },
       {
-        "code": "PROB2B2",
-        "url": "https://www.codechef.com/problems/PROB2B2"
-      },
-      {
-        "code": "PROB3B2",
-        "url": "https://www.codechef.com/problems/PROB3B2"
-      },
-      {
-        "code": "PROB4B2",
-        "url": "https://www.codechef.com/problems/PROB4B2"
+        "name": "Sample Problem D",
+        "url": "https://www.codechef.com/problems/SAMPLE2B",
+        "code": "SAMPLE2B",
+        "submissions": "650",
+        "accuracy": "45.30"
       }
     ]
   }
