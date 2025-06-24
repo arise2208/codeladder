@@ -18,7 +18,7 @@ const CodeChefContest = () => {
       setLoading(true);
       try {
         // 1. Load contest.json
-        const response = await fetch('/contest.json');
+        const response = await fetch('/codechef-contest.json');
         if (!response.ok) throw new Error('Failed to load contest data');
         const contestData = await response.json();
 
