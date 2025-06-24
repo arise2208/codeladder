@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CodeChefContest = () => {
   const [groupedContests, setGroupedContests] = useState({});
-  const [questionsMap, setQuestionsMap] = useState({}); // url => backend question object
+  const [questionsMap, setQuestionsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,17 +13,26 @@ const CodeChefContest = () => {
 
   const username = localStorage.getItem('username');
   const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username || !token) {
+      navigate('/login');
+      return;
+    }
+    // fetchLadders(); // If you have this function, define or uncomment it.
+    // eslint-disable-next-line
+  }, [username, token, navigate]);
 
   useEffect(() => {
     const loadContestData = async () => {
       setLoading(true);
       try {
-        // 1. Load contest.json
         const response = await fetch('/codechef-contest.json');
         if (!response.ok) throw new Error('Failed to load contest data');
         const contestData = await response.json();
 
-        // 2. Group contests like START191A/B/C/D → START191
+        // Group contests like START191A/B/C/D → START191
         const grouped = {};
         for (const contest of contestData) {
           const groupName = contest.contest.match(/^([A-Z]+\d+)/)?.[1];
@@ -31,7 +41,7 @@ const CodeChefContest = () => {
         }
         setGroupedContests(grouped);
 
-        // 3. Fetch all questions from backend (to map url to question object)
+        // Fetch all questions from backend (to map url to question object)
         const qres = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
           headers: {
             Authorization: `Bearer ${token}`,

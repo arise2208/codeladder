@@ -1,7 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ContestTable from './components/pages/ContestTable';
 
 const ProblemsetPage = () => {
+  // --- ADDED FIELDS FOR CONSISTENCY ---
+  const [groupedContests, setGroupedContests] = useState({});
+  const [questionsMap, setQuestionsMap] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const [viewMode, setViewMode] = useState('compact');
+
+  const username = localStorage.getItem('username');
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username || !token) {
+      navigate('/login');
+      return;
+    }
+    // fetchLadders(); // If you have this function, define or uncomment it.
+    // eslint-disable-next-line
+  }, [username, token, navigate]);
+
+  // --- YOUR ORIGINAL LOGIC ---
   const [tableData, setTableData] = useState([]);
   const [contestsJsonRaw, setContestsJsonRaw] = useState({});
 
