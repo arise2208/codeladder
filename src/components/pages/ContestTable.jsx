@@ -4,9 +4,9 @@ import React, { useState, useMemo } from 'react';
 const getColorByRating = (rating) => {
   if (rating == null) return "#000000"; 
 
-  if (rating >= 3000) return "#ff0000";       // Legendary Grandmaster (gradient red)
-  if (rating >= 2600) return "#ff0000";       // International Grandmaster
-  if (rating >= 2400) return "#ff8c00";       // Grandmaster - orange
+  if (rating >= 3000) return "#ff0000";       
+  if (rating >= 2600) return "#ff0000";       
+  if (rating >= 2400) return "#ff8c00";       
   if (rating >= 2300) return "#aa00aa";       // International Master - purple
   if (rating >= 2100) return "#aa00aa";       // Master - purple
   if (rating >= 1900) return "#a0a";          // Candidate Master - violet

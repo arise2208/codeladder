@@ -1,43 +1,54 @@
 import React, { useState, useEffect } from 'react';
-
-const LOCAL_STORAGE_KEY = 'codechefSolvedProblems';
+import axios from 'axios';
 
 const CodeChefContest = () => {
   const [groupedContests, setGroupedContests] = useState({});
-  const [solved, setSolved] = useState({});
+  const [questionsMap, setQuestionsMap] = useState({}); // url => backend question object
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [hideCompleted, setHideCompleted] = useState(false);
-  const [viewMode, setViewMode] = useState('compact'); // 'compact' or 'detailed'
+  const [viewMode, setViewMode] = useState('compact');
+
+  const username = localStorage.getItem('username');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const loadContestData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch('/codechef-contest.json');
-        if (!response.ok) {
-          throw new Error('Failed to load contest data');
-        }
+        // 1. Load contest.json
+        const response = await fetch('/contest.json');
+        if (!response.ok) throw new Error('Failed to load contest data');
         const contestData = await response.json();
-        
-        // Group contests like START191A/B/C/D → START191
+
+        // 2. Group contests like START191A/B/C/D → START191
         const grouped = {};
         for (const contest of contestData) {
-          const groupName = contest.contest.match(/^([A-Z]+\d+)/)?.[1]; // e.g., START191
+          const groupName = contest.contest.match(/^([A-Z]+\d+)/)?.[1];
           if (!grouped[groupName]) grouped[groupName] = [];
           grouped[groupName].push(contest);
         }
         setGroupedContests(grouped);
 
-        // Load solved state from localStorage
-        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (saved) {
-          setSolved(JSON.parse(saved));
-        }
+        // 3. Fetch all questions from backend (to map url to question object)
+        const qres = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-username': username
+          }
+        });
+
+        // Build a map: url (trimmed) => question object
+        const map = {};
+        qres.data.forEach(q => {
+          if (q.link) map[q.link.trim()] = q;
+        });
+        setQuestionsMap(map);
+
         setError(null);
       } catch (err) {
-        setError('Failed to load CodeChef contest data. Please make sure codechef-contest.json exists in the public folder.');
+        setError('Failed to load CodeChef contest data or problem set.');
         console.error('Error loading contest data:', err);
       } finally {
         setLoading(false);
@@ -45,37 +56,113 @@ const CodeChefContest = () => {
     };
 
     loadContestData();
-  }, []);
+    // eslint-disable-next-line
+  }, [token, username]);
 
   const maxProblems = 9;
   const labels = 'ABCDEFGHI'.split('');
 
-  // Helper: unique key for each problem cell
-  const problemKey = (contestCode, problemCode) => `${contestCode}|${problemCode}`;
+  // Helper: get backend question for this problem (by url)
+  const getBackendQuestion = (problem) => {
+    if (!problem.url) return null;
+    return questionsMap[problem.url.trim()] || null;
+  };
 
-  // Toggle solved state and persist to localStorage
-  const toggleSolved = (contestCode, problemCode) => {
-    const key = problemKey(contestCode, problemCode);
-    setSolved(prev => {
-      const updated = { ...prev, [key]: !prev[key] };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  // Helper: solved status for this problem for current user
+  const isSolved = (problem) => {
+    const backendQ = getBackendQuestion(problem);
+    if (!backendQ || !backendQ.solved_by) return false;
+    return backendQ.solved_by.includes(username);
+  };
+
+  // Mark as solved
+  const handleMarkSolved = async (problem) => {
+    const backendQ = getBackendQuestion(problem);
+    if (!backendQ) {
+      setError('Matching problem not found in backend!');
+      return;
+    }
+    if (!username) {
+      setError('Please login to mark problems as solved');
+      return;
+    }
+    try {
+      await axios.patch('https://backendcodeladder-2.onrender.com/markquestion', {
+        questionid: backendQ.question_id,
+        user: username
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-username': username
+        }
+      });
+      // Update questionsMap locally (no full refresh!)
+      setQuestionsMap(prevMap => ({
+        ...prevMap,
+        [backendQ.link.trim()]: {
+          ...backendQ,
+          solved_by: [...(backendQ.solved_by || []), username]
+        }
+      }));
+      setError('');
+    } catch (error) {
+      setError('Failed to mark as solved. Please try again.');
+    }
+  };
+
+  // Unmark as solved
+  const handleUnmark = async (problem) => {
+    const backendQ = getBackendQuestion(problem);
+    if (!backendQ) {
+      setError('Matching problem not found in backend!');
+      return;
+    }
+    if (!username) {
+      setError('Please login to unmark problems');
+      return;
+    }
+    try {
+      await axios.patch('https://backendcodeladder-2.onrender.com/unmarkquestion', {
+        questionid: backendQ.question_id,
+        user: username
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-username': username
+        }
+      });
+      setQuestionsMap(prevMap => ({
+        ...prevMap,
+        [backendQ.link.trim()]: {
+          ...backendQ,
+          solved_by: (backendQ.solved_by || []).filter(u => u !== username)
+        }
+      }));
+      setError('');
+    } catch (error) {
+      setError('Failed to unmark. Please try again.');
+    }
+  };
+
+  // Toggle solved state
+  const toggleSolved = (problem) => {
+    if (isSolved(problem)) {
+      handleUnmark(problem);
+    } else {
+      handleMarkSolved(problem);
+    }
   };
 
   // Calculate stats for a contest group
   const getGroupStats = (contests) => {
     let totalProblems = 0;
     let solvedProblems = 0;
-    
     contests.forEach(contest => {
       contest.problems.forEach(problem => {
         totalProblems++;
-        const key = problemKey(contest.contest, problem.code);
-        if (solved[key]) solvedProblems++;
+        if (isSolved(problem)) solvedProblems++;
       });
     });
-    
     return { totalProblems, solvedProblems };
   };
 
@@ -173,18 +260,15 @@ const CodeChefContest = () => {
             <i className="fas fa-pepper-hot"></i>
             <span className="font-medium">CodeChef Contests</span>
           </div>
-          
           <div className="mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-lg mb-6">
               <i className="fas fa-pepper-hot text-white text-3xl"></i>
             </div>
           </div>
-          
           <h1 className="section-header">CodeChef Contest Dashboard</h1>
           <p className="section-subheader mb-12">
             Track your progress across CodeChef contests with detailed problem statistics
           </p>
-          
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
@@ -226,7 +310,6 @@ const CodeChefContest = () => {
                 className="input-field pl-12 pr-4"
               />
             </div>
-            
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative">
@@ -248,7 +331,6 @@ const CodeChefContest = () => {
                 </div>
                 <span className="text-gray-700 font-medium">Hide Completed</span>
               </label>
-
               <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('compact')}
@@ -281,7 +363,6 @@ const CodeChefContest = () => {
         <div className="card-elevated overflow-hidden">
           <div className="overflow-x-auto">
             {viewMode === 'compact' ? (
-              // Compact Table View
               <table className="w-full min-w-[800px]">
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                   <tr>
@@ -340,7 +421,6 @@ const CodeChefContest = () => {
                               </div>
                             </td>
                           </tr>
-
                           {contests.map((contest) => (
                             <tr key={contest.contest} className="hover:bg-gray-50 transition-colors duration-200">
                               <td className="px-4 py-3 font-medium text-gray-900">{contest.contest}</td>
@@ -359,8 +439,7 @@ const CodeChefContest = () => {
                                 if (!p) return (
                                   <td key={i} className="px-3 py-3 text-center text-gray-400">-</td>
                                 );
-                                const key = problemKey(contest.contest, p.code);
-                                const isSolved = !!solved[key];
+                                const solvedFlag = isSolved(p);
                                 return (
                                   <td key={i} className="px-3 py-3 text-center">
                                     <div className="flex flex-col items-center gap-1">
@@ -372,19 +451,19 @@ const CodeChefContest = () => {
                                           className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors duration-200 text-sm"
                                           title={p.name}
                                         >
-                                          {p.code}
+                                          {p.name}
                                         </a>
                                         <button
-                                          title={isSolved ? "Mark as unsolved" : "Mark as solved"}
-                                          onClick={() => toggleSolved(contest.contest, p.code)}
+                                          title={solvedFlag ? "Mark as unsolved" : "Mark as solved"}
+                                          onClick={() => toggleSolved(p)}
                                           className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
-                                            isSolved 
+                                            solvedFlag 
                                               ? 'bg-green-500 text-white hover:bg-green-600' 
                                               : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
                                           }`}
-                                          aria-pressed={isSolved}
+                                          aria-pressed={solvedFlag}
                                         >
-                                          {isSolved ? (
+                                          {solvedFlag ? (
                                             <i className="fas fa-check text-xs"></i>
                                           ) : (
                                             <i className="fas fa-circle text-xs"></i>
@@ -474,11 +553,10 @@ const CodeChefContest = () => {
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {contest.problems.map((problem, index) => {
-                                  const key = problemKey(contest.contest, problem.code);
-                                  const isSolved = !!solved[key];
+                                  const solvedFlag = isSolved(problem);
                                   return (
                                     <div key={problem.code} className={`border rounded-lg p-4 transition-all duration-200 ${
-                                      isSolved ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 hover:border-gray-300'
+                                      solvedFlag ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 hover:border-gray-300'
                                     }`}>
                                       <div className="flex items-start justify-between mb-2">
                                         <div className="flex items-center gap-2">
@@ -486,16 +564,16 @@ const CodeChefContest = () => {
                                             {labels[index] || index + 1}
                                           </span>
                                           <button
-                                            title={isSolved ? "Mark as unsolved" : "Mark as solved"}
-                                            onClick={() => toggleSolved(contest.contest, problem.code)}
+                                            title={solvedFlag ? "Mark as unsolved" : "Mark as solved"}
+                                            onClick={() => toggleSolved(problem)}
                                             className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
-                                              isSolved 
+                                              solvedFlag 
                                                 ? 'bg-green-500 text-white hover:bg-green-600' 
                                                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
                                             }`}
-                                            aria-pressed={isSolved}
+                                            aria-pressed={solvedFlag}
                                           >
-                                            {isSolved ? (
+                                            {solvedFlag ? (
                                               <i className="fas fa-check text-xs"></i>
                                             ) : (
                                               <i className="fas fa-circle text-xs"></i>
@@ -539,7 +617,6 @@ const CodeChefContest = () => {
             )}
           </div>
         </div>
-
         {/* Footer Stats */}
         {filteredGroups.length > 0 && (
           <div className="mt-8 text-center">
