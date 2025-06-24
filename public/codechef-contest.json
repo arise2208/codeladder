@@ -1,0 +1,108 @@
+[
+  {
+    "contest": "START191A",
+    "division": "Division 1",
+    "problems": [
+      {
+        "code": "PROB1A",
+        "url": "https://www.codechef.com/problems/PROB1A"
+      },
+      {
+        "code": "PROB2A",
+        "url": "https://www.codechef.com/problems/PROB2A"
+      },
+      {
+        "code": "PROB3A",
+        "url": "https://www.codechef.com/problems/PROB3A"
+      }
+    ]
+  },
+  {
+    "contest": "START191B",
+    "division": "Division 2",
+    "problems": [
+      {
+        "code": "PROB1B",
+        "url": "https://www.codechef.com/problems/PROB1B"
+      },
+      {
+        "code": "PROB2B",
+        "url": "https://www.codechef.com/problems/PROB2B"
+      },
+      {
+        "code": "PROB3B",
+        "url": "https://www.codechef.com/problems/PROB3B"
+      },
+      {
+        "code": "PROB4B",
+        "url": "https://www.codechef.com/problems/PROB4B"
+      }
+    ]
+  },
+  {
+    "contest": "START191C",
+    "division": "Division 3",
+    "problems": [
+      {
+        "code": "PROB1C",
+        "url": "https://www.codechef.com/problems/PROB1C"
+      },
+      {
+        "code": "PROB2C",
+        "url": "https://www.codechef.com/problems/PROB2C"
+      },
+      {
+        "code": "PROB3C",
+        "url": "https://www.codechef.com/problems/PROB3C"
+      },
+      {
+        "code": "PROB4C",
+        "url": "https://www.codechef.com/problems/PROB4C"
+      },
+      {
+        "code": "PROB5C",
+        "url": "https://www.codechef.com/problems/PROB5C"
+      }
+    ]
+  },
+  {
+    "contest": "START192A",
+    "division": "Division 1",
+    "problems": [
+      {
+        "code": "PROB1A2",
+        "url": "https://www.codechef.com/problems/PROB1A2"
+      },
+      {
+        "code": "PROB2A2",
+        "url": "https://www.codechef.com/problems/PROB2A2"
+      },
+      {
+        "code": "PROB3A2",
+        "url": "https://www.codechef.com/problems/PROB3A2"
+      }
+    ]
+  },
+  {
+    "contest": "START192B",
+    "division": "Division 2",
+    "problems": [
+      {
+        "code": "PROB1B2",
+        "url": "https://www.codechef.com/problems/PROB1B2"
+      },
+      {
+        "code": "PROB2B2",
+        "url": "https://www.codechef.com/problems/PROB2B2"
+      },
+      {
+        "code": "PROB3B2",
+        "url": "https://www.codechef.com/problems/PROB3B2"
+      },
+      {
+        "code": "PROB4B2",
+        "url": "https://www.codechef.com/problems/PROB4B2"
+      }
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = ({ user, setUser }) => {
@@ -71,7 +71,8 @@ const Navbar = ({ user, setUser }) => {
           <NavLink to="/" icon="fas fa-home">Home</NavLink>
           <NavLink to="/problemset" icon="fas fa-code">Problems</NavLink>
           <NavLink to="/ladders" icon="fas fa-layer-group">Ladders</NavLink>
-          <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink> {/* ✅ Added */}
+          <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
+          <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           {user === "admin" && (
             <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>
           )}
@@ -151,7 +152,8 @@ const Navbar = ({ user, setUser }) => {
           <NavLink to="/" icon="fas fa-home">Home</NavLink>
           <NavLink to="/problemset" icon="fas fa-code">Problems</NavLink>
           <NavLink to="/ladders" icon="fas fa-layer-group">Ladders</NavLink>
-          <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink> {/* ✅ Added */}
+          <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
+          <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           {user === "admin" && <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>}
           
           <div className="pt-3 border-t border-gray-100">
