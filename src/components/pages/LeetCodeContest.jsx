@@ -7,6 +7,15 @@ const LETTERS = 'ABCD'.split('');
 // Helper to normalize LeetCode URLs (removes trailing slash)
 const normalizeLink = (link) => link ? link.replace(/\/$/, '') : '';
 
+// Helper to detect contest type (Weekly/Biweekly/Other) from URL or name
+const getContestType = (contest) => {
+  const url = contest.url?.toLowerCase() || '';
+  const name = contest.contest?.toLowerCase() || '';
+  if (url.includes('biweekly') || name.includes('biweekly')) return 'biweekly';
+  if (url.includes('weekly') || name.includes('weekly')) return 'weekly';
+  return 'other';
+};
+
 const LeetCodeContest = () => {
   const [contests, setContests] = useState([]);
   const [questionsMap, setQuestionsMap] = useState({});
@@ -16,6 +25,7 @@ const LeetCodeContest = () => {
   const [hideCompleted, setHideCompleted] = useState(false);
   const [viewMode, setViewMode] = useState('compact');
   const [unlinkedQuestions, setUnlinkedQuestions] = useState([]);
+  const [contestType, setContestType] = useState('all'); // new state
 
   const username = localStorage.getItem('username');
   const token = localStorage.getItem('token');
@@ -191,8 +201,13 @@ const LeetCodeContest = () => {
     return { totalProblems, solvedProblems, markedPoints };
   };
 
-  // Filter contests based on search and completion status
+  // Filter contests based on type selection, search and completion status
   const filteredContests = contests.filter((contest) => {
+    // Filter by contest type
+    if (contestType !== 'all') {
+      const type = getContestType(contest);
+      if (type !== contestType) return false;
+    }
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -274,7 +289,7 @@ const LeetCodeContest = () => {
             </div>
           </div>
         </div>
-        {/* Search & Filters */}
+        {/* Search, Filters & Contest Type Selection */}
         <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
           <input
             type="text"
@@ -291,6 +306,39 @@ const LeetCodeContest = () => {
             />
             <span className="text-gray-600">Hide Completed</span>
           </label>
+          {/* Weekly/Biweekly/All selection */}
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setContestType('all')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                contestType === 'all'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setContestType('weekly')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                contestType === 'weekly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => setContestType('biweekly')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                contestType === 'biweekly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Biweekly
+            </button>
+          </div>
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('compact')}
@@ -506,6 +554,12 @@ const LeetCodeContest = () => {
             <span className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-sm border border-gray-100 text-gray-600">
               <i className="fas fa-chart-bar text-blue-500"></i>
               Showing {filteredContests.length} contests
+              {contestType !== 'all' && (
+                <>
+                  <i className={`fas ${contestType === 'biweekly' ? 'fa-infinity' : 'fa-calendar-week'} text-orange-500`}></i>
+                  {contestType.charAt(0).toUpperCase() + contestType.slice(1)}
+                </>
+              )}
               {searchQuery && (
                 <>
                   <i className="fas fa-search text-green-500"></i>

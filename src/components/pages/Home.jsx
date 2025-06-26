@@ -38,7 +38,10 @@ export const Home = () => {
                 Codeforces Upsolver
               </Link>
               <Link to="/codechef" className="btn-secondary px-8 py-3 text-lg rounded-full">
-                CodeChef Tracker
+                CodeChef Upsolver
+              </Link>
+              <Link to="/leetcode" className="btn-secondary px-8 py-3 text-lg rounded-full">
+                Leetcode Upsolver
               </Link>
             </div>
           </div>
