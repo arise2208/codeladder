@@ -73,6 +73,7 @@ const Navbar = ({ user, setUser }) => {
           <NavLink to="/ladders" icon="fas fa-layer-group">Ladders</NavLink>
           <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
           <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
+          <NavLink to="/leetcode" icon="fas fa-pepper-hot">Leetcode</NavLink>
           {user === "admin" && (
             <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>
           )}

@@ -13,6 +13,7 @@ import LadderPage from './components/pages/LadderPage';
 import Admin from './components/pages/Admin';
 import ProblemsetPage from './ProblemsetPage';
 import CodeChefContest from './components/pages/CodeChefContest';
+import LeetCodeContest from './components/pages/LeetCodeContest';
 
 const App = () => {
   const [user, setUser] = useState("");
@@ -40,6 +41,7 @@ const App = () => {
           <Route path='/admin' element={<Admin />} />
           <Route path='/contest' element = {<ProblemsetPage></ProblemsetPage>} />
           <Route path='/codechef' element = {<CodeChefContest />} />
+          <Route path='/leetcode' element = {<LeetCodeContest/>} />
         </Routes>
       </div>
     </div>

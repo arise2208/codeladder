@@ -1,0 +1,2510 @@
+[
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-455/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-if-any-element-has-prime-frequency",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/inverse-coin-change",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-increments-to-equalize-leaf-paths",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-time-to-transport-all-individuals",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-454/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/generate-tag-for-video-caption",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-special-triplets",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-product-of-first-and-last-elements-of-a-subsequence",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-weighted-median-node-in-tree",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-453/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/transform-array-to-all-equal-elements",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-computer-unlocking-permutations",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-partitions-with-max-min-difference-at-most-k/",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-steps-to-convert-string-with-operations",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-452/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/partition-array-into-two-equal-product-subsets",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-absolute-difference-in-sliding-submatrix",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-moves-to-clean-the-classroom",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-count-of-distinct-primes-after-split",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-451/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-minimum-log-transportation-cost",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/resulting-string-after-adjacent-removals",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-profit-from-trading-stocks-with-discounts",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/lexicographically-smallest-string-after-adjacent-removals",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-450/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/smallest-index-with-digit-sum-equal-to-index",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-swaps-to-sort-by-digit-sum",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/grid-teleportation-traversal",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-weighted-subgraph-with-the-required-paths-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-449/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-deletions-for-at-most-k-distinct-characters",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/equal-sum-grid-partition-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-sum-of-edge-values-in-a-graph",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/equal-sum-grid-partition-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-448/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-product-of-two-digits",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/fill-a-special-grid",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/merge-operations-for-minimum-travel-time",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-sum-of-array-product-of-magical-sequences",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-447/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-covered-buildings",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/path-existence-queries-in-a-graph-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/concatenated-divisibility",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/path-existence-queries-in-a-graph-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-446/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/calculate-score-after-performing-instructions",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/make-array-non-decreasing/",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-x-value-of-array-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-x-value-of-array-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-445/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-closest-person",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/smallest-palindromic-rearrangement-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/smallest-palindromic-rearrangement-ii",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-numbers-with-non-decreasing-digits",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-444/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-pair-removal-to-sort-array-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/implement-router",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-product-of-subsequences-with-an-alternating-sum-equal-to-k",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-pair-removal-to-sort-array-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-443/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-reach-every-position",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-palindrome-after-substring-concatenation-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-palindrome-after-substring-concatenation-ii",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-elements-within-k-subarrays-equal",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-442/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-containers-on-a-ship",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/properties-graph",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-minimum-amount-of-time-to-brew-potions",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-array-elements-zero",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-441/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-unique-subarray-sum-after-deletion",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/closest-equal-element-queries",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/zero-array-transformation-iv",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-beautiful-numbers",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-440/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/fruits-into-baskets-ii",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/choose-k-elements-with-maximum-sum",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/fruits-into-baskets-iii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-subarrays-after-removing-one-conflicting-pair",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-439/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-largest-almost-missing-integer",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-palindromic-subsequence-after-at-most-k-operations",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/sum-of-k-subarrays-with-length-at-least-m",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/lexicographically-smallest-generated-string",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-438/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-if-digits-are-equal-in-string-after-operations-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-sum-with-at-most-k-elements",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/check-if-digits-are-equal-in-string-after-operations-ii",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-distance-between-points-on-a-square",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-437/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-special-substring-of-length-k",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/eat-pizzas",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/select-k-disjoint-special-substrings",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/length-of-longest-v-shaped-diagonal-segment/",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-436/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/sort-matrix-by-diagonals",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/assign-elements-to-groups-with-constraints",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-substrings-divisible-by-last-digit",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-minimum-game-score",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-435/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-difference-between-even-and-odd-frequency-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-manhattan-distance-after-k-changes",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-increments-for-target-multiples-in-an-array",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-difference-between-even-and-odd-frequency-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-434/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-partitions-with-even-sum-difference",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-mentions-per-user",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-frequency-after-subarray-operation",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/frequencies-of-shortest-supersequences",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-433/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/sum-of-variable-length-subarrays",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-and-minimum-sums-of-at-most-size-k-subsequences",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/paint-house-iv",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-and-minimum-sums-of-at-most-size-k-subarrays",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-432/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/zigzag-grid-traversal-with-skip",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-amount-of-money-robot-can-earn",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-non-decreasing-subarrays-after-k-operations/",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-431/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-subarray-with-equal-products",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-mirror-score-of-a-string",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-coins-from-k-consecutive-bags",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-score-of-non-overlapping-intervals/",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-430/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-columns-strictly-increasing",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-lexicographically-largest-string-from-the-box-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-special-subsequences",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-arrays-with-k-matching-adjacent-elements",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-429/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-operations-to-make-elements-in-array-distinct",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-number-of-distinct-elements-after-operations",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/smallest-substring-with-identical-characters-i",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/smallest-substring-with-identical-characters-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-428/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/button-with-longest-push-time",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-amount-after-two-days-of-conversions",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-beautiful-splits-in-an-array",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-character-frequencies-equal",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-427/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/transformed-array",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-area-rectangle-with-point-constraints-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-subarray-sum-with-length-divisible-by-k",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-area-rectangle-with-point-constraints-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-426/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/smallest-number-with-all-set-bits",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/identify-the-largest-outlier-in-an-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-number-of-target-nodes-after-connecting-trees-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-number-of-target-nodes-after-connecting-trees-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-425/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-positive-sum-subarray",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/rearrange-k-substrings-to-form-target-string",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-array-sum",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-sum-of-weights-after-edge-removals",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-424/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/make-array-elements-equal-to-zero",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/zero-array-transformation-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/zero-array-transformation-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimize-the-maximum-adjacent-element-difference",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-423/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/adjacent-increasing-subarrays-detection-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/adjacent-increasing-subarrays-detection-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/sum-of-good-subsequences",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-k-reducible-numbers-less-than-n",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-422/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-balanced-string",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-minimum-time-to-reach-last-room-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-minimum-time-to-reach-last-room-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-number-of-balanced-permutations",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-421/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-maximum-factor-score-of-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/total-characters-in-string-after-transformations-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-number-of-subsequences-with-equal-gcd",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/total-characters-in-string-after-transformations-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-420/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-sequence-of-strings-appeared-on-the-screen",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-substrings-with-k-frequency-characters-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-division-operations-to-make-array-non-decreasing",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/check-if-dfs-strings-are-palindromes",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-419/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-x-sum-of-all-k-long-subarrays-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/k-th-largest-perfect-subtree-size-in-binary-tree",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-winning-sequences",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-x-sum-of-all-k-long-subarrays-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-418/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-possible-number-by-binary-concatenation",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/remove-methods-from-project",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/construct-2d-grid-matching-graph-layout",
+        "points": "7"
+      },
+      {
+        "link": "https://leetcode.com/problems/sorted-gcd-pair-queries",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-417/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-k-th-character-in-string-game-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-of-substrings-containing-every-vowel-and-k-consonants-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-of-substrings-containing-every-vowel-and-k-consonants-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-k-th-character-in-string-game-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-416/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/report-spam-message",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-seconds-to-make-mountain-height-zero",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-substrings-that-can-be-rearranged-to-contain-a-string-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-substrings-that-can-be-rearranged-to-contain-a-string-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-415/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/the-two-sneaky-numbers-of-digitville",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-multiplication-score",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-valid-strings-to-form-target-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-valid-strings-to-form-target-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-414/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/convert-date-to-binary",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-score-of-numbers-in-ranges",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/reach-end-of-array-with-max-score",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-number-of-moves-to-kill-all-pawns",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-413/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-if-two-chessboard-squares-have-the-same-color",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/k-th-nearest-obstacle-queries",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/select-cells-in-grid-with-maximum-score",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-xor-score-subarray-queries",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-412/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/final-array-state-after-k-multiplication-operations-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-almost-equal-pairs-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/final-array-state-after-k-multiplication-operations-ii",
+        "points": "7"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-almost-equal-pairs-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-411/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-substrings-that-satisfy-k-constraint-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-energy-boost-from-two-drinks",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-largest-palindrome-divisible-by-k",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-substrings-that-satisfy-k-constraint-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-410/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/snake-in-matrix",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-good-nodes",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-count-of-monotonic-pairs-i",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-count-of-monotonic-pairs-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-409/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/design-neighbor-sum-service",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-distance-after-road-addition-queries-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-distance-after-road-addition-queries-ii",
+        "points": "7"
+      },
+      {
+        "link": "https://leetcode.com/problems/alternating-groups-iii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-408/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-if-digit-game-can-be-won",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-count-of-numbers-which-are-not-special",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-substrings-with-dominant-ones",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/check-if-the-rectangle-corner-is-reachable",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-407/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/number-of-bit-changes-to-make-two-integers-equal",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/vowels-game-in-a-string",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-number-of-operations-to-move-ones-to-the-end",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-array-equal-to-target",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-406/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/lexicographically-smallest-string-after-a-swap",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/delete-nodes-from-linked-list-present-in-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-for-cutting-cake-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-for-cutting-cake-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-405/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-encrypted-string",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/generate-binary-strings-without-adjacent-zeros",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-submatrices-with-equal-frequency-of-x-and-y",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/construct-string-with-minimum-cost",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-404/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-height-of-a-triangle",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-maximum-length-of-valid-subsequence-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-maximum-length-of-valid-subsequence-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-minimum-diameter-after-merging-two-trees",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-403/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-average-of-smallest-and-largest-elements",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-minimum-area-to-cover-all-ones-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-total-cost-of-alternating-subarrays",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-minimum-area-to-cover-all-ones-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-402/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-pairs-that-form-a-complete-day-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-pairs-that-form-a-complete-day-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-total-damage-with-spell-casting",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/peaks-in-array",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-401/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-child-who-has-the-ball-after-k-seconds",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-n-th-value-after-k-seconds",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-total-reward-using-operations-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-total-reward-using-operations-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-400/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-chairs-in-a-waiting-room",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-days-without-meetings",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/lexicographically-minimum-string-after-removing-stars",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-subarray-with-bitwise-or-closest-to-k",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-399/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-number-of-good-pairs-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/string-compression-iii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-number-of-good-pairs-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-sum-of-subsequence-with-non-adjacent-elements",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-398/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/special-array-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/special-array-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/sum-of-digit-differences-of-all-pairs",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-number-of-ways-to-reach-the-k-th-stair",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-397/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/permutation-difference-between-two-strings",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/taking-maximum-energy-from-the-mystic-dungeon",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-difference-score-in-a-grid",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-minimum-cost-array-permutation",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-396/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/valid-word",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-operations-to-make-word-k-periodic",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-length-of-anagram-concatenation",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-equalize-array",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-395/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-integer-added-to-array-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-integer-added-to-array-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-array-end",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-median-of-the-uniqueness-array",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-394/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-special-characters-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-special-characters-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-operations-to-satisfy-conditions",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-edges-in-shortest-paths",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-393/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/latest-time-you-can-obtain-after-replacing-characters",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-prime-difference",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/kth-smallest-amount-with-single-denomination-combination",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-sum-of-values-by-dividing-array",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-392/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/longest-strictly-increasing-or-strictly-decreasing-subarray",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/lexicographically-smallest-string-after-operations-with-constraint",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-median-of-array-equal-to-k",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-walk-in-weighted-graph",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-391/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/harshad-number",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/water-bottles-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-alternating-subarrays",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimize-manhattan-distances",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-390/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-length-substring-with-two-occurrences",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/apply-operations-to-make-sum-of-array-greater-than-or-equal-to-k",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/most-frequent-ids",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-common-suffix-queries",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-388/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/apple-redistribution-into-boxes",
+        "points": "2"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-happiness-of-selected-children",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-uncommon-substring-in-an-array",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-strength-of-k-disjoint-subarrays",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-387/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/distribute-elements-into-two-arrays-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-submatrices-with-top-left-element-and-sum-less-than-k",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-write-the-letter-y-on-a-grid",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/distribute-elements-into-two-arrays-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-386/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/split-the-array",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-largest-area-of-square-inside-two-rectangles",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/earliest-second-to-mark-indices-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/earliest-second-to-mark-indices-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-385/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-prefix-and-suffix-pairs-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-length-of-the-longest-common-prefix",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/most-frequent-prime",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-prefix-and-suffix-pairs-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-384/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/modify-the-matrix",
+        "points": "2"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-subarrays-that-match-a-pattern-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-palindromes-after-operations",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-subarrays-that-match-a-pattern-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-383/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/ant-on-the-boundary",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-time-to-revert-word-to-initial-state-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-grid-of-region-average",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-time-to-revert-word-to-initial-state-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-382/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/number-of-changing-keys",
+        "points": "2"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-maximum-number-of-elements-in-subset",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/alice-and-bob-playing-flower-game",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimize-or-of-remaining-elements-using-operations",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-381/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-pushes-to-type-word-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-houses-at-a-certain-distance-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-pushes-to-type-word-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-houses-at-a-certain-distance-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-380/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-elements-with-maximum-frequency",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-beautiful-indices-in-the-given-array-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-number-that-sum-of-the-prices-is-less-than-or-equal-to-k",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-beautiful-indices-in-the-given-array-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-379/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-area-of-longest-diagonal-rectangle",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-moves-to-capture-the-queen",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-size-of-a-set-after-removals",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-number-of-partitions-after-operations",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-378/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-if-bitwise-or-has-trailing-zeros",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-longest-special-substring-that-occurs-thrice-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-longest-special-substring-that-occurs-thrice-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/palindrome-rearrangement-queries",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-377/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-number-game",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-square-area-by-removing-fences-from-a-field",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-convert-string-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-convert-string-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-376/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-missing-and-repeated-values",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/divide-array-into-arrays-with-max-difference",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-make-array-equalindromic",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/apply-operations-to-maximize-frequency-score",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-375/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-tested-devices-after-test-operations",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/double-modular-exponentiation",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-subarrays-where-max-element-appears-at-least-k-times",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-the-number-of-good-partitions",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-373/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/matrix-similarity-after-cyclic-shifts",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-beautiful-substrings-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/make-lexicographically-smallest-array-by-swapping-elements",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-beautiful-substrings-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-372/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/make-three-strings-equal",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/separate-black-and-white-balls",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-xor-product",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-building-where-alice-and-bob-can-meet",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-371/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-strong-pair-xor-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/high-access-employees",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-maximize-last-elements-in-arrays",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-strong-pair-xor-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-370/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-champion-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-champion-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-score-after-applying-operations-on-a-tree",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-balanced-subsequence-sum",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-369/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-k-or-of-an-array",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-equal-sum-of-two-arrays-after-replacing-zeros",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-increment-operations-to-make-array-beautiful",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-points-after-collecting-coins-from-all-nodes",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-368/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-sum-of-mountain-triplets-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-sum-of-mountain-triplets-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-number-of-groups-to-create-a-valid-assignment",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-changes-to-make-k-semi-palindromes",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-367/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-indices-with-index-and-value-difference-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-and-lexicographically-smallest-beautiful-string",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-indices-with-index-and-value-difference-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/construct-product-matrix",
+        "points": "5"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-366/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/divisible-and-non-divisible-sums-difference",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-processing-time",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/apply-operations-to-make-two-strings-equal",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/apply-operations-on-array-to-maximize-sum-of-squares",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-365/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-value-of-an-ordered-triplet-i",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-value-of-an-ordered-triplet-ii",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-size-subarray-in-infinite-array",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-visited-nodes-in-a-directed-graph",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-364/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-odd-binary-number",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/beautiful-towers-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/beautiful-towers-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-valid-paths-in-a-tree",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-363/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/sum-of-values-at-indices-with-k-set-bits",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/happy-students",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-number-of-alloys",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-element-sum-of-a-complete-subset-of-indices",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-362/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/points-that-intersect-with-cars",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/determine-if-a-cell-is-reachable-at-a-given-time",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-moves-to-spread-stones-over-grid",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/string-transformation",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-361/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-symmetric-integers",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-a-special-number",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-of-interesting-subarrays",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-edge-weight-equilibrium-queries-in-a-tree",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-360/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/furthest-point-from-origin",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-minimum-possible-sum-of-a-beautiful-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-form-subsequence-with-target-sum",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-value-of-function-in-a-ball-passing-game",
+        "points": "5"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-359/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/check-if-a-string-is-an-acronym-of-words",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/determine-the-minimum-sum-of-a-k-avoiding-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-the-profit-as-the-salesman",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-longest-equal-subarray",
+        "points": "5"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-358/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/max-pair-sum-in-an-array",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/double-a-number-represented-as-a-linked-list",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-absolute-difference-between-elements-with-constraint",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/apply-operations-to-maximize-score",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-357/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/faulty-keyboard",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/check-if-it-is-possible-to-split-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-safest-path-in-a-grid",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-elegance-of-a-k-length-subsequence",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-356/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/number-of-employees-who-met-the-target",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-complete-subarrays-in-an-array",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-string-that-contains-three-strings",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-stepping-numbers-in-range",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-159/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-adjacent-swaps-to-alternate-parity",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-maximum-area-of-a-triangle",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-prime-gap-balanced-subarrays",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/kth-smallest-path-xor-sum",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-158/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximize-ysum-by-picking-a-triplet-of-distinct-xvalues",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-v",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-subarray-gcd-score",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-good-subtree-score",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-157/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/sum-of-largest-prime-substrings",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-maximum-number-of-non-intersecting-substrings",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-ways-to-assign-edge-weights-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-ways-to-assign-edge-weights-ii",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-156/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-most-frequent-vowel-and-consonant",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-convert-all-elements-to-zero",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-weighted-k-edge-path",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/subtree-inversion-sum",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-155/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-the-most-common-response",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/unit-conversion-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-cells-in-overlapping-horizontal-and-vertical-substrings",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximum-profit-from-valid-topological-order-in-dag",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-154/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-array-sum-divisible-by-k",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-unique-xor-triplets-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/number-of-unique-xor-triplets-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-path-in-a-weighted-tree",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-153/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/reverse-degree-of-a-string",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-active-section-with-trade-i",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-divide-array-into-subarrays",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-active-section-with-trade-ii",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-152/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/unique-3-digit-even-numbers",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/design-spreadsheet",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-common-prefix-of-k-strings-after-removal",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-special-path-ii",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-151/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/transform-array-by-parity",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-number-of-copy-arrays",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-minimum-cost-to-remove-array-elements",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/permutations-iv",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-150/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/sum-of-good-numbers",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/separate-squares-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/separate-squares-ii",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/shortest-matching-substring",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-149/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/find-valid-pair-of-adjacent-digits-in-string",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/reschedule-meetings-for-maximum-free-time-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/reschedule-meetings-for-maximum-free-time-ii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-good-caption",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-148/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/maximum-difference-between-adjacent-elements-in-a-circular-array",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-cost-to-make-arrays-identical",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-special-path",
+        "points": "6"
+      },
+      {
+        "link": "https://leetcode.com/problems/manhattan-distances-of-all-arrangements-of-pieces",
+        "points": "8"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-147/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/substring-matching-pattern",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/design-task-manager",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-subsequence-with-decreasing-adjacent-difference",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-subarray-sum-after-removing-all-occurrences-of-one-element",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-146/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/count-subarrays-of-length-three-with-a-condition",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-paths-with-the-given-xor-value",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/check-if-grid-can-be-cut-into-sections",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/subsequences-with-a-unique-middle-mode-i",
+        "points": "7"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-145/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/minimum-operations-to-make-array-values-equal-to-k",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/minimum-time-to-break-locks-i",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/digit-operations-to-make-two-integers-equal",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/count-connected-components-in-lcm-graph",
+        "points": "6"
+      }
+    ]
+  },
+  {
+    "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/biweekly-contest-144/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/stone-removal-game",
+        "points": "3"
+      },
+      {
+        "link": "https://leetcode.com/problems/shift-distance-between-two-strings",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/zero-array-transformation-iii",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/find-the-maximum-number-of-fruits-collected",
+        "points": "6"
+      }
+    ]
+  }
+]
