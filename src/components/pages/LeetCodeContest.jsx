@@ -4,10 +4,18 @@ import { useNavigate } from 'react-router-dom';
 
 const LETTERS = 'ABCD'.split('');
 
-// Helper to normalize LeetCode URLs (removes trailing slash)
+// --- Helper functions & constants (as before) ---
+const EASY_COLOR = "#23b6b6";
+const MEDIUM_COLOR = "#c49000";
+const HARD_COLOR = "#a52626";
+const getLeetCodeDifficultyStyle = (tags = []) => {
+  const lowerTags = tags.map(t => t.toLowerCase());
+  if (lowerTags.includes('easy')) return { color: '#1da1f2' };
+  if (lowerTags.includes('medium')) return { color: '#c49000' };
+  if (lowerTags.includes('hard')) return { color: '#a52626' };
+  return { color: '#444' };
+};
 const normalizeLink = (link) => link ? link.replace(/\/$/, '') : '';
-
-// Helper to detect contest type (Weekly/Biweekly/Other) from URL or name
 const getContestType = (contest) => {
   const url = contest.url?.toLowerCase() || '';
   const name = contest.contest?.toLowerCase() || '';
@@ -15,8 +23,32 @@ const getContestType = (contest) => {
   if (url.includes('weekly') || name.includes('weekly')) return 'weekly';
   return 'other';
 };
+const SKILL_GROUPS = [
+  {
+    label: 'Advanced',
+    skills: [
+      'Dynamic Programming', 'Union Find', 'Topological Sort', 'Trie',
+      'Segment Tree', 'Binary Indexed Tree', 'Suffix Array', 'Monotonic Stack'
+    ]
+  },
+  {
+    label: 'Intermediate',
+    skills: [
+      'Breadth-First Search', 'Depth-First Search', 'Graph', 'Backtracking',
+      'Greedy', 'Heap', 'Priority Queue', 'Stack', 'Queue'
+    ]
+  },
+  {
+    label: 'Fundamental',
+    skills: [
+      'Array', 'Matrix', 'String', 'Hash Table', 'Sorting',
+      'Two Pointers', 'Bit Manipulation', 'Math', 'Simulation'
+    ]
+  }
+];
 
 const LeetCodeContest = () => {
+  // --- State and hooks (as before) ---
   const [contests, setContests] = useState([]);
   const [questionsMap, setQuestionsMap] = useState({});
   const [loading, setLoading] = useState(true);
@@ -25,21 +57,17 @@ const LeetCodeContest = () => {
   const [hideCompleted, setHideCompleted] = useState(false);
   const [viewMode, setViewMode] = useState('compact');
   const [unlinkedQuestions, setUnlinkedQuestions] = useState([]);
-  const [contestType, setContestType] = useState('all'); // new state
+  const [contestType, setContestType] = useState('all');
+  const [showGroup, setShowGroup] = useState({});
 
   const username = localStorage.getItem('username');
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
-  // Authentication check
   useEffect(() => {
-    if (!username || !token) {
-      navigate('/login');
-    }
-    // eslint-disable-next-line
+    if (!username || !token) navigate('/login');
   }, [username, token, navigate]);
 
-  // Fetch contest and problemset
   useEffect(() => {
     const loadLeetCodeData = async () => {
       setLoading(true);
@@ -50,20 +78,13 @@ const LeetCodeContest = () => {
         setContests(data);
 
         const qres = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'x-username': username
-          }
+          headers: { Authorization: `Bearer ${token}`, 'x-username': username }
         });
 
-        // Use normalized link as key
         const map = {};
-        qres.data.forEach(q => {
-          if (q.link) map[normalizeLink(q.link)] = q;
-        });
+        qres.data.forEach(q => { if (q.link) map[normalizeLink(q.link)] = q; });
         setQuestionsMap(map);
 
-        // Find unlinked questions using normalized links
         const missing = [];
         data.forEach(contest => {
           contest.problems.forEach(problem => {
@@ -77,53 +98,35 @@ const LeetCodeContest = () => {
           });
         });
         setUnlinkedQuestions(missing);
-
         setError('');
       } catch (err) {
         setError('Failed to load LeetCode contest data or problem set.');
-        console.error('Error loading contest data:', err);
       } finally {
         setLoading(false);
       }
     };
     loadLeetCodeData();
-    // eslint-disable-next-line
   }, [token, username]);
 
-  // Helper: get backend question for this problem (by url)
   const getBackendQuestion = (problem) => {
     if (!problem.link) return null;
     return questionsMap[normalizeLink(problem.link)] || null;
   };
 
-  // Helper: solved status for this problem for current user
   const isSolved = (problem) => {
     const backendQ = getBackendQuestion(problem);
     if (!backendQ || !backendQ.solved_by) return false;
     return backendQ.solved_by.includes(username);
   };
 
-  // Mark as solved
   const handleMarkSolved = async (problem) => {
     const backendQ = getBackendQuestion(problem);
-    if (!backendQ) {
-      setError('Matching problem not found in backend!');
-      return;
-    }
-    if (!username) {
-      setError('Please login to mark problems as solved');
-      return;
-    }
+    if (!backendQ) { setError('Matching problem not found in backend!'); return; }
+    if (!username) { setError('Please login to mark problems as solved'); return; }
     try {
       await axios.patch('https://backendcodeladder-2.onrender.com/markquestion', {
-        questionid: backendQ.question_id,
-        user: username
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
+        questionid: backendQ.question_id, user: username
+      }, { headers: { Authorization: `Bearer ${token}`, 'x-username': username } });
       setQuestionsMap(prevMap => ({
         ...prevMap,
         [normalizeLink(backendQ.link)]: {
@@ -137,27 +140,14 @@ const LeetCodeContest = () => {
     }
   };
 
-  // Unmark as solved
   const handleUnmark = async (problem) => {
     const backendQ = getBackendQuestion(problem);
-    if (!backendQ) {
-      setError('Matching problem not found in backend!');
-      return;
-    }
-    if (!username) {
-      setError('Please login to unmark problems');
-      return;
-    }
+    if (!backendQ) { setError('Matching problem not found in backend!'); return; }
+    if (!username) { setError('Please login to unmark problems'); return; }
     try {
       await axios.patch('https://backendcodeladder-2.onrender.com/unmarkquestion', {
-        questionid: backendQ.question_id,
-        user: username
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
+        questionid: backendQ.question_id, user: username
+      }, { headers: { Authorization: `Bearer ${token}`, 'x-username': username } });
       setQuestionsMap(prevMap => ({
         ...prevMap,
         [normalizeLink(backendQ.link)]: {
@@ -171,26 +161,15 @@ const LeetCodeContest = () => {
     }
   };
 
-  // Toggle solved state
-  const toggleSolved = (problem) => {
-    if (isSolved(problem)) {
-      handleUnmark(problem);
-    } else {
-      handleMarkSolved(problem);
-    }
-  };
+  const toggleSolved = (problem) => { isSolved(problem) ? handleUnmark(problem) : handleMarkSolved(problem); };
 
-  // Get problem name from link
   const getProblemName = (link) =>
     link
       ? link.replace('https://leetcode.com/problems/', '').replace(/\/$/, '').replace(/-/g, ' ')
       : '';
 
-  // Calculate stats for a contest
   const getStats = (contest) => {
-    let totalProblems = 0;
-    let solvedProblems = 0;
-    let markedPoints = 0;
+    let totalProblems = 0, solvedProblems = 0, markedPoints = 0;
     contest.problems.forEach((problem) => {
       totalProblems++;
       if (isSolved(problem)) {
@@ -201,14 +180,65 @@ const LeetCodeContest = () => {
     return { totalProblems, solvedProblems, markedPoints };
   };
 
-  // Filter contests based on type selection, search and completion status
+  // ---- Stats for arc widget & skills panel ----
+  const solvedProblems = Object.values(questionsMap).filter(
+    q => q.solved_by && q.solved_by.includes(username)
+  );
+  const tagCount = {};
+  solvedProblems.forEach(q => {
+    (q.tags || []).forEach(tag => {
+      const tagLabel = tag.trim();
+      if (!tagLabel) return;
+      if (['easy', 'medium', 'hard'].includes(tagLabel.toLowerCase())) return;
+      tagCount[tagLabel] = (tagCount[tagLabel] || 0) + 1;
+    });
+  });
+  const skillStatGroups = SKILL_GROUPS.map(group => {
+    const arr = group.skills
+      .map(skill => ({
+        skill,
+        count: tagCount[skill] || 0
+      }))
+      .filter(item => item.count > 0);
+    return { ...group, arr };
+  });
+  const shownSkills = new Set(SKILL_GROUPS.flatMap(g => g.skills));
+  const otherSkills = Object.entries(tagCount)
+    .filter(([tag]) => !shownSkills.has(tag))
+    .map(([tag, count]) => ({ skill: tag, count }));
+  const getShownArr = (arr, groupLabel) =>
+    showGroup[groupLabel] ? arr : arr.slice(0, 3);
+
+  // Arc chart & difficulty stats
+  const difficultyCount = { Easy: 0, Medium: 0, Hard: 0 };
+  let attempting = 0;
+  solvedProblems.forEach(q => {
+    if (q.tags?.some(t => t.toLowerCase() === 'easy')) difficultyCount.Easy += 1;
+    else if (q.tags?.some(t => t.toLowerCase() === 'medium')) difficultyCount.Medium += 1;
+    else if (q.tags?.some(t => t.toLowerCase() === 'hard')) difficultyCount.Hard += 1;
+    if (q.is_attempting) attempting++;
+  });
+  const totalEasy = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='easy')).length;
+  const totalMedium = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='medium')).length;
+  const totalHard = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='hard')).length;
+  const solved = difficultyCount.Easy + difficultyCount.Medium + difficultyCount.Hard;
+  const total = totalEasy + totalMedium + totalHard;
+  const radius = 80, stroke = 10, cx = 90, cy = 90;
+  const circumference = 2 * Math.PI * radius;
+  const easyAngle = total ? (totalEasy / total) * 360 : 0;
+  const mediumAngle = total ? (totalMedium / total) * 360 : 0;
+  const hardAngle = total ? (totalHard / total) * 360 : 0;
+  const angleToLen = (angle) => (angle / 360) * circumference;
+  const easyStart = 0;
+  const mediumStart = easyAngle;
+  const hardStart = easyAngle + mediumAngle;
+
+  // ---- Filtered contests and stats ----
   const filteredContests = contests.filter((contest) => {
-    // Filter by contest type
     if (contestType !== 'all') {
       const type = getContestType(contest);
       if (type !== contestType) return false;
     }
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       const matchesSearch =
@@ -219,7 +249,6 @@ const LeetCodeContest = () => {
         );
       if (!matchesSearch) return false;
     }
-    // Hide completed filter
     if (hideCompleted) {
       const { totalProblems, solvedProblems } = getStats(contest);
       if (totalProblems > 0 && solvedProblems === totalProblems) return false;
@@ -227,7 +256,6 @@ const LeetCodeContest = () => {
     return true;
   });
 
-  // Calculate overall stats
   const overallStats = contests.reduce(
     (acc, contest) => {
       const { totalProblems, solvedProblems } = getStats(contest);
@@ -268,28 +296,191 @@ const LeetCodeContest = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 section-padding">
       <div className="max-w-7xl mx-auto container-padding">
-        {/* Header & Stats */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blue-800 mb-4">LeetCode Contest Dashboard</h1>
-          <p className="mb-8 text-gray-600">
-            Track your progress across LeetCode contests with detailed problem statistics
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-center mb-8">
-            <div className="bg-white rounded-xl px-6 py-4 shadow text-center">
-              <div className="text-3xl font-bold text-blue-700">{contests.length}</div>
-              <div className="text-gray-600 font-medium">Contests</div>
+        {/* LeetCode arc/difficulty widget */}
+        <div
+          style={{
+            background: "#181818",
+            borderRadius: 16,
+            padding: 24,
+            color: "#fff",
+            display: "flex",
+            gap: 32,
+            alignItems: "center",
+            maxWidth: 480,
+            margin: "0 auto 2rem auto",
+            boxShadow: "0 2px 16px 0 #0008"
+          }}
+        >
+          {/* Arc Chart */}
+          <div style={{ position: "relative", width: 180, height: 180 }}>
+            <svg width={180} height={180}>
+              <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#222" strokeWidth={stroke} />
+              {easyAngle > 0 &&
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={radius}
+                  fill="none"
+                  stroke={EASY_COLOR}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${angleToLen(easyAngle)} ${circumference}`}
+                  strokeDashoffset={0}
+                  strokeLinecap="round"
+                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
+                />
+              }
+              {mediumAngle > 0 &&
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={radius}
+                  fill="none"
+                  stroke={MEDIUM_COLOR}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${angleToLen(mediumAngle)} ${circumference}`}
+                  strokeDashoffset={-angleToLen(mediumStart)}
+                  strokeLinecap="round"
+                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
+                />
+              }
+              {hardAngle > 0 &&
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={radius}
+                  fill="none"
+                  stroke={HARD_COLOR}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${angleToLen(hardAngle)} ${circumference}`}
+                  strokeDashoffset={-angleToLen(hardStart)}
+                  strokeLinecap="round"
+                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
+                />
+              }
+            </svg>
+            <div style={{
+              position: "absolute",
+              top: 0, left: 0, width: "100%", height: "100%",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center"
+            }}>
+              <div style={{ fontWeight: "bold", fontSize: 42, lineHeight: 1 }}>{solved}</div>
+              <div style={{ fontSize: 20, color: "#ccc" }}>/ {total}</div>
+              <div style={{ color: "#8bffb4", fontWeight: 700, marginTop: 8, fontSize: 18 }}>Solved</div>
+              {attempting > 0 && (
+                <div style={{ color: "#bbb", marginTop: 6, fontSize: 16 }}>{attempting} Attempting</div>
+              )}
             </div>
-            <div className="bg-white rounded-xl px-6 py-4 shadow text-center">
-              <div className="text-3xl font-bold text-green-700">{overallStats.solvedProblems}</div>
-              <div className="text-gray-600 font-medium">Problems Solved</div>
+          </div>
+          {/* Difficulty counts */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{
+              background: "#222",
+              borderRadius: 8,
+              padding: "10px 18px",
+              minWidth: 100,
+              marginBottom: 8,
+              display: "flex", flexDirection: "column", alignItems: "center",
+            }}>
+              <div style={{
+                color: EASY_COLOR,
+                fontWeight: 700,
+                fontSize: 18,
+                marginBottom: 2,
+                letterSpacing: 1
+              }}>Easy</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Easy}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalEasy}</span></div>
             </div>
-            <div className="bg-white rounded-xl px-6 py-4 shadow text-center">
-              <div className="text-3xl font-bold text-blue-700">{overallStats.totalProblems}</div>
-              <div className="text-gray-600 font-medium">Total Problems</div>
+            <div style={{
+              background: "#222",
+              borderRadius: 8,
+              padding: "10px 18px",
+              minWidth: 100,
+              marginBottom: 8,
+              display: "flex", flexDirection: "column", alignItems: "center",
+            }}>
+              <div style={{
+                color: MEDIUM_COLOR,
+                fontWeight: 700,
+                fontSize: 18,
+                marginBottom: 2,
+                letterSpacing: 1
+              }}>Med.</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Medium}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalMedium}</span></div>
+            </div>
+            <div style={{
+              background: "#222",
+              borderRadius: 8,
+              padding: "10px 18px",
+              minWidth: 100,
+              display: "flex", flexDirection: "column", alignItems: "center",
+            }}>
+              <div style={{
+                color: HARD_COLOR,
+                fontWeight: 700,
+                fontSize: 18,
+                marginBottom: 2,
+                letterSpacing: 1
+              }}>Hard</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Hard}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalHard}</span></div>
             </div>
           </div>
         </div>
-        {/* Search, Filters & Contest Type Selection */}
+
+        {/* ---- Skills Panel ---- */}
+        <div className="flex flex-col md:flex-row gap-6 justify-center items-center mb-8">
+          <div className="flex-1 min-w-[340px] bg-white rounded-xl shadow px-6 py-6">
+            <h3 className="text-lg font-semibold mb-3">Skills</h3>
+            {skillStatGroups.map((group) =>
+              group.arr.length > 0 ? (
+                <div key={group.label} className="mb-3">
+                  <div className="font-semibold text-sm text-gray-700 mb-1">{group.label}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {getShownArr(group.arr, group.label).map(item => (
+                      <span key={item.skill} className="inline-block bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.skill} <span className="text-blue-700 font-bold">x{item.count}</span>
+                      </span>
+                    ))}
+                    {group.arr.length > 3 && (
+                      <button
+                        className="text-blue-600 hover:underline ml-1 text-sm font-semibold"
+                        onClick={() =>
+                          setShowGroup(g => ({ ...g, [group.label]: !g[group.label] }))
+                        }
+                      >
+                        {showGroup[group.label] ? 'Show less' : 'Show more'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : null
+            )}
+            {otherSkills.length > 0 && (
+              <div className="mb-3">
+                <div className="font-semibold text-sm text-gray-700 mb-1">Other</div>
+                <div className="flex flex-wrap gap-2">
+                  {getShownArr(otherSkills, 'Other').map(item => (
+                    <span key={item.skill} className="inline-block bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium">
+                      {item.skill} <span className="text-blue-700 font-bold">x{item.count}</span>
+                    </span>
+                  ))}
+                  {otherSkills.length > 3 && (
+                    <button
+                      className="text-blue-600 hover:underline ml-1 text-sm font-semibold"
+                      onClick={() =>
+                        setShowGroup(g => ({ ...g, ['Other']: !g['Other'] }))
+                      }
+                    >
+                      {showGroup['Other'] ? 'Show less' : 'Show more'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ---- Contest Table & Filters ---- */}
         <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
           <input
             type="text"
@@ -315,9 +506,7 @@ const LeetCodeContest = () => {
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-            >
-              All
-            </button>
+            >All</button>
             <button
               onClick={() => setContestType('weekly')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -325,9 +514,7 @@ const LeetCodeContest = () => {
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-            >
-              Weekly
-            </button>
+            >Weekly</button>
             <button
               onClick={() => setContestType('biweekly')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -335,9 +522,7 @@ const LeetCodeContest = () => {
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-            >
-              Biweekly
-            </button>
+            >Biweekly</button>
           </div>
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
             <button
@@ -348,8 +533,7 @@ const LeetCodeContest = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fas fa-th mr-1"></i>
-              Compact
+              <i className="fas fa-th mr-1"></i>Compact
             </button>
             <button
               onClick={() => setViewMode('detailed')}
@@ -359,12 +543,10 @@ const LeetCodeContest = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fas fa-list mr-1"></i>
-              Detailed
+              <i className="fas fa-list mr-1"></i>Detailed
             </button>
           </div>
         </div>
-        {/* Contest Table */}
         <div className="bg-white rounded-xl shadow overflow-auto">
           {viewMode === 'compact' ? (
             <table className="w-full min-w-[800px]">
@@ -404,8 +586,7 @@ const LeetCodeContest = () => {
                             rel="noopener noreferrer"
                             className="text-blue-700 font-bold underline"
                           >
-                            {contest.url.match(/contest\/([^/]+)\//i)?.[1] ||
-                              contest.url}
+                            {contest.url.match(/contest\/([^/]+)\//i)?.[1] || contest.url}
                           </a>
                         </td>
                         {LETTERS.map((_, idx) => {
@@ -413,24 +594,23 @@ const LeetCodeContest = () => {
                           if (!problem)
                             return (
                               <React.Fragment key={idx}>
-                                <td className="px-3 py-3 text-center text-gray-400">
-                                  N/A
-                                </td>
-                                <td className="px-3 py-3 text-center text-gray-400">
-                                  -
-                                </td>
+                                <td className="px-3 py-3 text-center text-gray-400">N/A</td>
+                                <td className="px-3 py-3 text-center text-gray-400">-</td>
                               </React.Fragment>
                             );
                           const solvedFlag = isSolved(problem);
+                          const backendQ = getBackendQuestion(problem);
+                          const tags = backendQ?.tags || [];
                           return (
                             <React.Fragment key={problem.link}>
-                              <td className="px-3 py-3 text-center">
+                              <td className="px-3 py-3 text-center transition-all duration-150 rounded">
                                 <div className="flex flex-col items-center gap-1">
                                   <a
                                     href={problem.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors duration-200 text-sm"
+                                    className="font-medium hover:underline transition-colors duration-200 text-sm"
+                                    style={getLeetCodeDifficultyStyle(tags)}
                                   >
                                     {getProblemName(problem.link)}
                                   </a>
@@ -466,7 +646,6 @@ const LeetCodeContest = () => {
               </tbody>
             </table>
           ) : (
-            // Detailed List View
             <div className="space-y-6 p-6">
               {filteredContests.length === 0 ? (
                 <div className="text-center text-gray-500">No contests found.</div>
@@ -484,8 +663,7 @@ const LeetCodeContest = () => {
                           rel="noopener noreferrer"
                           className="font-bold text-blue-800 text-lg underline"
                         >
-                          {contest.url.match(/contest\/([^/]+)\//i)?.[1] ||
-                            contest.url}
+                          {contest.url.match(/contest\/([^/]+)\//i)?.[1] || contest.url}
                         </a>
                         <div className="w-32 h-2 bg-blue-100 rounded-full overflow-hidden">
                           <div
@@ -500,10 +678,12 @@ const LeetCodeContest = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {contest.problems.map((problem, idx) => {
                           const solvedFlag = isSolved(problem);
+                          const backendQ = getBackendQuestion(problem);
+                          const tags = backendQ?.tags || [];
                           return (
                             <div
                               key={problem.link}
-                              className={`p-4 border rounded-lg flex flex-col gap-2 ${solvedFlag ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}`}
+                              className={`p-4 border rounded-lg flex flex-col gap-2 transition-all duration-150`}
                             >
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="font-mono text-sm font-medium text-gray-600">
@@ -530,7 +710,8 @@ const LeetCodeContest = () => {
                                 href={problem.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors duration-200 text-sm"
+                                className="font-medium hover:underline transition-colors duration-200 text-sm"
+                                style={getLeetCodeDifficultyStyle(tags)}
                               >
                                 {getProblemName(problem.link)}
                               </a>
@@ -548,7 +729,6 @@ const LeetCodeContest = () => {
             </div>
           )}
         </div>
-        {/* Footer */}
         {filteredContests.length > 0 && (
           <div className="mt-8 text-center">
             <span className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-sm border border-gray-100 text-gray-600">
