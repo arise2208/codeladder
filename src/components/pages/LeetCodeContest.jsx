@@ -4,18 +4,21 @@ import { useNavigate } from 'react-router-dom';
 
 const LETTERS = 'ABCD'.split('');
 
-// --- Helper functions & constants (as before) ---
-const EASY_COLOR = "#23b6b6";
-const MEDIUM_COLOR = "#c49000";
-const HARD_COLOR = "#a52626";
+// --- Helper functions & constants ---
+const EASY_COLOR = "#00b8a3";
+const MEDIUM_COLOR = "#ffc01e";
+const HARD_COLOR = "#ff375f";
+
 const getLeetCodeDifficultyStyle = (tags = []) => {
   const lowerTags = tags.map(t => t.toLowerCase());
-  if (lowerTags.includes('easy')) return { color: '#1da1f2' };
-  if (lowerTags.includes('medium')) return { color: '#c49000' };
-  if (lowerTags.includes('hard')) return { color: '#a52626' };
-  return { color: '#444' };
+  if (lowerTags.includes('easy')) return { color: EASY_COLOR, fontWeight: '600' };
+  if (lowerTags.includes('medium')) return { color: MEDIUM_COLOR, fontWeight: '600' };
+  if (lowerTags.includes('hard')) return { color: HARD_COLOR, fontWeight: '600' };
+  return { color: '#374151', fontWeight: '500' };
 };
+
 const normalizeLink = (link) => link ? link.replace(/\/$/, '') : '';
+
 const getContestType = (contest) => {
   const url = contest.url?.toLowerCase() || '';
   const name = contest.contest?.toLowerCase() || '';
@@ -23,6 +26,7 @@ const getContestType = (contest) => {
   if (url.includes('weekly') || name.includes('weekly')) return 'weekly';
   return 'other';
 };
+
 const SKILL_GROUPS = [
   {
     label: 'Advanced',
@@ -48,7 +52,6 @@ const SKILL_GROUPS = [
 ];
 
 const LeetCodeContest = () => {
-  // --- State and hooks (as before) ---
   const [contests, setContests] = useState([]);
   const [questionsMap, setQuestionsMap] = useState({});
   const [loading, setLoading] = useState(true);
@@ -180,7 +183,7 @@ const LeetCodeContest = () => {
     return { totalProblems, solvedProblems, markedPoints };
   };
 
-  // ---- Stats for arc widget & skills panel ----
+  // ---- Stats for difficulty widget & skills panel ----
   const solvedProblems = Object.values(questionsMap).filter(
     q => q.solved_by && q.solved_by.includes(username)
   );
@@ -209,29 +212,18 @@ const LeetCodeContest = () => {
   const getShownArr = (arr, groupLabel) =>
     showGroup[groupLabel] ? arr : arr.slice(0, 3);
 
-  // Arc chart & difficulty stats
+  // Difficulty stats
   const difficultyCount = { Easy: 0, Medium: 0, Hard: 0 };
-  let attempting = 0;
   solvedProblems.forEach(q => {
     if (q.tags?.some(t => t.toLowerCase() === 'easy')) difficultyCount.Easy += 1;
     else if (q.tags?.some(t => t.toLowerCase() === 'medium')) difficultyCount.Medium += 1;
     else if (q.tags?.some(t => t.toLowerCase() === 'hard')) difficultyCount.Hard += 1;
-    if (q.is_attempting) attempting++;
   });
   const totalEasy = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='easy')).length;
   const totalMedium = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='medium')).length;
   const totalHard = Object.values(questionsMap).filter(q=>q.tags?.some(t=>t.toLowerCase()==='hard')).length;
   const solved = difficultyCount.Easy + difficultyCount.Medium + difficultyCount.Hard;
   const total = totalEasy + totalMedium + totalHard;
-  const radius = 80, stroke = 10, cx = 90, cy = 90;
-  const circumference = 2 * Math.PI * radius;
-  const easyAngle = total ? (totalEasy / total) * 360 : 0;
-  const mediumAngle = total ? (totalMedium / total) * 360 : 0;
-  const hardAngle = total ? (totalHard / total) * 360 : 0;
-  const angleToLen = (angle) => (angle / 360) * circumference;
-  const easyStart = 0;
-  const mediumStart = easyAngle;
-  const hardStart = easyAngle + mediumAngle;
 
   // ---- Filtered contests and stats ----
   const filteredContests = contests.filter((contest) => {
@@ -268,356 +260,533 @@ const LeetCodeContest = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-gray-600">
-        <div className="animate-spin w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full mb-4"></div>
-        <div className="text-lg">Loading LeetCode Contests...</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50/30 section-padding">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mb-6 animate-pulse">
+              <i className="fab fa-leetcode text-white text-2xl"></i>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Loading LeetCode Contests...</h2>
+            <p className="text-gray-600 mb-8">Fetching the latest contest data for you</p>
+            <div className="flex justify-center">
+              <div className="animate-spin w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-red-600">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-2xl mb-6">
-          <i className="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50/30 section-padding">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mb-6">
+              <i className="fas fa-exclamation-triangle text-white text-2xl"></i>
+            </div>
+            <h2 className="text-3xl font-bold text-red-600 mb-4">Error Loading Data</h2>
+            <p className="text-gray-600 mb-8">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary"
+            >
+              <i className="fas fa-refresh mr-2"></i>
+              Retry
+            </button>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold mb-4">Error Loading Data</h2>
-        <p className="mb-8">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-6 py-2 rounded bg-orange-600 text-white"
-        >
-          Retry
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 section-padding">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50/30 section-padding">
       <div className="max-w-7xl mx-auto container-padding">
-        {/* LeetCode arc/difficulty widget */}
-        <div
-          style={{
-            background: "#181818",
-            borderRadius: 16,
-            padding: 24,
-            color: "#fff",
-            display: "flex",
-            gap: 32,
-            alignItems: "center",
-            maxWidth: 480,
-            margin: "0 auto 2rem auto",
-            boxShadow: "0 2px 16px 0 #0008"
-          }}
-        >
-          {/* Arc Chart */}
-          <div style={{ position: "relative", width: 180, height: 180 }}>
-            <svg width={180} height={180}>
-              <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#222" strokeWidth={stroke} />
-              {easyAngle > 0 &&
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={radius}
-                  fill="none"
-                  stroke={EASY_COLOR}
-                  strokeWidth={stroke}
-                  strokeDasharray={`${angleToLen(easyAngle)} ${circumference}`}
-                  strokeDashoffset={0}
-                  strokeLinecap="round"
-                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
-                />
-              }
-              {mediumAngle > 0 &&
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={radius}
-                  fill="none"
-                  stroke={MEDIUM_COLOR}
-                  strokeWidth={stroke}
-                  strokeDasharray={`${angleToLen(mediumAngle)} ${circumference}`}
-                  strokeDashoffset={-angleToLen(mediumStart)}
-                  strokeLinecap="round"
-                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
-                />
-              }
-              {hardAngle > 0 &&
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={radius}
-                  fill="none"
-                  stroke={HARD_COLOR}
-                  strokeWidth={stroke}
-                  strokeDasharray={`${angleToLen(hardAngle)} ${circumference}`}
-                  strokeDashoffset={-angleToLen(hardStart)}
-                  strokeLinecap="round"
-                  style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
-                />
-              }
-            </svg>
-            <div style={{
-              position: "absolute",
-              top: 0, left: 0, width: "100%", height: "100%",
-              display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center"
-            }}>
-              <div style={{ fontWeight: "bold", fontSize: 42, lineHeight: 1 }}>{solved}</div>
-              <div style={{ fontSize: 20, color: "#ccc" }}>/ {total}</div>
-              <div style={{ color: "#8bffb4", fontWeight: 700, marginTop: 8, fontSize: 18 }}>Solved</div>
-              {attempting > 0 && (
-                <div style={{ color: "#bbb", marginTop: 6, fontSize: 16 }}>{attempting} Attempting</div>
-              )}
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-700 rounded-full px-4 py-2 mb-6">
+            <i className="fab fa-leetcode"></i>
+            <span className="font-medium">LeetCode Contests</span>
+          </div>
+          <div className="mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-lg mb-6">
+              <i className="fab fa-leetcode text-white text-3xl"></i>
             </div>
           </div>
-          {/* Difficulty counts */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div style={{
-              background: "#222",
-              borderRadius: 8,
-              padding: "10px 18px",
-              minWidth: 100,
-              marginBottom: 8,
-              display: "flex", flexDirection: "column", alignItems: "center",
-            }}>
-              <div style={{
-                color: EASY_COLOR,
-                fontWeight: 700,
-                fontSize: 18,
-                marginBottom: 2,
-                letterSpacing: 1
-              }}>Easy</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Easy}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalEasy}</span></div>
+          <h1 className="section-header">LeetCode Contest Dashboard</h1>
+          <p className="section-subheader mb-12">
+            Track your progress across LeetCode contests with detailed problem statistics and skill analysis
+          </p>
+          
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl mb-4">
+                <i className="fas fa-layer-group text-white"></i>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">{contests.length}</div>
+              <div className="text-gray-600 font-medium">Total Contests</div>
             </div>
-            <div style={{
-              background: "#222",
-              borderRadius: 8,
-              padding: "10px 18px",
-              minWidth: 100,
-              marginBottom: 8,
-              display: "flex", flexDirection: "column", alignItems: "center",
-            }}>
-              <div style={{
-                color: MEDIUM_COLOR,
-                fontWeight: 700,
-                fontSize: 18,
-                marginBottom: 2,
-                letterSpacing: 1
-              }}>Med.</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Medium}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalMedium}</span></div>
+            <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mb-4">
+                <i className="fas fa-check-circle text-white"></i>
+              </div>
+              <div className="text-3xl font-bold text-green-600 mb-1">{overallStats.solvedProblems}</div>
+              <div className="text-gray-600 font-medium">Problems Solved</div>
             </div>
-            <div style={{
-              background: "#222",
-              borderRadius: 8,
-              padding: "10px 18px",
-              minWidth: 100,
-              display: "flex", flexDirection: "column", alignItems: "center",
-            }}>
-              <div style={{
-                color: HARD_COLOR,
-                fontWeight: 700,
-                fontSize: 18,
-                marginBottom: 2,
-                letterSpacing: 1
-              }}>Hard</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{difficultyCount.Hard}<span style={{ color: "#888", fontWeight: 400, fontSize: 16 }}>/{totalHard}</span></div>
+            <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mb-4">
+                <i className="fas fa-list-ol text-white"></i>
+              </div>
+              <div className="text-3xl font-bold text-blue-600 mb-1">{overallStats.totalProblems}</div>
+              <div className="text-gray-600 font-medium">Total Problems</div>
             </div>
           </div>
         </div>
 
-        {/* ---- Skills Panel ---- */}
-        <div className="flex flex-col md:flex-row gap-6 justify-center items-center mb-8">
-          <div className="flex-1 min-w-[340px] bg-white rounded-xl shadow px-6 py-6">
-            <h3 className="text-lg font-semibold mb-3">Skills</h3>
-            {skillStatGroups.map((group) =>
-              group.arr.length > 0 ? (
-                <div key={group.label} className="mb-3">
-                  <div className="font-semibold text-sm text-gray-700 mb-1">{group.label}</div>
+        {/* Enhanced Difficulty Tracker */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Difficulty Progress Cards */}
+          <div className="card-elevated">
+            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <i className="fas fa-chart-pie text-orange-500"></i>
+              Difficulty Progress
+            </h3>
+            <div className="space-y-6">
+              {/* Easy */}
+              <div className="group">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: EASY_COLOR }}></div>
+                    <span className="font-semibold text-gray-900">Easy</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">
+                    {difficultyCount.Easy} / {totalEasy}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      backgroundColor: EASY_COLOR,
+                      width: `${totalEasy > 0 ? (difficultyCount.Easy / totalEasy) * 100 : 0}%`
+                    }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalEasy > 0 ? Math.round((difficultyCount.Easy / totalEasy) * 100) : 0}% completed
+                </div>
+              </div>
+
+              {/* Medium */}
+              <div className="group">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: MEDIUM_COLOR }}></div>
+                    <span className="font-semibold text-gray-900">Medium</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">
+                    {difficultyCount.Medium} / {totalMedium}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      backgroundColor: MEDIUM_COLOR,
+                      width: `${totalMedium > 0 ? (difficultyCount.Medium / totalMedium) * 100 : 0}%`
+                    }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalMedium > 0 ? Math.round((difficultyCount.Medium / totalMedium) * 100) : 0}% completed
+                </div>
+              </div>
+
+              {/* Hard */}
+              <div className="group">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: HARD_COLOR }}></div>
+                    <span className="font-semibold text-gray-900">Hard</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">
+                    {difficultyCount.Hard} / {totalHard}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      backgroundColor: HARD_COLOR,
+                      width: `${totalHard > 0 ? (difficultyCount.Hard / totalHard) * 100 : 0}%`
+                    }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalHard > 0 ? Math.round((difficultyCount.Hard / totalHard) * 100) : 0}% completed
+                </div>
+              </div>
+            </div>
+
+            {/* Overall Progress */}
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-bold text-gray-900">Overall Progress</span>
+                <span className="text-lg font-bold text-blue-600">
+                  {solved} / {total}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${total > 0 ? (solved / total) * 100 : 0}%` }}
+                ></div>
+              </div>
+              <div className="text-sm text-gray-600 mt-2 text-center">
+                {total > 0 ? Math.round((solved / total) * 100) : 0}% of all problems solved
+              </div>
+            </div>
+          </div>
+
+          {/* Skills Panel */}
+          <div className="card-elevated">
+            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <i className="fas fa-brain text-purple-500"></i>
+              Skills Mastered
+            </h3>
+            <div className="space-y-4 max-h-80 overflow-y-auto">
+              {skillStatGroups.map((group) =>
+                group.arr.length > 0 ? (
+                  <div key={group.label} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    <div className="font-semibold text-sm text-gray-700 mb-2 flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        group.label === 'Advanced' ? 'bg-red-500' :
+                        group.label === 'Intermediate' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}></div>
+                      {group.label}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {getShownArr(group.arr, group.label).map(item => (
+                        <span key={item.skill} className="inline-flex items-center gap-1 bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                          {item.skill} 
+                          <span className="text-blue-700 font-bold text-xs bg-blue-100 px-1.5 py-0.5 rounded-full">
+                            {item.count}
+                          </span>
+                        </span>
+                      ))}
+                      {group.arr.length > 3 && (
+                        <button
+                          className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-semibold transition-colors"
+                          onClick={() =>
+                            setShowGroup(g => ({ ...g, [group.label]: !g[group.label] }))
+                          }
+                        >
+                          {showGroup[group.label] ? 'Show less' : `+${group.arr.length - 3} more`}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : null
+              )}
+              {otherSkills.length > 0 && (
+                <div className="border-b border-gray-100 pb-4 last:border-b-0">
+                  <div className="font-semibold text-sm text-gray-700 mb-2 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                    Other Skills
+                  </div>
                   <div className="flex flex-wrap gap-2">
-                    {getShownArr(group.arr, group.label).map(item => (
-                      <span key={item.skill} className="inline-block bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium">
-                        {item.skill} <span className="text-blue-700 font-bold">x{item.count}</span>
+                    {getShownArr(otherSkills, 'Other').map(item => (
+                      <span key={item.skill} className="inline-flex items-center gap-1 bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                        {item.skill} 
+                        <span className="text-blue-700 font-bold text-xs bg-blue-100 px-1.5 py-0.5 rounded-full">
+                          {item.count}
+                        </span>
                       </span>
                     ))}
-                    {group.arr.length > 3 && (
+                    {otherSkills.length > 3 && (
                       <button
-                        className="text-blue-600 hover:underline ml-1 text-sm font-semibold"
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-semibold transition-colors"
                         onClick={() =>
-                          setShowGroup(g => ({ ...g, [group.label]: !g[group.label] }))
+                          setShowGroup(g => ({ ...g, ['Other']: !g['Other'] }))
                         }
                       >
-                        {showGroup[group.label] ? 'Show less' : 'Show more'}
+                        {showGroup['Other'] ? 'Show less' : `+${otherSkills.length - 3} more`}
                       </button>
                     )}
                   </div>
                 </div>
-              ) : null
-            )}
-            {otherSkills.length > 0 && (
-              <div className="mb-3">
-                <div className="font-semibold text-sm text-gray-700 mb-1">Other</div>
-                <div className="flex flex-wrap gap-2">
-                  {getShownArr(otherSkills, 'Other').map(item => (
-                    <span key={item.skill} className="inline-block bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm font-medium">
-                      {item.skill} <span className="text-blue-700 font-bold">x{item.count}</span>
-                    </span>
-                  ))}
-                  {otherSkills.length > 3 && (
-                    <button
-                      className="text-blue-600 hover:underline ml-1 text-sm font-semibold"
-                      onClick={() =>
-                        setShowGroup(g => ({ ...g, ['Other']: !g['Other'] }))
-                      }
-                    >
-                      {showGroup['Other'] ? 'Show less' : 'Show more'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        {/* ---- Contest Table & Filters ---- */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Search contests or problems..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="input-field px-4 py-2 rounded border border-gray-300 focus:outline-blue-400 flex-1"
-          />
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={hideCompleted}
-              onChange={e => setHideCompleted(e.target.checked)}
-            />
-            <span className="text-gray-600">Hide Completed</span>
-          </label>
-          {/* Weekly/Biweekly/All selection */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setContestType('all')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                contestType === 'all'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >All</button>
-            <button
-              onClick={() => setContestType('weekly')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                contestType === 'weekly'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >Weekly</button>
-            <button
-              onClick={() => setContestType('biweekly')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                contestType === 'biweekly'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >Biweekly</button>
-          </div>
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('compact')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                viewMode === 'compact'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fas fa-th mr-1"></i>Compact
-            </button>
-            <button
-              onClick={() => setViewMode('detailed')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                viewMode === 'detailed'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fas fa-list mr-1"></i>Detailed
-            </button>
+        {/* Search and Filter Section */}
+        <div className="card-elevated mb-8">
+          <div className="flex flex-col lg:flex-row gap-6 items-center">
+            <div className="flex-1 relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                <i className="fas fa-search text-gray-400"></i>
+              </div>
+              <input
+                type="text"
+                placeholder="Search contests, problems, or contest types..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-12 pr-4"
+              />
+            </div>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={hideCompleted}
+                    onChange={(e) => setHideCompleted(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`w-6 h-6 rounded-lg border-2 transition-all duration-200 ${
+                    hideCompleted 
+                      ? 'bg-orange-600 border-orange-600' 
+                      : 'border-gray-300 group-hover:border-orange-400'
+                  }`}>
+                    {hideCompleted && (
+                      <i className="fas fa-check text-white text-xs absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                    )}
+                  </div>
+                </div>
+                <span className="text-gray-700 font-medium">Hide Completed</span>
+              </label>
+              
+              {/* Contest Type Filter */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setContestType('all')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    contestType === 'all' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >All</button>
+                <button
+                  onClick={() => setContestType('weekly')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    contestType === 'weekly' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >Weekly</button>
+                <button
+                  onClick={() => setContestType('biweekly')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    contestType === 'biweekly' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >Biweekly</button>
+              </div>
+              
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('compact')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'compact'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <i className="fas fa-th mr-1"></i>Compact
+                </button>
+                <button
+                  onClick={() => setViewMode('detailed')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'detailed'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <i className="fas fa-list mr-1"></i>Detailed
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow overflow-auto">
-          {viewMode === 'compact' ? (
-            <table className="w-full min-w-[800px]">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-4 text-left font-bold text-blue-900 min-w-[120px]">Contest</th>
-                  {LETTERS.map((letter) => (
-                    <React.Fragment key={letter}>
-                      <th className="px-3 py-4 text-center font-bold text-blue-900 min-w-[120px]">
-                        Problem {letter}
-                      </th>
-                      <th className="px-3 py-4 text-center font-bold text-blue-900 min-w-[60px]">
-                        Points
-                      </th>
-                    </React.Fragment>
-                  ))}
-                  <th className="px-4 py-4 text-center font-bold text-blue-900 min-w-[80px]">Marked Points</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredContests.length === 0 ? (
+
+        {/* Contest Table */}
+        <div className="card-elevated overflow-hidden">
+          <div className="overflow-x-auto">
+            {viewMode === 'compact' ? (
+              <table className="w-full min-w-[800px]">
+                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                   <tr>
-                    <td colSpan={LETTERS.length * 2 + 2} className="px-6 py-16 text-center text-gray-500">
-                      No contests found.
-                    </td>
+                    <th className="px-4 py-4 text-left font-bold text-gray-900 min-w-[120px]">Contest</th>
+                    {LETTERS.map((letter) => (
+                      <React.Fragment key={letter}>
+                        <th className="px-3 py-4 text-center font-bold text-gray-900 min-w-[120px]">
+                          Problem {letter}
+                        </th>
+                        <th className="px-3 py-4 text-center font-bold text-gray-900 min-w-[60px]">
+                          Points
+                        </th>
+                      </React.Fragment>
+                    ))}
+                    <th className="px-4 py-4 text-center font-bold text-gray-900 min-w-[80px]">Total Points</th>
                   </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredContests.length === 0 ? (
+                    <tr>
+                      <td colSpan={LETTERS.length * 2 + 2} className="px-6 py-16 text-center">
+                        <div className="flex flex-col items-center gap-4 text-gray-500">
+                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i className="fas fa-search text-2xl"></i>
+                          </div>
+                          <div>
+                            <p className="text-lg font-medium text-gray-700 mb-2">No contests found</p>
+                            <p className="text-sm">Try adjusting your search or filter criteria</p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredContests.map((contest) => {
+                      const problems = contest.problems.slice(0, LETTERS.length);
+                      const { markedPoints } = getStats(contest);
+                      return (
+                        <tr key={contest.url} className="hover:bg-gray-50 transition-colors duration-200">
+                          <td className="px-4 py-3">
+                            <a
+                              href={contest.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-700 font-bold hover:text-blue-900 hover:underline transition-colors duration-200"
+                            >
+                              {contest.url.match(/contest\/([^/]+)\//i)?.[1] || contest.url}
+                            </a>
+                          </td>
+                          {LETTERS.map((_, idx) => {
+                            const problem = problems[idx];
+                            if (!problem)
+                              return (
+                                <React.Fragment key={idx}>
+                                  <td className="px-3 py-3 text-center text-gray-400">N/A</td>
+                                  <td className="px-3 py-3 text-center text-gray-400">-</td>
+                                </React.Fragment>
+                              );
+                            const solvedFlag = isSolved(problem);
+                            const backendQ = getBackendQuestion(problem);
+                            const tags = backendQ?.tags || [];
+                            return (
+                              <React.Fragment key={problem.link}>
+                                <td className="px-3 py-3 text-center">
+                                  <div className="flex flex-col items-center gap-2">
+                                    <a
+                                      href={problem.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="font-medium hover:underline transition-colors duration-200 text-sm"
+                                      style={getLeetCodeDifficultyStyle(tags)}
+                                    >
+                                      {getProblemName(problem.link)}
+                                    </a>
+                                    <button
+                                      title={solvedFlag ? "Mark as unsolved" : "Mark as solved"}
+                                      onClick={() => toggleSolved(problem)}
+                                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                        solvedFlag
+                                          ? 'bg-green-500 text-white hover:bg-green-600'
+                                          : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                                      }`}
+                                      aria-pressed={solvedFlag}
+                                    >
+                                      {solvedFlag ? (
+                                        <i className="fas fa-check text-xs"></i>
+                                      ) : (
+                                        <i className="fas fa-circle text-xs"></i>
+                                      )}
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="px-3 py-3 text-center font-medium">
+                                  {problem.points || "-"}
+                                </td>
+                              </React.Fragment>
+                            );
+                          })}
+                          <td className="px-4 py-3 text-center font-bold text-green-600">{markedPoints}</td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <div className="space-y-6 p-6">
+                {filteredContests.length === 0 ? (
+                  <div className="text-center text-gray-500">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i className="fas fa-search text-2xl"></i>
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium text-gray-700 mb-2">No contests found</p>
+                        <p className="text-sm">Try adjusting your search or filter criteria</p>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   filteredContests.map((contest) => {
-                    const problems = contest.problems.slice(0, LETTERS.length);
-                    const { markedPoints } = getStats(contest);
+                    const { totalProblems, solvedProblems, markedPoints } = getStats(contest);
+                    const completionPercentage =
+                      totalProblems > 0 ? (solvedProblems / totalProblems) * 100 : 0;
                     return (
-                      <tr key={contest.url}>
-                        <td className="px-4 py-3">
+                      <div key={contest.url} className="border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4">
                           <a
                             href={contest.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-700 font-bold underline"
+                            className="font-bold text-blue-800 text-lg hover:text-blue-900 hover:underline transition-colors duration-200"
                           >
                             {contest.url.match(/contest\/([^/]+)\//i)?.[1] || contest.url}
                           </a>
-                        </td>
-                        {LETTERS.map((_, idx) => {
-                          const problem = problems[idx];
-                          if (!problem)
+                          <div className="flex items-center gap-4">
+                            <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
+                                style={{ width: `${completionPercentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-medium text-gray-600">
+                              {solvedProblems}/{totalProblems} solved
+                            </span>
+                            <span className="text-sm font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                              {markedPoints} pts
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                          {contest.problems.map((problem, idx) => {
+                            const solvedFlag = isSolved(problem);
+                            const backendQ = getBackendQuestion(problem);
+                            const tags = backendQ?.tags || [];
                             return (
-                              <React.Fragment key={idx}>
-                                <td className="px-3 py-3 text-center text-gray-400">N/A</td>
-                                <td className="px-3 py-3 text-center text-gray-400">-</td>
-                              </React.Fragment>
-                            );
-                          const solvedFlag = isSolved(problem);
-                          const backendQ = getBackendQuestion(problem);
-                          const tags = backendQ?.tags || [];
-                          return (
-                            <React.Fragment key={problem.link}>
-                              <td className="px-3 py-3 text-center transition-all duration-150 rounded">
-                                <div className="flex flex-col items-center gap-1">
-                                  <a
-                                    href={problem.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="font-medium hover:underline transition-colors duration-200 text-sm"
-                                    style={getLeetCodeDifficultyStyle(tags)}
-                                  >
-                                    {getProblemName(problem.link)}
-                                  </a>
+                              <div
+                                key={problem.link}
+                                className={`p-4 border rounded-lg flex flex-col gap-3 transition-all duration-200 ${
+                                  solvedFlag ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-mono text-sm font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                    {LETTERS[idx] || idx + 1}
+                                  </span>
                                   <button
                                     title={solvedFlag ? "Mark as unsolved" : "Mark as solved"}
                                     onClick={() => toggleSolved(problem)}
-                                    className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                    className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
                                       solvedFlag
                                         ? 'bg-green-500 text-white hover:bg-green-600'
                                         : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
@@ -631,128 +800,77 @@ const LeetCodeContest = () => {
                                     )}
                                   </button>
                                 </div>
-                              </td>
-                              <td className="px-3 py-3 text-center">
-                                {problem.points || "-"}
-                              </td>
-                            </React.Fragment>
-                          );
-                        })}
-                        <td className="px-4 py-3 text-center font-bold text-green-600">{markedPoints}</td>
-                      </tr>
+                                <a
+                                  href={problem.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium hover:underline transition-colors duration-200 text-sm leading-tight"
+                                  style={getLeetCodeDifficultyStyle(tags)}
+                                >
+                                  {getProblemName(problem.link)}
+                                </a>
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                                    {problem.points || '0'} pts
+                                  </span>
+                                  {tags.length > 0 && (
+                                    <span 
+                                      className="px-2 py-1 rounded text-xs font-medium"
+                                      style={{ 
+                                        backgroundColor: tags.some(t => t.toLowerCase() === 'easy') ? '#dcfdf4' :
+                                                        tags.some(t => t.toLowerCase() === 'medium') ? '#fef3c7' :
+                                                        tags.some(t => t.toLowerCase() === 'hard') ? '#fee2e2' : '#f3f4f6',
+                                        color: tags.some(t => t.toLowerCase() === 'easy') ? EASY_COLOR :
+                                               tags.some(t => t.toLowerCase() === 'medium') ? MEDIUM_COLOR :
+                                               tags.some(t => t.toLowerCase() === 'hard') ? HARD_COLOR : '#6b7280'
+                                      }}
+                                    >
+                                      {tags.find(t => ['easy', 'medium', 'hard'].includes(t.toLowerCase()))?.toLowerCase() || 'unknown'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     );
                   })
                 )}
-              </tbody>
-            </table>
-          ) : (
-            <div className="space-y-6 p-6">
-              {filteredContests.length === 0 ? (
-                <div className="text-center text-gray-500">No contests found.</div>
-              ) : (
-                filteredContests.map((contest) => {
-                  const { totalProblems, solvedProblems, markedPoints } = getStats(contest);
-                  const completionPercentage =
-                    totalProblems > 0 ? (solvedProblems / totalProblems) * 100 : 0;
-                  return (
-                    <div key={contest.url} className="border border-gray-100 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <a
-                          href={contest.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-bold text-blue-800 text-lg underline"
-                        >
-                          {contest.url.match(/contest\/([^/]+)\//i)?.[1] || contest.url}
-                        </a>
-                        <div className="w-32 h-2 bg-blue-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
-                            style={{ width: `${completionPercentage}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm text-green-700">
-                          {solvedProblems}/{totalProblems} solved, <b>{markedPoints}</b> points
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        {contest.problems.map((problem, idx) => {
-                          const solvedFlag = isSolved(problem);
-                          const backendQ = getBackendQuestion(problem);
-                          const tags = backendQ?.tags || [];
-                          return (
-                            <div
-                              key={problem.link}
-                              className={`p-4 border rounded-lg flex flex-col gap-2 transition-all duration-150`}
-                            >
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-mono text-sm font-medium text-gray-600">
-                                  {LETTERS[idx] || idx + 1}
-                                </span>
-                                <button
-                                  title={solvedFlag ? "Mark as unsolved" : "Mark as solved"}
-                                  onClick={() => toggleSolved(problem)}
-                                  className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
-                                    solvedFlag
-                                      ? 'bg-green-500 text-white hover:bg-green-600'
-                                      : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                                  }`}
-                                  aria-pressed={solvedFlag}
-                                >
-                                  {solvedFlag ? (
-                                    <i className="fas fa-check text-xs"></i>
-                                  ) : (
-                                    <i className="fas fa-circle text-xs"></i>
-                                  )}
-                                </button>
-                              </div>
-                              <a
-                                href={problem.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:underline transition-colors duration-200 text-sm"
-                                style={getLeetCodeDifficultyStyle(tags)}
-                              >
-                                {getProblemName(problem.link)}
-                              </a>
-                              <span className="text-xs text-gray-600">
-                                Points: <b>{problem.points || '-'}</b>
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Footer Stats */}
         {filteredContests.length > 0 && (
           <div className="mt-8 text-center">
-            <span className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-sm border border-gray-100 text-gray-600">
-              <i className="fas fa-chart-bar text-blue-500"></i>
-              Showing {filteredContests.length} contests
+            <div className="inline-flex items-center gap-4 bg-white rounded-full px-6 py-3 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-600">
+                <i className="fas fa-chart-bar text-orange-500"></i>
+                <span className="font-medium">
+                  Showing {filteredContests.length} contests
+                </span>
+              </div>
               {contestType !== 'all' && (
-                <>
-                  <i className={`fas ${contestType === 'biweekly' ? 'fa-infinity' : 'fa-calendar-week'} text-orange-500`}></i>
-                  {contestType.charAt(0).toUpperCase() + contestType.slice(1)}
-                </>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <i className={`fas ${contestType === 'biweekly' ? 'fa-infinity' : 'fa-calendar-week'} text-blue-500`}></i>
+                  <span>{contestType.charAt(0).toUpperCase() + contestType.slice(1)}</span>
+                </div>
               )}
               {searchQuery && (
-                <>
+                <div className="flex items-center gap-2 text-gray-600">
                   <i className="fas fa-search text-green-500"></i>
-                  matching "{searchQuery}"
-                </>
+                  <span>matching "{searchQuery}"</span>
+                </div>
               )}
               {hideCompleted && (
-                <>
-                  <i className="fas fa-eye-slash text-blue-500"></i>
-                  hiding completed
-                </>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <i className="fas fa-eye-slash text-purple-500"></i>
+                  <span>hiding completed</span>
+                </div>
               )}
-            </span>
+            </div>
           </div>
         )}
       </div>
