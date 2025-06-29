@@ -1,6 +1,29 @@
 [
   {
     "contest": "leetcode.com",
+    "url": "https://leetcode.com/contest/weekly-contest-456/",
+    "problems": [
+      {
+        "link": "https://leetcode.com/problems/partition-string/",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/longest-common-prefix-between-adjacent-strings-after-removals/",
+        "points": "4"
+      },
+      {
+        "link": "https://leetcode.com/problems/partition-array-to-minimize-xor/",
+        "points": "5"
+      },
+      {
+        "link": "https://leetcode.com/problems/maximize-spanning-tree-stability-with-upgrades/",
+        "points": "6"
+      }
+    ]
+  },
+  
+  {
+    "contest": "leetcode.com",
     "url": "https://leetcode.com/contest/weekly-contest-455/",
     "problems": [
       {
