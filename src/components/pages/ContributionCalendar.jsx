@@ -18,6 +18,7 @@ const ContributionCalendar = () => {
   })
 
   const username = localStorage.getItem("username") || "admin"
+  const token = localStorage.getItem("token")
 
   const getDateString = (date) => date.toISOString().split("T")[0]
   const getStartOfYear = (date) => new Date(date.getFullYear(), 0, 1)
@@ -30,16 +31,56 @@ const ContributionCalendar = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`https://backendcodeladder-2.onrender.com/usersubmissions/${username}`)
-      const submissions = res.data?.submissions?.filter((s) => s.marked && s.date) || []
+      // Fetch user submissions
+      const submissionsRes = await axios.get(`https://backendcodeladder-2.onrender.com/usersubmissions/${username}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-username': username
+        }
+      })
+      
+      const submissions = submissionsRes.data?.submissions?.filter((s) => s.marked && s.date) || []
 
-      // Group submissions by date with problem details
+      // Fetch individual question details for each submission
+      const enrichedSubmissions = await Promise.all(
+        submissions.map(async (submission) => {
+          try {
+            const questionRes = await axios.get(`https://backendcodeladder-2.onrender.com/question/${submission.questionId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'x-username': username
+              }
+            })
+            
+            return {
+              ...submission,
+              title: questionRes.data.title,
+              link: questionRes.data.link,
+              tags: questionRes.data.tags || [],
+              question_id: questionRes.data.question_id
+            }
+          } catch (error) {
+            console.error(`Failed to fetch question ${submission.questionId}:`, error)
+            // Return submission with basic info if question fetch fails
+            return {
+              ...submission,
+              title: `Question ${submission.questionId}`,
+              link: null,
+              tags: [],
+              question_id: submission.questionId
+            }
+          }
+        })
+      )
+
+      // Group submissions by date with complete problem details
       const submissionsByDate = new Map()
       const tagCount = {}
       const monthlyCount = {}
 
-      submissions.forEach((s) => {
+      enrichedSubmissions.forEach((s) => {
         const day = s.date.split("T")[0]
+        
         if (!submissionsByDate.has(day)) {
           submissionsByDate.set(day, [])
         }
@@ -90,7 +131,7 @@ const ContributionCalendar = () => {
 
       setData(contributions)
       setStats({
-        totalContributions: submissions.length,
+        totalContributions: enrichedSubmissions.length,
         longestStreak,
         currentStreak,
         tagStats: tagCount,
@@ -138,8 +179,10 @@ const ContributionCalendar = () => {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    if (username && token) {
+      fetchData()
+    }
+  }, [username, token])
 
   const getColor = (count) => {
     if (count === 0) return "#ebedf0"
