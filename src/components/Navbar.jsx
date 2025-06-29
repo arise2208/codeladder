@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [stats, setStats] = useState({
+    totalProblems: 0,
+    solvedProblems: 0,
+    totalLadders: 0
+  });
+
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +24,50 @@ const Navbar = ({ user, setUser }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fetch user stats for navbar display
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!username || !token) return;
+      
+      try {
+        // Fetch problems
+        const problemsRes = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-username': username
+          }
+        });
+        
+        const problems = problemsRes.data || [];
+        const solvedCount = problems.filter(p => p.solved_by?.includes(username)).length;
+        
+        // Fetch ladders
+        const laddersRes = await axios.post(
+          'https://backendcodeladder-2.onrender.com/ladders',
+          { username },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-username': username
+            }
+          }
+        );
+        
+        const ladders = laddersRes.data || [];
+        
+        setStats({
+          totalProblems: problems.length,
+          solvedProblems: solvedCount,
+          totalLadders: ladders.length
+        });
+      } catch (error) {
+        console.error('Failed to fetch navbar stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, [username, token]);
+
   const handleLogout = () => {
     localStorage.clear();
     setUser('');
@@ -23,7 +76,7 @@ const Navbar = ({ user, setUser }) => {
 
   const isActivePage = (path) => location.pathname === path;
 
-  const NavLink = ({ to, children, icon, isSpecial = false }) => (
+  const NavLink = ({ to, children, icon, isSpecial = false, badge = null }) => (
     <Link 
       to={to}
       className={`navbar-link group relative flex items-center gap-3 font-medium transition-all duration-300 px-4 py-2.5 rounded-xl ${
@@ -36,6 +89,11 @@ const Navbar = ({ user, setUser }) => {
       <i className={`${icon} text-sm group-hover:scale-110 transition-transform duration-200`}></i>
       <span className="relative font-semibold">
         {children}
+        {badge && (
+          <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">
+            {badge}
+          </span>
+        )}
         {isActivePage(to) && (
           <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
         )}
@@ -69,8 +127,20 @@ const Navbar = ({ user, setUser }) => {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-2">
           <NavLink to="/" icon="fas fa-home">Home</NavLink>
-          <NavLink to="/problemset" icon="fas fa-code">Problems</NavLink>
-          <NavLink to="/ladders" icon="fas fa-layer-group">Ladders</NavLink>
+          <NavLink 
+            to="/problemset" 
+            icon="fas fa-code"
+            badge={stats.solvedProblems > 0 ? stats.solvedProblems : null}
+          >
+            Problems
+          </NavLink>
+          <NavLink 
+            to="/ladders" 
+            icon="fas fa-layer-group"
+            badge={stats.totalLadders > 0 ? stats.totalLadders : null}
+          >
+            Ladders
+          </NavLink>
           <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
           <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           <NavLink to="/leetcode" icon="fab fa-leetcode">LeetCode</NavLink>
@@ -82,7 +152,7 @@ const Navbar = ({ user, setUser }) => {
 
         {/* User Section */}
         <div className="flex items-center gap-4">
-          {/* User Avatar */}
+          {/* User Avatar with Stats */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-2 border border-gray-100 hover:border-gray-200 transition-all duration-300">
               {user && user !== 'Guest' ? (
@@ -95,10 +165,17 @@ const Navbar = ({ user, setUser }) => {
                   </div>
                   <div className="hidden sm:block">
                     <span className="text-gray-900 font-semibold text-sm">{user}</span>
-                    <p className="text-green-600 text-xs font-medium flex items-center gap-1">
-                      <i className="fas fa-circle text-xs"></i>
-                      Online
-                    </p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-green-600 font-medium flex items-center gap-1">
+                        <i className="fas fa-circle text-xs"></i>
+                        Online
+                      </span>
+                      {stats.solvedProblems > 0 && (
+                        <span className="text-blue-600 font-medium">
+                          • {stats.solvedProblems} solved
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </>
               ) : (
@@ -152,13 +229,38 @@ const Navbar = ({ user, setUser }) => {
       }`}>
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-lg space-y-2">
           <NavLink to="/" icon="fas fa-home">Home</NavLink>
-          <NavLink to="/problemset" icon="fas fa-code">Problems</NavLink>
-          <NavLink to="/ladders" icon="fas fa-layer-group">Ladders</NavLink>
+          <NavLink 
+            to="/problemset" 
+            icon="fas fa-code"
+            badge={stats.solvedProblems > 0 ? stats.solvedProblems : null}
+          >
+            Problems
+          </NavLink>
+          <NavLink 
+            to="/ladders" 
+            icon="fas fa-layer-group"
+            badge={stats.totalLadders > 0 ? stats.totalLadders : null}
+          >
+            Ladders
+          </NavLink>
           <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
           <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           <NavLink to="/leetcode" icon="fab fa-leetcode">LeetCode</NavLink>
           <NavLink to="/calendar" icon="fas fa-calendar-alt">Calendar</NavLink>
           {user === "admin" && <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>}
+          
+          {/* Mobile User Stats */}
+          {user && user !== 'Guest' && stats.solvedProblems > 0 && (
+            <div className="pt-3 border-t border-gray-100">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <div className="text-sm font-semibold text-blue-900 mb-1">Your Progress</div>
+                <div className="flex items-center justify-between text-xs text-blue-700">
+                  <span>{stats.solvedProblems} problems solved</span>
+                  <span>{stats.totalLadders} ladders</span>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="pt-3 border-t border-gray-100">
             {(!user || user === 'Guest') ? (
