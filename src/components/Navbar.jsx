@@ -74,6 +74,7 @@ const Navbar = ({ user, setUser }) => {
           <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
           <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           <NavLink to="/leetcode" icon="fab fa-leetcode">LeetCode</NavLink>
+          <NavLink to="/calendar" icon="fas fa-calendar-alt">Calendar</NavLink>
           {user === "admin" && (
             <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>
           )}
@@ -156,6 +157,7 @@ const Navbar = ({ user, setUser }) => {
           <NavLink to="/contest" icon="fas fa-trophy">Contests</NavLink>
           <NavLink to="/codechef" icon="fas fa-pepper-hot">CodeChef</NavLink>
           <NavLink to="/leetcode" icon="fab fa-leetcode">LeetCode</NavLink>
+          <NavLink to="/calendar" icon="fas fa-calendar-alt">Calendar</NavLink>
           {user === "admin" && <NavLink to="/admin" icon="fas fa-user-shield" isSpecial={true}>Admin</NavLink>}
           
           <div className="pt-3 border-t border-gray-100">

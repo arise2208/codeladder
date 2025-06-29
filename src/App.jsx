@@ -14,6 +14,7 @@ import Admin from './components/pages/Admin';
 import ProblemsetPage from './ProblemsetPage';
 import CodeChefContest from './components/pages/CodeChefContest';
 import LeetCodeContest from './components/pages/LeetCodeContest';
+import ContributionCalendar from './components/pages/ContributionCalendar';
 
 const App = () => {
   const [user, setUser] = useState("");
@@ -42,6 +43,8 @@ const App = () => {
           <Route path='/contest' element = {<ProblemsetPage></ProblemsetPage>} />
           <Route path='/codechef' element = {<CodeChefContest />} />
           <Route path='/leetcode' element = {<LeetCodeContest/>} />
+          <Route path="/calendar" element={<ContributionCalendar />} />
+
         </Routes>
       </div>
     </div>
