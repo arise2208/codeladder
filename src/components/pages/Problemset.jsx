@@ -1,116 +1,185 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+"use client"
+
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 function Problemset() {
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [hideSolved, setHideSolved] = useState(false);
-  const username = localStorage.getItem('username');
-  const token = localStorage.getItem('token');
-  const navigate = useNavigate();
+  const [questions, setQuestions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [search, setSearch] = useState("")
+  const [hideSolved, setHideSolved] = useState(false)
+  const username = localStorage.getItem("username")
+  const token = localStorage.getItem("token")
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!username || !token) {
-      navigate('/login');
-      return;
+      navigate("/login")
+      return
     }
-    fetchQuestions();
-  }, [username, token, navigate]);
+    fetchQuestions()
+  }, [username, token, navigate])
 
   const fetchQuestions = async () => {
     try {
-      setLoading(true);
-      const response = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
+      setLoading(true)
+      const response = await axios.get("https://backendcodeladder-2.onrender.com/problemset", {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setQuestions(response.data);
-      setError('');
+          "x-username": username,
+        },
+      })
+      setQuestions(response.data)
+      setError("")
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      setError('Failed to fetch questions. Please try again later.');
+      console.error("Error fetching questions:", error)
+      setError("Failed to fetch questions. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleMarkSolved = async (questionId) => {
     if (!username) {
-      setError('Please login to mark problems as solved');
-      return;
+      setError("Please login to mark problems as solved")
+      return
     }
 
     try {
-      await axios.patch('https://backendcodeladder-2.onrender.com/markquestion', {
-        questionid: questionId,
-        user: username
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      
-      setQuestions(prevQuestions =>
-        prevQuestions.map(q =>
-          q.question_id === questionId
-            ? { ...q, solved_by: [...(q.solved_by || []), username] }
-            : q
-        )
-      );
-      setError('');
+      await axios.patch(
+        "https://backendcodeladder-2.onrender.com/markquestion",
+        {
+          questionid: questionId,
+          user: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q.question_id === questionId ? { ...q, solved_by: [...(q.solved_by || []), username] } : q,
+        ),
+      )
+      setError("")
     } catch (error) {
-      console.error('Error marking as solved:', error);
-      setError('Failed to mark as solved. Please try again.');
+      console.error("Error marking as solved:", error)
+      setError("Failed to mark as solved. Please try again.")
     }
-  };
+  }
 
   const handleUnmark = async (questionId) => {
     if (!username) {
-      setError('Please login to unmark problems');
-      return;
+      setError("Please login to unmark problems")
+      return
     }
 
     try {
-      await axios.patch('https://backendcodeladder-2.onrender.com/unmarkquestion', {
-        questionid: questionId,
-        user: username
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      
-      setQuestions(prevQuestions =>
-        prevQuestions.map(q =>
-          q.question_id === questionId
-            ? { ...q, solved_by: (q.solved_by || []).filter(u => u !== username) }
-            : q
-        )
-      );
-      setError('');
+      await axios.patch(
+        "https://backendcodeladder-2.onrender.com/unmarkquestion",
+        {
+          questionid: questionId,
+          user: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q.question_id === questionId ? { ...q, solved_by: (q.solved_by || []).filter((u) => u !== username) } : q,
+        ),
+      )
+      setError("")
     } catch (error) {
-      console.error('Error unmarking:', error);
-      setError('Failed to unmark. Please try again.');
+      console.error("Error unmarking:", error)
+      setError("Failed to unmark. Please try again.")
     }
-  };
+  }
 
-  const filteredQuestions = questions.filter(q => {
-    const matchesSearch = q.title.toLowerCase().includes(search.toLowerCase()) ||
-                         (q.tags && q.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())));
-    const isSolved = q.solved_by?.includes(username);
-    
-    if (hideSolved && isSolved) return false;
-    return matchesSearch;
-  });
+  // Enhanced question title styling function
+  const getQuestionStyle = (tags) => {
+    if (!tags || tags.length === 0) return "text-gray-900"
 
-  const solvedCount = questions.filter(q => q.solved_by?.includes(username)).length;
+    // LeetCode difficulty coloring
+    const hasEasy = tags.some((tag) => tag.toLowerCase() === "easy")
+    const hasMedium = tags.some((tag) => tag.toLowerCase() === "medium")
+    const hasHard = tags.some((tag) => tag.toLowerCase() === "hard")
+
+    if (hasEasy) {
+      return "text-sky-600 hover:text-sky-700"
+    }
+    if (hasMedium) {
+      return "text-yellow-600 hover:text-yellow-700"
+    }
+    if (hasHard) {
+      return "text-red-600 hover:text-red-700"
+    }
+
+    // CodeChef rating coloring
+    const isCodeChef = tags.some((t) => t.toLowerCase().includes("codechef"))
+    const numericTag = tags.find((tag) => /^\d+$/.test(tag))
+
+    if (isCodeChef && numericTag) {
+      const rating = Number.parseInt(numericTag)
+
+      if (rating == null || isNaN(Number(rating))) {
+    return "text-gray-400"; // unrated or invalid
+  }
+  
+
+  if (rating < 1400) {
+    return "text-gray-600 hover:text-gray-700"; // 1★ Newbie
+  }
+  if (rating < 1600) {
+    return "text-green-600 hover:text-green-700"; // 2★ Beginner
+  }
+  if (rating < 1800) {
+    return "text-blue-600 hover:text-blue-700"; // 3★ Specialist
+  }
+  if (rating < 2000) {
+    return "text-purple-600 hover:text-purple-700"; // 4★ Expert
+  }
+  if (rating < 2200) {
+    return "text-amber-600 hover:text-amber-700"; // 5★ Candidate Master
+  }
+  if (rating < 2500) {
+    return "text-orange-600 hover:text-orange-700"; // 6★ Master
+  }
+  if (rating < 2800) {
+    return "text-red-600 hover:text-red-700"; // 7★ International Master
+  }
+  if (rating < 3000) {
+    return "text-pink-600 hover:text-pink-700"; // 8★ Grandmaster
+  }
+  // 9★ Legendary Grandmaster
+  return "text-black hover:text-black bg-yellow-200";
+    }
+
+    // Default styling
+    return "text-gray-900 hover:text-blue-600"
+  }
+
+  const filteredQuestions = questions.filter((q) => {
+    const matchesSearch =
+      q.title.toLowerCase().includes(search.toLowerCase()) ||
+      (q.tags && q.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase())))
+    const isSolved = q.solved_by?.includes(username)
+    if (hideSolved && isSolved) return false
+    return matchesSearch
+  })
+
+  const solvedCount = questions.filter((q) => q.solved_by?.includes(username)).length
 
   if (loading) {
     return (
@@ -128,7 +197,7 @@ function Problemset() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -140,18 +209,16 @@ function Problemset() {
             <i className="fas fa-fire"></i>
             <span className="font-medium">Coding Challenges</span>
           </div>
-          
           <div className="mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-6">
               <i className="fas fa-code text-white text-3xl"></i>
             </div>
           </div>
-          
           <h1 className="section-header">Problem Set</h1>
           <p className="section-subheader mb-12">
             Master algorithms and data structures with our curated collection of coding problems
           </p>
-          
+
           {/* Enhanced Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
@@ -165,6 +232,7 @@ function Problemset() {
                 Growing daily
               </div>
             </div>
+
             <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mb-4">
                 <i className="fas fa-check-circle text-white"></i>
@@ -176,6 +244,7 @@ function Problemset() {
                 Keep going!
               </div>
             </div>
+
             <div className="card-elevated text-center group hover:scale-105 transition-all duration-300">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl mb-4">
                 <i className="fas fa-target text-white"></i>
@@ -205,7 +274,6 @@ function Problemset() {
                 className="input-field pl-12 pr-4"
               />
             </div>
-            
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative">
@@ -215,11 +283,11 @@ function Problemset() {
                     onChange={(e) => setHideSolved(e.target.checked)}
                     className="sr-only"
                   />
-                  <div className={`w-6 h-6 rounded-lg border-2 transition-all duration-200 ${
-                    hideSolved 
-                      ? 'bg-blue-600 border-blue-600' 
-                      : 'border-gray-300 group-hover:border-blue-400'
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded-lg border-2 transition-all duration-200 ${
+                      hideSolved ? "bg-blue-600 border-blue-600" : "border-gray-300 group-hover:border-blue-400"
+                    }`}
+                  >
                     {hideSolved && (
                       <i className="fas fa-check text-white text-xs absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
                     )}
@@ -227,9 +295,7 @@ function Problemset() {
                 </div>
                 <span className="text-gray-700 font-medium">Hide Solved</span>
               </label>
-              
               <div className="h-6 w-px bg-gray-200"></div>
-              
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <i className="fas fa-filter"></i>
                 <span className="font-medium">Filters</span>
@@ -303,7 +369,7 @@ function Problemset() {
                   </tr>
                 ) : (
                   filteredQuestions.map((q, index) => {
-                    const isSolved = q.solved_by?.includes(username);
+                    const isSolved = q.solved_by?.includes(username)
                     return (
                       <tr
                         key={q.question_id}
@@ -311,9 +377,7 @@ function Problemset() {
                           isSolved ? "bg-green-50/50" : "bg-white"
                         }`}
                       >
-                        <td className="px-6 py-4 font-mono text-sm text-gray-500 font-medium">
-                          {index + 1}
-                        </td>
+                        <td className="px-6 py-4 font-mono text-sm text-gray-500 font-medium">{index + 1}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {isSolved && (
@@ -327,7 +391,7 @@ function Problemset() {
                               href={q.link}
                               target="_blank"
                               rel="noreferrer"
-                              className="font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 group-hover:underline"
+                              className={`font-semibold transition-colors duration-200 group-hover:underline ${getQuestionStyle(q.tags)}`}
                             >
                               {q.title}
                             </a>
@@ -337,14 +401,19 @@ function Problemset() {
                         <td className="px-6 py-4">
                           <div className="flex flex-wrap gap-1">
                             {q.tags && q.tags.length > 0 ? (
-                              q.tags.slice(0, 3).map(tag => (
-                                <span key={tag} className="badge badge-primary text-xs">{tag}</span>
+                              q.tags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                                >
+                                  {tag}
+                                </span>
                               ))
                             ) : (
                               <span className="text-gray-400 text-sm italic">No tags</span>
                             )}
                             {q.tags && q.tags.length > 3 && (
-                              <span className="badge bg-gray-100 text-gray-600 text-xs">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
                                 +{q.tags.length - 3} more
                               </span>
                             )}
@@ -352,23 +421,19 @@ function Problemset() {
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={() =>
-                              isSolved
-                                ? handleUnmark(q.question_id)
-                                : handleMarkSolved(q.question_id)
-                            }
+                            onClick={() => (isSolved ? handleUnmark(q.question_id) : handleMarkSolved(q.question_id))}
                             className={`tooltip inline-flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 font-medium ${
                               isSolved
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700'
+                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                : "bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700"
                             }`}
-                            data-tooltip={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
+                            data-tooltip={isSolved ? "Mark as unsolved" : "Mark as solved"}
                           >
-                            <i className={`fas ${isSolved ? 'fa-check' : 'fa-circle'} text-sm`}></i>
+                            <i className={`fas ${isSolved ? "fa-check" : "fa-circle"} text-sm`}></i>
                           </button>
                         </td>
                       </tr>
-                    );
+                    )
                   })
                 )}
               </tbody>
@@ -403,7 +468,7 @@ function Problemset() {
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default Problemset;
+export default Problemset
