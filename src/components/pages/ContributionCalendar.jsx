@@ -17,6 +17,25 @@ const ContributionCalendar = () => {
     bestDay: { date: null, count: 0 },
   })
 
+  // New: Difficulty progress state
+  const [difficultyStats, setDifficultyStats] = useState({
+    easy: { solved: 0, total: 0 },
+    medium: { solved: 0, total: 0 },
+    hard: { solved: 0, total: 0 },
+    all: { solved: 0, total: 0 },
+  })
+
+  // New: CodeChef rating bands state
+  const [codechefStats, setCodechefStats] = useState({
+    "1★ (≤1399)": { solved: 0, total: 0, color: "bg-gray-500" },
+    "2★ (1400-1599)": { solved: 0, total: 0, color: "bg-green-500" },
+    "3★ (1600-1799)": { solved: 0, total: 0, color: "bg-blue-500" },
+    "4★ (1800-1999)": { solved: 0, total: 0, color: "bg-purple-500" },
+    "5★ (2000-2199)": { solved: 0, total: 0, color: "bg-yellow-500" },
+    "6★ (2200-2499)": { solved: 0, total: 0, color: "bg-orange-500" },
+    "7★ (≥2500)": { solved: 0, total: 0, color: "bg-red-500" },
+  })
+
   const username = localStorage.getItem("username") || "admin"
   const token = localStorage.getItem("token")
 
@@ -29,35 +48,167 @@ const ContributionCalendar = () => {
   }
   const getDaysInYear = (year) => ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365)
 
+  // Helper to calculate percent
+  const percent = (a, b) => (b === 0 ? 0 : Math.round((a / b) * 100))
+
+  // Fetch difficulty stats
+  const fetchDifficultyStats = async () => {
+    try {
+      const questionRes = await axios.get("https://backendcodeladder-2.onrender.com/problemset", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "x-username": username,
+        },
+      })
+
+      const questions = questionRes.data || []
+      const easy = { solved: 0, total: 0 }
+      const medium = { solved: 0, total: 0 }
+      const hard = { solved: 0, total: 0 }
+      const all = { solved: 0, total: 0 }
+
+      questions.forEach((q) => {
+        const tags = (q.tags || []).map((tag) => tag.toLowerCase())
+
+        if (tags.includes("easy")) {
+          easy.total++
+          if (q.solved_by && q.solved_by.includes(username)) easy.solved++
+        }
+        if (tags.includes("medium")) {
+          medium.total++
+          if (q.solved_by && q.solved_by.includes(username)) medium.solved++
+        }
+        if (tags.includes("hard")) {
+          hard.total++
+          if (q.solved_by && q.solved_by.includes(username)) hard.solved++
+        }
+
+        all.total++
+        if (q.solved_by && q.solved_by.includes(username)) all.solved++
+      })
+
+      setDifficultyStats({
+        easy,
+        medium,
+        hard,
+        all,
+      })
+    } catch (e) {
+      setDifficultyStats({
+        easy: { solved: 0, total: 0 },
+        medium: { solved: 0, total: 0 },
+        hard: { solved: 0, total: 0 },
+        all: { solved: 0, total: 0 },
+      })
+    }
+  }
+
+  // Fetch CodeChef rating stats
+  const fetchCodechefStats = async () => {
+    try {
+      const questionRes = await axios.get("https://backendcodeladder-2.onrender.com/problemset", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "x-username": username,
+        },
+      })
+
+      const questions = questionRes.data || []
+
+      // Filter questions with CodeChef tag
+      const codechefQuestions = questions.filter(
+        (q) => q.tags && q.tags.some((tag) => tag.toLowerCase().includes("codechef")),
+      )
+
+      const ratingBands = {
+        "1★ (≤1399)": { solved: 0, total: 0, color: "bg-gray-500" },
+        "2★ (1400-1599)": { solved: 0, total: 0, color: "bg-green-500" },
+        "3★ (1600-1799)": { solved: 0, total: 0, color: "bg-blue-500" },
+        "4★ (1800-1999)": { solved: 0, total: 0, color: "bg-purple-500" },
+        "5★ (2000-2199)": { solved: 0, total: 0, color: "bg-yellow-500" },
+        "6★ (2200-2499)": { solved: 0, total: 0, color: "bg-orange-500" },
+        "7★ (≥2500)": { solved: 0, total: 0, color: "bg-red-500" },
+      }
+
+      // Helper function to get rating band
+      const getRatingBand = (rating) => {
+        if (rating <= 1399) return "1★ (≤1399)"
+        if (rating <= 1599) return "2★ (1400-1599)"
+        if (rating <= 1799) return "3★ (1600-1799)"
+        if (rating <= 1999) return "4★ (1800-1999)"
+        if (rating <= 2199) return "5★ (2000-2199)"
+        if (rating <= 2499) return "6★ (2200-2499)"
+        return "7★ (≥2500)"
+      }
+
+      // Helper function to extract rating from tags
+      const extractRatingFromTags = (tags) => {
+        if (!tags || !Array.isArray(tags)) return null
+
+        // Look for numeric tags that represent ratings
+        for (const tag of tags) {
+          const numericTag = Number.parseInt(tag.toString())
+          // Check if it's a valid number and within reasonable rating range (100-4000)
+          if (!isNaN(numericTag) && numericTag >= 100 && numericTag <= 4000) {
+            return numericTag
+          }
+        }
+        return null
+      }
+
+      codechefQuestions.forEach((q) => {
+        // Extract rating from tags
+        const rating = extractRatingFromTags(q.tags)
+
+        // Only process questions that have a valid rating tag
+        if (rating !== null) {
+          const band = getRatingBand(rating)
+
+          ratingBands[band].total++
+          if (q.solved_by && q.solved_by.includes(username)) {
+            ratingBands[band].solved++
+          }
+        }
+      })
+
+      setCodechefStats(ratingBands)
+    } catch (e) {
+      console.error("Failed to fetch CodeChef stats:", e)
+    }
+  }
+
   const fetchData = async () => {
     try {
       // Fetch user submissions
       const submissionsRes = await axios.get(`https://backendcodeladder-2.onrender.com/usersubmissions/${username}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
+          "x-username": username,
+        },
       })
-      
+
       const submissions = submissionsRes.data?.submissions?.filter((s) => s.marked && s.date) || []
 
       // Fetch individual question details for each submission
       const enrichedSubmissions = await Promise.all(
         submissions.map(async (submission) => {
           try {
-            const questionRes = await axios.get(`https://backendcodeladder-2.onrender.com/question/${submission.questionId}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'x-username': username
-              }
-            })
-            
+            const questionRes = await axios.get(
+              `https://backendcodeladder-2.onrender.com/question/${submission.questionId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "x-username": username,
+                },
+              },
+            )
+
             return {
               ...submission,
               title: questionRes.data.title,
               link: questionRes.data.link,
               tags: questionRes.data.tags || [],
-              question_id: questionRes.data.question_id
+              question_id: questionRes.data.question_id,
             }
           } catch (error) {
             console.error(`Failed to fetch question ${submission.questionId}:`, error)
@@ -67,10 +218,10 @@ const ContributionCalendar = () => {
               title: `Question ${submission.questionId}`,
               link: null,
               tags: [],
-              question_id: submission.questionId
+              question_id: submission.questionId,
             }
           }
-        })
+        }),
       )
 
       // Group submissions by date with complete problem details
@@ -80,7 +231,6 @@ const ContributionCalendar = () => {
 
       enrichedSubmissions.forEach((s) => {
         const day = s.date.split("T")[0]
-        
         if (!submissionsByDate.has(day)) {
           submissionsByDate.set(day, [])
         }
@@ -102,7 +252,6 @@ const ContributionCalendar = () => {
       const year = today.getFullYear()
       const start = getStartOfYear(today)
       const days = getDaysInYear(year)
-
       const contributions = []
       let bestDay = { date: null, count: 0 }
 
@@ -180,6 +329,8 @@ const ContributionCalendar = () => {
 
   useEffect(() => {
     if (username && token) {
+      fetchDifficultyStats()
+      fetchCodechefStats()
       fetchData()
     }
   }, [username, token])
@@ -230,12 +381,14 @@ const ContributionCalendar = () => {
         current = new Array(7).fill(null)
       }
     })
+
     return grouped
   })()
 
   const monthLabels = (() => {
     const labels = []
     let currentMonth = -1
+
     weeks.forEach((week, i) => {
       const first = week.find((d) => d !== null)
       if (first && first.month !== currentMonth) {
@@ -244,6 +397,7 @@ const ContributionCalendar = () => {
         labels.push({ month: monthName, position: i })
       }
     })
+
     return labels
   })()
 
@@ -290,9 +444,166 @@ const ContributionCalendar = () => {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 lg:mb-6 tracking-tight">
             Contribution Calendar
           </h1>
+
           <p className="text-lg md:text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8 lg:mb-12">
             Track your daily coding progress and maintain your problem-solving streak
           </p>
+        </div>
+
+        {/* Difficulty Progress Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <i className="fas fa-tasks text-blue-500"></i>
+            Difficulty Progress
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-cyan-50 rounded-xl p-5 flex flex-col items-center">
+              <span className="text-cyan-600 text-sm font-semibold uppercase mb-2">Easy</span>
+              <span className="text-3xl font-bold text-cyan-700">
+                {difficultyStats.easy.solved}{" "}
+                <span className="text-gray-500 text-xl">/ {difficultyStats.easy.total}</span>
+              </span>
+              <span className="text-sm text-gray-600 mt-1">
+                {percent(difficultyStats.easy.solved, difficultyStats.easy.total)}% completed
+              </span>
+            </div>
+
+            <div className="bg-yellow-50 rounded-xl p-5 flex flex-col items-center">
+              <span className="text-yellow-600 text-sm font-semibold uppercase mb-2">Medium</span>
+              <span className="text-3xl font-bold text-yellow-700">
+                {difficultyStats.medium.solved}{" "}
+                <span className="text-gray-500 text-xl">/ {difficultyStats.medium.total}</span>
+              </span>
+              <span className="text-sm text-gray-600 mt-1">
+                {percent(difficultyStats.medium.solved, difficultyStats.medium.total)}% completed
+              </span>
+            </div>
+
+            <div className="bg-red-50 rounded-xl p-5 flex flex-col items-center">
+              <span className="text-red-600 text-sm font-semibold uppercase mb-2">Hard</span>
+              <span className="text-3xl font-bold text-red-700">
+                {difficultyStats.hard.solved}{" "}
+                <span className="text-gray-500 text-xl">/ {difficultyStats.hard.total}</span>
+              </span>
+              <span className="text-sm text-gray-600 mt-1">
+                {percent(difficultyStats.hard.solved, difficultyStats.hard.total)}% completed
+              </span>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-5 flex flex-col items-center">
+              <span className="text-green-600 text-sm font-semibold uppercase mb-2">Overall Progress</span>
+              <span className="text-3xl font-bold text-green-700">
+                {difficultyStats.all.solved}{" "}
+                <span className="text-gray-500 text-xl">/ {difficultyStats.all.total}</span>
+              </span>
+              <span className="text-sm text-gray-600 mt-1">
+                {percent(difficultyStats.all.solved, difficultyStats.all.total)}% of all problems solved
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* CodeChef Rating Bands Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <i className="fas fa-star text-yellow-500"></i>
+            CodeChef Rating Bands
+          </h2>
+
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100/50 p-6">
+            <div className="mb-6">
+              <p className="text-gray-600 text-sm">
+                Distribution of solved CodeChef problems across different rating bands
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {Object.entries(codechefStats).map(([band, data]) => {
+                const maxTotal = Math.max(...Object.values(codechefStats).map((d) => d.total))
+                const totalWidth = maxTotal > 0 ? (data.total / maxTotal) * 100 : 0
+                const solvedWidth = data.total > 0 ? (data.solved / data.total) * totalWidth : 0
+
+                return (
+                  <div key={band} className="flex items-center gap-4">
+                    {/* Star Badge */}
+                    <div
+                      className={`flex items-center justify-center w-12 h-8 rounded text-white text-sm font-bold ${data.color}`}
+                    >
+                      {band.split(" ")[0]}
+                    </div>
+
+                    {/* Rating Range */}
+                    <div className="w-32 text-sm font-medium text-gray-700">{band.split(" ").slice(1).join(" ")}</div>
+
+                    {/* Bar Chart */}
+                    <div className="flex-1 relative">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden relative">
+                          {/* Total problems bar (background) */}
+                          <div
+                            className="h-full bg-gray-300 rounded-lg transition-all duration-500"
+                            style={{ width: `${totalWidth}%` }}
+                          />
+                          {/* Solved problems bar (foreground) */}
+                          <div
+                            className={`absolute top-0 left-0 h-full rounded-lg transition-all duration-700 ${data.color} opacity-80`}
+                            style={{ width: `${solvedWidth}%` }}
+                          />
+
+                          {/* Count labels */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs font-semibold text-gray-700">
+                              {data.solved} / {data.total}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Percentage */}
+                        <div className="w-16 text-right">
+                          <span className="text-sm font-bold text-gray-900">
+                            {data.total > 0 ? Math.round((data.solved / data.total) * 100) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Summary Stats */}
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {Object.values(codechefStats).reduce((sum, band) => sum + band.total, 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Total CodeChef</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {Object.values(codechefStats).reduce((sum, band) => sum + band.solved, 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Solved</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {Object.values(codechefStats).reduce((sum, band) => sum + (band.solved > 0 ? 1 : 0), 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Bands Covered</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {Object.entries(codechefStats).reduce(
+                      (highest, [band, data]) => (data.solved > 0 ? band.split(" ")[0] : highest),
+                      "0★",
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-600">Highest Band</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Stats Overview */}
@@ -426,7 +737,6 @@ const ContributionCalendar = () => {
                   </div>
                   More
                 </div>
-
                 <div className="text-sm text-gray-500">Click on a square to see problems solved that day</div>
               </div>
             </div>
