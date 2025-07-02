@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 import ContestTable from './components/pages/ContestTable';
 
 const ProblemsetPage = () => {
@@ -36,7 +37,7 @@ const ProblemsetPage = () => {
         const json = await res.json();
 
         if (json.status !== 'OK') {
-          console.error('Invalid problemset.json structure');
+          toast.error('Invalid problemset structure');
           return;
         }
 
@@ -51,8 +52,10 @@ const ProblemsetPage = () => {
         }));
 
         setTableData(problems);
+        toast.success('Problems loaded successfully');
       } catch (err) {
         console.error('Failed to fetch problemset.json', err);
+        toast.error('Failed to load problems');
       }
     };
 
@@ -63,15 +66,23 @@ const ProblemsetPage = () => {
         setContestsJsonRaw(json);
       } catch (err) {
         console.error('Failed to fetch contest.json', err);
+        toast.error('Failed to load contests');
       }
     };
 
-    loadProblemset();
-    loadContests();
+    toast.promise(
+      Promise.all([loadProblemset(), loadContests()]),
+      {
+        loading: 'Loading problems and contests...',
+        success: 'Data loaded successfully',
+        error: 'Error loading data',
+      }
+    );
   }, []);
 
   return (
     <div className="p-6">
+      <Toaster position="top-right" />
       <h1 className="text-2xl font-bold mb-4">Codeforces contest upsolver</h1>
       <ContestTable tableData={tableData} contestsJsonRaw={contestsJsonRaw} />
     </div>
