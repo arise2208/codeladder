@@ -4,46 +4,46 @@
     "division": "Scorable Problems for Division 1",
     "problems": [
       {
-        "name": "Permuted Greater than 2",
-        "url": "https://www.codechef.com/problems/PERMGE2",
-        "code": "PERMGE2",
-        "submissions": "215",
-        "accuracy": "67.71"
+        "name": "No 3 Please!",
+        "url": "https://www.codechef.com/problems/NO3P",
+        "code": "NO3P",
+        "submissions": "169",
+        "accuracy": "39.35"
       },
       {
-        "name": "Grid Path (Easy)",
-        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
-        "code": "GRIDPATHEZ",
-        "submissions": "205",
-        "accuracy": "59.77"
+        "name": "Equate XY",
+        "url": "https://www.codechef.com/problems/EQXY",
+        "code": "EQXY",
+        "submissions": "161",
+        "accuracy": "59.85"
       },
       {
-        "name": "Add 1 or 2",
-        "url": "https://www.codechef.com/problems/SUB12",
-        "code": "SUB12",
-        "submissions": "202",
-        "accuracy": "33.66"
+        "name": "MinPath Minimize",
+        "url": "https://www.codechef.com/problems/PARTMIN",
+        "code": "PARTMIN",
+        "submissions": "125",
+        "accuracy": "36.86"
       },
       {
-        "name": "Coloured Array",
-        "url": "https://www.codechef.com/problems/COLARR7",
-        "code": "COLARR7",
-        "submissions": "104",
-        "accuracy": "19.55"
+        "name": "Priority Customers (Easy)",
+        "url": "https://www.codechef.com/problems/PRIOC",
+        "code": "PRIOC",
+        "submissions": "28",
+        "accuracy": "38.16"
       },
       {
-        "name": "Grid Path (Hard)",
-        "url": "https://www.codechef.com/problems/GRIDPATHHD",
-        "code": "GRIDPATHHD",
-        "submissions": "35",
-        "accuracy": "27.61"
+        "name": "Priority Customers (Hard)",
+        "url": "https://www.codechef.com/problems/PRIOCK",
+        "code": "PRIOCK",
+        "submissions": "9",
+        "accuracy": "40.91"
       },
       {
-        "name": "XOR Shortest Path",
-        "url": "https://www.codechef.com/problems/XORSPATH",
-        "code": "XORSPATH",
-        "submissions": "14",
-        "accuracy": "21.88"
+        "name": "Min Mex Sum",
+        "url": "https://www.codechef.com/problems/MINMEXSUM",
+        "code": "MINMEXSUM",
+        "submissions": "0",
+        "accuracy": "0"
       }
     ]
   },
@@ -52,53 +52,46 @@
     "division": "Scorable Problems for Division 2",
     "problems": [
       {
-        "name": "Add to get GCD",
-        "url": "https://www.codechef.com/problems/ADDGCD",
-        "code": "ADDGCD",
-        "submissions": "1829",
-        "accuracy": "42.7"
+        "name": "Security Lines",
+        "url": "https://www.codechef.com/problems/SECLN",
+        "code": "SECLN",
+        "submissions": "1616",
+        "accuracy": "60.58"
       },
       {
-        "name": "Permuted Greater than 2",
-        "url": "https://www.codechef.com/problems/PERMGE2",
-        "code": "PERMGE2",
-        "submissions": "1802",
-        "accuracy": "49.7"
+        "name": "No 3 Please!",
+        "url": "https://www.codechef.com/problems/NO3P",
+        "code": "NO3P",
+        "submissions": "1333",
+        "accuracy": "27.02"
       },
       {
-        "name": "Add 1 or 2",
-        "url": "https://www.codechef.com/problems/SUB12",
-        "code": "SUB12",
-        "submissions": "1168",
-        "accuracy": "27.08"
+        "name": "Equate XY",
+        "url": "https://www.codechef.com/problems/EQXY",
+        "code": "EQXY",
+        "submissions": "955",
+        "accuracy": "37.35"
       },
       {
-        "name": "Grid Path (Easy)",
-        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
-        "code": "GRIDPATHEZ",
-        "submissions": "1080",
-        "accuracy": "43.89"
+        "name": "MinPath Minimize",
+        "url": "https://www.codechef.com/problems/PARTMIN",
+        "code": "PARTMIN",
+        "submissions": "229",
+        "accuracy": "31.74"
       },
       {
-        "name": "Coloured Array",
-        "url": "https://www.codechef.com/problems/COLARR7",
-        "code": "COLARR7",
-        "submissions": "197",
-        "accuracy": "15.09"
+        "name": "Priority Customers (Easy)",
+        "url": "https://www.codechef.com/problems/PRIOC",
+        "code": "PRIOC",
+        "submissions": "3",
+        "accuracy": "3.57"
       },
       {
-        "name": "Grid Path (Hard)",
-        "url": "https://www.codechef.com/problems/GRIDPATHHD",
-        "code": "GRIDPATHHD",
-        "submissions": "41",
-        "accuracy": "26.63"
-      },
-      {
-        "name": "XOR Shortest Path",
-        "url": "https://www.codechef.com/problems/XORSPATH",
-        "code": "XORSPATH",
-        "submissions": "6",
-        "accuracy": "13.46"
+        "name": "Priority Customers (Hard)",
+        "url": "https://www.codechef.com/problems/PRIOCK",
+        "code": "PRIOCK",
+        "submissions": "0",
+        "accuracy": "0"
       }
     ]
   },
@@ -107,53 +100,53 @@
     "division": "Scorable Problems for Division 3",
     "problems": [
       {
-        "name": "Nearest Square",
-        "url": "https://www.codechef.com/problems/NEARSQ",
-        "code": "NEARSQ",
-        "submissions": "2834",
-        "accuracy": "87.55"
+        "name": "No Odd Sum",
+        "url": "https://www.codechef.com/problems/NODDSM",
+        "code": "NODDSM",
+        "submissions": "2771",
+        "accuracy": "47.08"
       },
       {
-        "name": "Add to get GCD",
-        "url": "https://www.codechef.com/problems/ADDGCD",
-        "code": "ADDGCD",
-        "submissions": "2671",
-        "accuracy": "35.29"
+        "name": "Security Lines",
+        "url": "https://www.codechef.com/problems/SECLN",
+        "code": "SECLN",
+        "submissions": "2237",
+        "accuracy": "44.42"
       },
       {
-        "name": "Permuted Greater than 2",
-        "url": "https://www.codechef.com/problems/PERMGE2",
-        "code": "PERMGE2",
-        "submissions": "2429",
-        "accuracy": "36.79"
+        "name": "No 3 Please!",
+        "url": "https://www.codechef.com/problems/NO3P",
+        "code": "NO3P",
+        "submissions": "1239",
+        "accuracy": "20.26"
       },
       {
-        "name": "Add 1 or 2",
-        "url": "https://www.codechef.com/problems/SUB12",
-        "code": "SUB12",
-        "submissions": "518",
-        "accuracy": "23.45"
+        "name": "Equate XY",
+        "url": "https://www.codechef.com/problems/EQXY",
+        "code": "EQXY",
+        "submissions": "365",
+        "accuracy": "29.25"
       },
       {
-        "name": "Grid Path (Easy)",
-        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
-        "code": "GRIDPATHEZ",
-        "submissions": "398",
-        "accuracy": "31.3"
+        "name": "MinPath Minimize",
+        "url": "https://www.codechef.com/problems/PARTMIN",
+        "code": "PARTMIN",
+        "submissions": "54",
+        "accuracy": "21.72"
       },
       {
-        "name": "Coloured Array",
-        "url": "https://www.codechef.com/problems/COLARR7",
-        "code": "COLARR7",
-        "submissions": "71",
-        "accuracy": "18.91"
+        "name": "Priority Customers (Easy)",
+        "url": "https://www.codechef.com/problems/PRIOC",
+        "code": "PRIOC",
+        "submissions": "0",
+        "accuracy": "0"
       },
       {
-        "name": "Grid Path (Hard)",
-        "url": "https://www.codechef.com/problems/GRIDPATHHD",
-        "code": "GRIDPATHHD",
-        "submissions": "21",
-        "accuracy": "17.57"
+        "name": "Priority Customers (Hard)",
+        "url": "https://www.codechef.com/problems/PRIOCK",
+        "code": "PRIOCK",
+        "submissions": "0",
+        "accuracy": "0"
       }
     ]
   },
@@ -162,60 +155,53 @@
     "division": "Scorable Problems for Division 4",
     "problems": [
       {
-        "name": "Divide into 3",
-        "url": "https://www.codechef.com/problems/DIVIDE3",
-        "code": "DIVIDE3",
-        "submissions": "15697",
-        "accuracy": "65.74"
+        "name": "Missing Shoes",
+        "url": "https://www.codechef.com/problems/SHOM",
+        "code": "SHOM",
+        "submissions": "15696",
+        "accuracy": "87.19"
       },
       {
-        "name": "Nearest Square",
-        "url": "https://www.codechef.com/problems/NEARSQ",
-        "code": "NEARSQ",
-        "submissions": "14499",
-        "accuracy": "74.08"
+        "name": "No Odd Sum",
+        "url": "https://www.codechef.com/problems/NODDSM",
+        "code": "NODDSM",
+        "submissions": "8258",
+        "accuracy": "28.02"
       },
       {
-        "name": "Add to get GCD",
-        "url": "https://www.codechef.com/problems/ADDGCD",
-        "code": "ADDGCD",
-        "submissions": "9117",
-        "accuracy": "40.47"
+        "name": "Security Lines",
+        "url": "https://www.codechef.com/problems/SECLN",
+        "code": "SECLN",
+        "submissions": "2466",
+        "accuracy": "23.57"
       },
       {
-        "name": "Permuted Greater than 2",
-        "url": "https://www.codechef.com/problems/PERMGE2",
-        "code": "PERMGE2",
-        "submissions": "3371",
-        "accuracy": "21.14"
+        "name": "No 3 Please!",
+        "url": "https://www.codechef.com/problems/NO3P",
+        "code": "NO3P",
+        "submissions": "989",
+        "accuracy": "11.63"
       },
       {
-        "name": "Add 1 or 2",
-        "url": "https://www.codechef.com/problems/SUB12",
-        "code": "SUB12",
-        "submissions": "378",
-        "accuracy": "18.46"
+        "name": "Equate XY",
+        "url": "https://www.codechef.com/problems/EQXY",
+        "code": "EQXY",
+        "submissions": "347",
+        "accuracy": "20.41"
       },
       {
-        "name": "Grid Path (Easy)",
-        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
-        "code": "GRIDPATHEZ",
-        "submissions": "285",
-        "accuracy": "23.8"
+        "name": "MinPath Minimize",
+        "url": "https://www.codechef.com/problems/PARTMIN",
+        "code": "PARTMIN",
+        "submissions": "92",
+        "accuracy": "16.48"
       },
       {
-        "name": "Coloured Array",
-        "url": "https://www.codechef.com/problems/COLARR7",
-        "code": "COLARR7",
-        "submissions": "121",
-        "accuracy": "7.77"
-      },
-      {
-        "name": "Grid Path (Hard)",
-        "url": "https://www.codechef.com/problems/GRIDPATHHD",
-        "code": "GRIDPATHHD",
-        "submissions": "46",
-        "accuracy": "13.51"
+        "name": "Priority Customers (Easy)",
+        "url": "https://www.codechef.com/problems/PRIOC",
+        "code": "PRIOC",
+        "submissions": "1",
+        "accuracy": "0.16"
       }
     ]
   },
