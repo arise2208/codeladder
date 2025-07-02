@@ -1,4 +1,224 @@
 [
+   {
+    "contest": "START192A",
+    "division": "Scorable Problems for Division 1",
+    "problems": [
+      {
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "215",
+        "accuracy": "67.71"
+      },
+      {
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "205",
+        "accuracy": "59.77"
+      },
+      {
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "202",
+        "accuracy": "33.66"
+      },
+      {
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "104",
+        "accuracy": "19.55"
+      },
+      {
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "35",
+        "accuracy": "27.61"
+      },
+      {
+        "name": "XOR Shortest Path",
+        "url": "https://www.codechef.com/problems/XORSPATH",
+        "code": "XORSPATH",
+        "submissions": "14",
+        "accuracy": "21.88"
+      }
+    ]
+  },
+  {
+    "contest": "START192B",
+    "division": "Scorable Problems for Division 2",
+    "problems": [
+      {
+        "name": "Add to get GCD",
+        "url": "https://www.codechef.com/problems/ADDGCD",
+        "code": "ADDGCD",
+        "submissions": "1829",
+        "accuracy": "42.7"
+      },
+      {
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "1802",
+        "accuracy": "49.7"
+      },
+      {
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "1168",
+        "accuracy": "27.08"
+      },
+      {
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "1080",
+        "accuracy": "43.89"
+      },
+      {
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "197",
+        "accuracy": "15.09"
+      },
+      {
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "41",
+        "accuracy": "26.63"
+      },
+      {
+        "name": "XOR Shortest Path",
+        "url": "https://www.codechef.com/problems/XORSPATH",
+        "code": "XORSPATH",
+        "submissions": "6",
+        "accuracy": "13.46"
+      }
+    ]
+  },
+  {
+    "contest": "START192C",
+    "division": "Scorable Problems for Division 3",
+    "problems": [
+      {
+        "name": "Nearest Square",
+        "url": "https://www.codechef.com/problems/NEARSQ",
+        "code": "NEARSQ",
+        "submissions": "2834",
+        "accuracy": "87.55"
+      },
+      {
+        "name": "Add to get GCD",
+        "url": "https://www.codechef.com/problems/ADDGCD",
+        "code": "ADDGCD",
+        "submissions": "2671",
+        "accuracy": "35.29"
+      },
+      {
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "2429",
+        "accuracy": "36.79"
+      },
+      {
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "518",
+        "accuracy": "23.45"
+      },
+      {
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "398",
+        "accuracy": "31.3"
+      },
+      {
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "71",
+        "accuracy": "18.91"
+      },
+      {
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "21",
+        "accuracy": "17.57"
+      }
+    ]
+  },
+  {
+    "contest": "START192D",
+    "division": "Scorable Problems for Division 4",
+    "problems": [
+      {
+        "name": "Divide into 3",
+        "url": "https://www.codechef.com/problems/DIVIDE3",
+        "code": "DIVIDE3",
+        "submissions": "15697",
+        "accuracy": "65.74"
+      },
+      {
+        "name": "Nearest Square",
+        "url": "https://www.codechef.com/problems/NEARSQ",
+        "code": "NEARSQ",
+        "submissions": "14499",
+        "accuracy": "74.08"
+      },
+      {
+        "name": "Add to get GCD",
+        "url": "https://www.codechef.com/problems/ADDGCD",
+        "code": "ADDGCD",
+        "submissions": "9117",
+        "accuracy": "40.47"
+      },
+      {
+        "name": "Permuted Greater than 2",
+        "url": "https://www.codechef.com/problems/PERMGE2",
+        "code": "PERMGE2",
+        "submissions": "3371",
+        "accuracy": "21.14"
+      },
+      {
+        "name": "Add 1 or 2",
+        "url": "https://www.codechef.com/problems/SUB12",
+        "code": "SUB12",
+        "submissions": "378",
+        "accuracy": "18.46"
+      },
+      {
+        "name": "Grid Path (Easy)",
+        "url": "https://www.codechef.com/problems/GRIDPATHEZ",
+        "code": "GRIDPATHEZ",
+        "submissions": "285",
+        "accuracy": "23.8"
+      },
+      {
+        "name": "Coloured Array",
+        "url": "https://www.codechef.com/problems/COLARR7",
+        "code": "COLARR7",
+        "submissions": "121",
+        "accuracy": "7.77"
+      },
+      {
+        "name": "Grid Path (Hard)",
+        "url": "https://www.codechef.com/problems/GRIDPATHHD",
+        "code": "GRIDPATHHD",
+        "submissions": "46",
+        "accuracy": "13.51"
+      }
+    ]
+  },
   {
     "contest": "START191A",
     "division": "Scorable Problems for Division 1",
