@@ -18,6 +18,9 @@ const LadderPage = () => {
   const [collabSearchQuery, setCollabSearchQuery] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedSections, setExpandedSections] = useState({});
+  const [groupedQuestions, setGroupedQuestions] = useState({});
+  const [currentView, setCurrentView] = useState('all'); // 'all' or 'revision'
   const username = localStorage.getItem('username');
   const token = localStorage.getItem('token');
   const [newCollaborator, setNewCollaborator] = useState('');
@@ -66,12 +69,66 @@ const LadderPage = () => {
         );
         const results = await Promise.all(promises);
         setQuestions(results);
+        
+        // Group questions by tags for structured display
+        const grouped = groupQuestionsByTags(results);
+        setGroupedQuestions(grouped);
       } catch {
         setError('Failed to load question details');
       }
     };
     fetchQuestions();
   }, [ladder, isAuthorized, token, username]);
+
+  const groupQuestionsByTags = (questions) => {
+    const groups = {};
+    
+    questions.forEach((question, index) => {
+      const tags = question.tags || [];
+      
+      // Try to find a main category tag
+      let category = 'Miscellaneous';
+      
+      // Define category mappings
+      const categoryMappings = {
+        'Arrays': ['array', 'arrays'],
+        'Strings': ['string', 'strings'],
+        'Dynamic Programming': ['dp', 'dynamic programming', 'dynamic-programming'],
+        'Graphs': ['graph', 'graphs', 'dfs', 'bfs'],
+        'Trees': ['tree', 'trees', 'binary tree'],
+        'Math': ['math', 'mathematics', 'number theory'],
+        'Greedy': ['greedy'],
+        'Sorting': ['sorting', 'sort'],
+        'Binary Search': ['binary search', 'binary-search'],
+        'Two Pointers': ['two pointers', 'two-pointers'],
+        'Sliding Window': ['sliding window', 'sliding-window'],
+        'Backtracking': ['backtracking'],
+        'Recursion': ['recursion', 'recursive'],
+        'Data Structures': ['data structures', 'stack', 'queue', 'heap'],
+      };
+
+      // Find the best category match
+      for (const [cat, keywords] of Object.entries(categoryMappings)) {
+        if (tags.some(tag => keywords.some(keyword => 
+          tag.toLowerCase().includes(keyword.toLowerCase())
+        ))) {
+          category = cat;
+          break;
+        }
+      }
+
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      
+      groups[category].push({
+        ...question,
+        originalIndex: index
+      });
+    });
+
+    return groups;
+  };
 
   const fetchAllQuestions = async () => {
     try {
@@ -137,6 +194,7 @@ const LadderPage = () => {
   };
 
   const toggleSelectToAdd = (id) => setSelectedToAdd(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  
   const handleAddToLadder = async () => {
     try {
       await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
@@ -158,11 +216,11 @@ const LadderPage = () => {
     }
   };
 
-  // For remove modal
   const toggleSelectToRemove = (id) =>
     setSelectedToRemove(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
+    
   const handleRemoveSelected = async () => {
     try {
       await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
@@ -185,28 +243,6 @@ const LadderPage = () => {
       setRemoveSearchQuery('');
     } catch {
       alert('Failed to remove selected questions');
-    }
-  };
-
-  const handleRemoveSingle = async (questionId) => {
-    try {
-      await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
-        table_id: Number(tableId),
-        questionIds: [questionId],
-        action: 'remove',
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setLadder(prev => ({
-        ...prev,
-        questions: prev.questions.filter(q => q !== questionId),
-      }));
-      setQuestions(prev => prev.filter(q => q.question_id !== questionId));
-    } catch {
-      alert('Failed to remove question');
     }
   };
 
@@ -256,6 +292,25 @@ const LadderPage = () => {
     }
   };
 
+  const toggleSection = (sectionName) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionName]: !prev[sectionName]
+    }));
+  };
+
+  const getSectionProgress = (sectionQuestions) => {
+    const solved = sectionQuestions.filter(q => q.solved_by?.includes(username)).length;
+    const total = sectionQuestions.length;
+    return { solved, total };
+  };
+
+  const getOverallProgress = () => {
+    const solved = questions.filter(q => q.solved_by?.includes(username)).length;
+    const total = questions.length;
+    return { solved, total };
+  };
+
   const filteredQuestions = allQuestions
     .filter(q => !ladder?.questions.includes(q.question_id))
     .filter(q => {
@@ -267,7 +322,6 @@ const LadderPage = () => {
       );
     });
 
-  // For remove modal: filter questions by title/tags in removeSearchQuery
   const questionsToRemove = questions.filter(q => {
     if (!removeSearchQuery) return true;
     const query = removeSearchQuery.toLowerCase();
@@ -277,7 +331,6 @@ const LadderPage = () => {
     );
   });
 
-  // For collab modal: filter collaborators
   const filteredCollabs = ladder?.user?.filter(user => {
     if (!collabSearchQuery) return true;
     return user.toLowerCase().includes(collabSearchQuery.toLowerCase());
@@ -302,410 +355,419 @@ const LadderPage = () => {
     setNewCollaborator('');
   };
 
-  const solvedCount = questions.filter(q => q.solved_by?.includes(username)).length;
-  const totalCount = questions.length;
-  const progressPercentage = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
-
-  // --- Render ---
-
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg min-h-[60vh] font-inter">
-        <h2 className="text-3xl font-extrabold text-gray-700 mb-2 tracking-tight">Loading...</h2>
-        <p className="text-lg text-gray-500 mb-6">Please wait while we load the ladder information.</p>
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <h2 className="text-2xl font-bold text-gray-300 mb-2">Loading...</h2>
+              <p className="text-gray-500">Please wait while we load the ladder information.</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
+
   if (!isAuthorized) {
     return (
-      <div className="max-w-3xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg min-h-[60vh] font-inter">
-        <h2 className="text-3xl font-extrabold text-red-500 mb-2 tracking-tight">🚫 Access Denied</h2>
-        <p className="text-lg text-gray-500 mb-6">
-          You do not have permission to access this ladder.
-        </p>
-        <button
-          onClick={() => navigate('/')}
-          className="px-5 py-2 rounded-md font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-900 transition"
-        >
-          ← Go Back to Dashboard
-        </button>
-      </div>
-    );
-  }
-  if (error && isAuthorized) {
-    return (
-      <div className="max-w-3xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg min-h-[60vh] font-inter">
-        <h2 className="text-3xl font-extrabold text-red-500 mb-2 tracking-tight">Error</h2>
-        <p>{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-5 py-2 rounded-md font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-900 transition"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-6xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg min-h-[60vh] font-inter">
-      <h1 className="text-4xl font-extrabold text-blue-900 mb-2 tracking-tight">
-        {ladder?.table_title || `Table ${tableId}`}
-      </h1>
-      <div className="text-gray-600 font-medium mb-5 text-lg">
-        <span> <b>Grinding </b> </span>
-      </div>
-
-       {/* Sleek Progress Bar */}
-      {totalCount > 0 && (
-        <div className="mb-10">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold text-blue-900 tracking-tight">Progress</span>
-            <span className="text-gray-500">
-              <span className="font-semibold">{solvedCount}</span> of <span className="font-semibold">{totalCount}</span> solved
-              <span className="ml-2 text-sm">({Math.round(progressPercentage)}%)</span>
-            </span>
-          </div>
-          {/* Progress bar: reduced height */}
-          <div className="relative h-2 rounded-full bg-gray-200 overflow-hidden shadow-inner">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700 shadow-lg transition-all duration-500 flex items-center"
-              style={{
-                width: `${progressPercentage}%`,
-                minWidth: progressPercentage > 0 ? '2rem' : 0,
-                background: progressPercentage === 100
-                  ? 'linear-gradient(90deg,#22c55e 45%,#16a34a 100%)'
-                  : undefined
-              }}
-            >
-              <span className="absolute right-2 text-xs text-white font-bold" style={{ right: 8, top: -18 }}>
-                {progressPercentage > 10 && `${Math.round(progressPercentage)}%`}
-              </span>
-            </div>
-          </div>
-          {progressPercentage === 100 && (
-            <div className="text-center mt-2 text-green-600 font-bold text-lg">
-              🎉 Congratulations! You've completed this ladder! 🎉
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Buttons */}
-      <div className="flex gap-4 mb-8">
-        <button
-          onClick={() => { fetchAllQuestions(); setShowAddModal(true); }}
-          className="px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-900 transition"
-        >
-          ➕ Add Questions to Ladder
-        </button>
-        <button
-          onClick={() => setShowRemoveModal(true)}
-          className={`px-4 py-2 rounded-md bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold transition ${
-            questions.length === 0 ? 'opacity-60 cursor-not-allowed' : 'hover:from-red-600 hover:to-red-900'
-          }`}
-          disabled={questions.length === 0}
-        >
-          ❌ Remove Selected
-        </button>
-        <button
-          onClick={() => setShowCollabModal(true)}
-          className="px-4 py-2 rounded-md bg-gradient-to-r from-purple-500 to-blue-700 text-white font-semibold hover:from-purple-600 hover:to-blue-900 transition"
-        >
-          👥 Current Collaborators
-        </button>
-      </div>
-
-      {/* Dynamic Questions Table */}
-      <div className="overflow-x-auto rounded-lg shadow border border-gray-200 mb-10">
-        <table className="w-full table-fixed min-w-[900px]">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-2 px-4 text-left font-bold text-gray-700 w-16">#</th>
-              <th className="py-2 px-4 text-left font-bold text-gray-700 w-2/6">Title</th>
-              <th className="py-2 px-4 text-left font-bold text-gray-700 w-2/6">Tags</th>
-              <th className="py-2 px-4 text-left font-bold text-gray-700 w-24">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
-            {questions.map((q, idx) => {
-              const isSolved = q.solved_by?.includes(username);
-              return (
-                <tr
-                  key={q.question_id}
-                  className={isSolved ? "bg-green-50" : "bg-white"}
-                  style={{ height: "44px" }}
-                >
-                  <td className="py-1 px-4 align-middle font-mono text-sm text-gray-500">{idx + 1}</td>
-                  <td className="py-1 px-4 align-middle">
-                    <a
-                      href={q.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-bold text-blue-800 hover:text-blue-600 transition"
-                    >
-                      {q.title}
-                    </a>
-                  </td>
-                  <td className="py-1 px-4 align-middle">
-                    <div className="flex flex-wrap gap-1">
-                      {q.tags && q.tags.length > 0 ? (
-                        q.tags.map(tag =>
-                          <span key={tag} className="inline-block bg-blue-100 text-blue-900 rounded-full text-xs px-2 py-0.5 font-medium">{tag}</span>
-                        )
-                      ) : (
-                        <span className="text-gray-400 text-base">No tags</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-1 px-4 align-middle">
-                    <button
-                      onClick={() =>
-                        isSolved
-                          ? handleUnmark(q.question_id)
-                          : handleMarkSolved(q.question_id)
-                      }
-                      className={`w-8 h-8 rounded-full flex items-center justify-center
-                        ${isSolved
-                          ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'border border-blue-400 bg-white hover:bg-blue-500 hover:text-white text-blue-500'}
-                        transition focus:outline-none`}
-                      title={isSolved ? 'Unmark as Solved' : 'Mark as Solved'}
-                    >
-                      {isSolved ? (
-                        <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M7.629 14.996a1 1 0 01-.706-.293l-3.63-3.63a1 1 0 111.414-1.414l2.923 2.924 6.293-6.293a1 1 0 111.414 1.414l-7 7a1 1 0 01-.708.292z"/></svg>
-                      ) : (
-                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" className="w-5 h-5"><circle cx="10" cy="10" r="8" strokeWidth="2" /><circle cx="10" cy="10" r="4" strokeWidth="2" /></svg>
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add-Question Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 z-50 flex items-center justify-center" onClick={handleAddModalClose}>
-          <div className="bg-white rounded-xl p-8 w-[520px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="font-extrabold text-xl mb-3">Select Questions to Add</h3>
-            <input
-              type="text"
-              placeholder="🔍 Search questions by title or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-3 py-2 rounded border border-gray-300 text-base w-full mb-3"
-            />
-            <div className="text-gray-400 text-sm mb-2">
-              {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''} found
-              {searchQuery && ` (filtered from ${allQuestions.filter(q => !ladder?.questions.includes(q.question_id)).length})`}
-            </div>
-            <div className="max-h-60 overflow-y-auto border border-gray-100 rounded">
-              {filteredQuestions.length === 0 ? (
-                <div className="p-7 text-center text-gray-400">
-                  {searchQuery ? 'No questions match your search.' : 'No questions available to add.'}
-                </div>
-              ) : (
-                filteredQuestions.map(q => (
-                  <div
-                    key={q.question_id}
-                    className="flex justify-between items-center px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
-                  >
-                    <div>
-                      <div className="font-bold">{q.title}</div>
-                      {q.tags && q.tags.length > 0 && (
-                        <div className="mt-1">
-                          {q.tags.map(tag =>
-                            <span key={tag} className="inline-block bg-blue-100 text-blue-900 rounded-full text-xs px-2 py-0.5 mr-1 mb-1 font-medium">{tag}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="checkbox"
-                      onChange={() => toggleSelectToAdd(q.question_id)}
-                      checked={selectedToAdd.includes(q.question_id)}
-                      className="ml-2 w-5 h-5 accent-blue-500"
-                    />
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <div className="text-base text-gray-500">
-                {selectedToAdd.length} selected
-              </div>
-              <div>
-                <button
-                  onClick={handleAddToLadder}
-                  className={`px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold mr-2 transition ${selectedToAdd.length === 0 ? 'opacity-60 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-900'
-                    }`}
-                  disabled={selectedToAdd.length === 0}
-                >
-                  ✅ Add Selected ({selectedToAdd.length})
-                </button>
-                <button
-                  onClick={handleAddModalClose}
-                  className="px-4 py-2 rounded-md bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold hover:from-red-600 hover:to-red-900 transition">
-                  ❌ Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Remove-Question Modal */}
-      {showRemoveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 z-50 flex items-center justify-center" onClick={handleRemoveModalClose}>
-          <div className="bg-white rounded-xl p-8 w-[600px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="font-extrabold text-xl mb-3">Select Questions to Remove</h3>
-            <input
-              type="text"
-              placeholder="🔍 Search questions by title or tags..."
-              value={removeSearchQuery}
-              onChange={(e) => setRemoveSearchQuery(e.target.value)}
-              className="px-3 py-2 rounded border border-gray-300 text-base w-full mb-3"
-            />
-            <div className="text-gray-400 text-sm mb-2">
-              {questionsToRemove.length} question{questionsToRemove.length !== 1 ? 's' : ''} found
-              {removeSearchQuery && ` (filtered from ${questions.length})`}
-            </div>
-            <div className="max-h-60 overflow-y-auto border border-gray-100 rounded">
-              {questionsToRemove.length === 0 ? (
-                <div className="p-7 text-center text-gray-400">
-                  {removeSearchQuery ? 'No questions match your search.' : 'No questions available to remove.'}
-                </div>
-              ) : (
-                questionsToRemove.map(q => (
-                  <div
-                    key={q.question_id}
-                    className="flex justify-between items-center px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
-                  >
-                    <div>
-                      <div className="font-bold">{q.title}</div>
-                      {q.tags && q.tags.length > 0 && (
-                        <div className="mt-1">
-                          {q.tags.map(tag =>
-                            <span key={tag} className="inline-block bg-blue-100 text-blue-900 rounded-full text-xs px-2 py-0.5 mr-1 mb-1 font-medium">{tag}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="checkbox"
-                      onChange={() => toggleSelectToRemove(q.question_id)}
-                      checked={selectedToRemove.includes(q.question_id)}
-                      className="ml-2 w-5 h-5 accent-red-500"
-                    />
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <div className="text-base text-gray-500">
-                {selectedToRemove.length} selected
-              </div>
-              <div>
-                <button
-                  onClick={handleRemoveSelected}
-                  className={`px-4 py-2 rounded-md bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold mr-2 transition ${selectedToRemove.length === 0 ? 'opacity-60 cursor-not-allowed' : 'hover:from-red-600 hover:to-red-900'
-                    }`}
-                  disabled={selectedToRemove.length === 0}
-                >
-                  ❌ Remove Selected ({selectedToRemove.length})
-                </button>
-                <button
-                  onClick={handleRemoveModalClose}
-                  className="px-4 py-2 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 text-white font-semibold hover:from-gray-600 hover:to-gray-800 transition">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Collaborators Modal */}
-      {showCollabModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 z-50 flex items-center justify-center" onClick={handleCollabModalClose}>
-          <div className="bg-white rounded-xl p-8 w-[500px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="font-extrabold text-xl mb-3">Current Collaborators</h3>
-            <input
-              type="text"
-              placeholder="🔍 Search collaborators by username..."
-              value={collabSearchQuery}
-              onChange={(e) => setCollabSearchQuery(e.target.value)}
-              className="px-3 py-2 rounded border border-gray-300 text-base w-full mb-3"
-            />
-            <div className="mb-4">
-              <div className="text-gray-400 text-sm mb-2">
-                {filteredCollabs.length} collaborator{filteredCollabs.length !== 1 ? "s" : ""} found
-                {collabSearchQuery && ` (filtered from ${ladder.user.length})`}
-              </div>
-              <div className="max-h-60 overflow-y-auto border border-gray-100 rounded">
-                {filteredCollabs.length === 0 ? (
-                  <div className="p-7 text-center text-gray-400">
-                    {collabSearchQuery ? 'No collaborators match your search.' : 'No collaborators found.'}
-                  </div>
-                ) : (
-                  filteredCollabs.map((user, idx) => (
-                    <div key={user} className="flex items-center justify-between px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition">
-                      <div>
-                        <span className="font-bold">{user}</span>
-                        {idx === 0 && <span className="ml-2 text-blue-600 font-bold">(Owner)</span>}
-                        {user === username && <span className="ml-2 text-green-600 font-semibold">(You)</span>}
-                      </div>
-                      {ladder.user[0] === username && idx !== 0 && (
-                        <button
-                          onClick={() => handleRemoveCollaborator(user)}
-                          className="px-3 py-1 rounded bg-gradient-to-r from-red-500 to-red-700 text-white text-sm font-medium hover:from-red-600 hover:to-red-900 transition"
-                        >
-                          ❌ Remove
-                        </button>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-            {ladder.user[0] === username && (
-              <>
-                <div className="my-4 border-t pt-4">
-                  <input
-                    type="text"
-                    placeholder="Enter username/email to invite..."
-                    value={newCollaborator}
-                    onChange={(e) => setNewCollaborator(e.target.value)}
-                    className="px-3 py-2 rounded border border-gray-300 text-base w-full mb-2"
-                  />
-                  <button
-                    onClick={handleAddCollaborator}
-                    className="w-full px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-900 transition"
-                  >
-                    ➕ Add Collaborator
-                  </button>
-                  {collabMessage && (
-                    <div className={`mt-2 text-center font-medium ${collabMessage.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>
-                      {collabMessage}
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-            <div className="flex justify-end mt-2">
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-red-400 mb-4">🚫 Access Denied</h2>
+              <p className="text-gray-400 mb-6">You do not have permission to access this ladder.</p>
               <button
-                onClick={handleCollabModalClose}
-                className="px-4 py-2 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 text-white font-semibold hover:from-gray-600 hover:to-gray-800 transition"
+                onClick={() => navigate('/')}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
-                Close
+                ← Go Back to Dashboard
               </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  if (error && isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-red-400 mb-4">Error</h2>
+              <p className="text-gray-400 mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const overallProgress = getOverallProgress();
+  const progressPercentage = overallProgress.total > 0 ? (overallProgress.solved / overallProgress.total) * 100 : 0;
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">
+                {ladder?.table_title || `Ladder ${tableId}`}
+              </h1>
+              <p className="text-gray-400">Structured learning path</p>
+            </div>
+            
+            {/* Progress Stats */}
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">
+                  {overallProgress.solved} / {overallProgress.total}
+                </div>
+                <div className="text-sm text-gray-400">completed</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              onClick={() => setCurrentView('all')}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                currentView === 'all'
+                  ? 'bg-white text-gray-900'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              All Problems
+            </button>
+            <button
+              onClick={() => setCurrentView('revision')}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                currentView === 'revision'
+                  ? 'bg-white text-gray-900'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Revision
+            </button>
+            
+            {/* Search and Actions */}
+            <div className="flex items-center gap-4 ml-auto">
+              <div className="relative">
+                <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input
+                  type="text"
+                  placeholder="Search problems..."
+                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              
+              <select className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                <option>Difficulty</option>
+                <option>Easy</option>
+                <option>Medium</option>
+                <option>Hard</option>
+              </select>
+              
+              <button
+                onClick={() => { fetchAllQuestions(); setShowAddModal(true); }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                <i className="fas fa-plus"></i>
+                Add Problems
+              </button>
+              
+              <button
+                onClick={() => setShowCollabModal(true)}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                <i className="fas fa-users"></i>
+                Collaborators
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="space-y-6">
+          {Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => {
+            const { solved, total } = getSectionProgress(sectionQuestions);
+            const sectionProgress = total > 0 ? (solved / total) * 100 : 0;
+            const isExpanded = expandedSections[sectionName] !== false; // Default to expanded
+
+            return (
+              <div key={sectionName} className="bg-gray-800 rounded-lg overflow-hidden">
+                {/* Section Header */}
+                <button
+                  onClick={() => toggleSection(sectionName)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-750 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'} text-gray-400`}></i>
+                    <h3 className="text-xl font-semibold text-white">{sectionName}</h3>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-white font-medium">{solved} / {total}</div>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
+                        style={{ width: `${sectionProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Section Content */}
+                {isExpanded && (
+                  <div className="px-6 pb-6">
+                    <div className="space-y-3">
+                      {sectionQuestions.map((question, index) => {
+                        const isSolved = question.solved_by?.includes(username);
+                        return (
+                          <div
+                            key={question.question_id}
+                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                              isSolved ? 'bg-green-900/30' : 'bg-gray-700/50 hover:bg-gray-700'
+                            }`}
+                          >
+                            {/* Problem Number */}
+                            <div className="w-8 text-center text-gray-400 font-mono text-sm">
+                              {index + 1}
+                            </div>
+
+                            {/* Status Checkbox */}
+                            <button
+                              onClick={() =>
+                                isSolved
+                                  ? handleUnmark(question.question_id)
+                                  : handleMarkSolved(question.question_id)
+                              }
+                              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                                isSolved
+                                  ? 'bg-green-500 border-green-500'
+                                  : 'border-gray-500 hover:border-gray-400'
+                              }`}
+                            >
+                              {isSolved && <i className="fas fa-check text-white text-xs"></i>}
+                            </button>
+
+                            {/* Problem Title */}
+                            <div className="flex-1">
+                              <a
+                                href={question.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`font-medium hover:underline transition-colors ${
+                                  isSolved ? 'text-green-400' : 'text-white hover:text-blue-400'
+                                }`}
+                              >
+                                {question.title}
+                              </a>
+                              
+                              {/* Tags */}
+                              {question.tags && question.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {question.tags.slice(0, 3).map(tag => (
+                                    <span
+                                      key={tag}
+                                      className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {question.tags.length > 3 && (
+                                    <span className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">
+                                      +{question.tags.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => toggleSelectToRemove(question.question_id)}
+                                className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                                title="Remove from ladder"
+                              >
+                                <i className="fas fa-trash text-sm"></i>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Add Question Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleAddModalClose}>
+            <div className="bg-gray-800 rounded-xl p-8 w-[520px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <h3 className="font-bold text-xl mb-4 text-white">Select Questions to Add</h3>
+              <input
+                type="text"
+                placeholder="🔍 Search questions by title or tags..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 w-full mb-4 focus:outline-none focus:border-blue-500"
+              />
+              <div className="text-gray-400 text-sm mb-3">
+                {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''} found
+              </div>
+              <div className="max-h-60 overflow-y-auto border border-gray-600 rounded-lg bg-gray-700">
+                {filteredQuestions.length === 0 ? (
+                  <div className="p-8 text-center text-gray-400">
+                    {searchQuery ? 'No questions match your search.' : 'No questions available to add.'}
+                  </div>
+                ) : (
+                  filteredQuestions.map(q => (
+                    <div
+                      key={q.question_id}
+                      className="flex justify-between items-center px-4 py-3 border-b border-gray-600 hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium text-white">{q.title}</div>
+                        {q.tags && q.tags.length > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {q.tags.map(tag =>
+                              <span key={tag} className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">{tag}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="checkbox"
+                        onChange={() => toggleSelectToAdd(q.question_id)}
+                        checked={selectedToAdd.includes(q.question_id)}
+                        className="ml-3 w-5 h-5 accent-blue-500"
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <div className="text-gray-400">
+                  {selectedToAdd.length} selected
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddToLadder}
+                    disabled={selectedToAdd.length === 0}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                  >
+                    Add Selected ({selectedToAdd.length})
+                  </button>
+                  <button
+                    onClick={handleAddModalClose}
+                    className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Collaborators Modal */}
+        {showCollabModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleCollabModalClose}>
+            <div className="bg-gray-800 rounded-xl p-8 w-[500px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <h3 className="font-bold text-xl mb-4 text-white">Current Collaborators</h3>
+              <input
+                type="text"
+                placeholder="🔍 Search collaborators..."
+                value={collabSearchQuery}
+                onChange={(e) => setCollabSearchQuery(e.target.value)}
+                className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 w-full mb-4 focus:outline-none focus:border-blue-500"
+              />
+              <div className="mb-4">
+                <div className="text-gray-400 text-sm mb-3">
+                  {filteredCollabs.length} collaborator{filteredCollabs.length !== 1 ? "s" : ""} found
+                </div>
+                <div className="max-h-60 overflow-y-auto border border-gray-600 rounded-lg bg-gray-700">
+                  {filteredCollabs.length === 0 ? (
+                    <div className="p-8 text-center text-gray-400">
+                      {collabSearchQuery ? 'No collaborators match your search.' : 'No collaborators found.'}
+                    </div>
+                  ) : (
+                    filteredCollabs.map((user, idx) => (
+                      <div key={user} className="flex items-center justify-between px-4 py-3 border-b border-gray-600 hover:bg-gray-600 transition-colors">
+                        <div>
+                          <span className="font-medium text-white">{user}</span>
+                          {idx === 0 && <span className="ml-2 text-blue-400 font-medium">(Owner)</span>}
+                          {user === username && <span className="ml-2 text-green-400 font-medium">(You)</span>}
+                        </div>
+                        {ladder.user[0] === username && idx !== 0 && (
+                          <button
+                            onClick={() => handleRemoveCollaborator(user)}
+                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+              {ladder.user[0] === username && (
+                <div className="border-t border-gray-600 pt-4">
+                  <input
+                    type="text"
+                    placeholder="Enter username to invite..."
+                    value={newCollaborator}
+                    onChange={(e) => setNewCollaborator(e.target.value)}
+                    className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 w-full mb-3 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    onClick={handleAddCollaborator}
+                    className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                  >
+                    Add Collaborator
+                  </button>
+                  {collabMessage && (
+                    <div className={`mt-3 text-center font-medium ${collabMessage.startsWith('✅') ? 'text-green-400' : 'text-red-400'}`}>
+                      {collabMessage}
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={handleCollabModalClose}
+                  className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
