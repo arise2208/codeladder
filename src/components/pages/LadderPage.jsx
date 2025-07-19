@@ -10,6 +10,7 @@ const LadderPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showCollabModal, setShowCollabModal] = useState(false);
+  const [showCsvModal, setShowCsvModal] = useState(false);
   const [allQuestions, setAllQuestions] = useState([]);
   const [selectedToAdd, setSelectedToAdd] = useState([]);
   const [selectedToRemove, setSelectedToRemove] = useState([]);
@@ -25,6 +26,9 @@ const LadderPage = () => {
   const token = localStorage.getItem('token');
   const [newCollaborator, setNewCollaborator] = useState('');
   const [collabMessage, setCollabMessage] = useState('');
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvUploadMessage, setCsvUploadMessage] = useState('');
+  const [csvUploading, setCsvUploading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -355,6 +359,132 @@ const LadderPage = () => {
     setNewCollaborator('');
   };
 
+  const handleCsvUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCsvFile(file);
+  };
+
+  const processCsvFile = async () => {
+    if (!csvFile) {
+      setCsvUploadMessage('❌ Please select a CSV file first');
+      return;
+    }
+
+    setCsvUploading(true);
+    setCsvUploadMessage('');
+
+    try {
+      const text = await csvFile.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        setCsvUploadMessage('❌ CSV file must have at least a header and one data row');
+        setCsvUploading(false);
+        return;
+      }
+
+      // Parse CSV and extract URLs
+      const urls = [];
+      for (let i = 1; i < lines.length; i++) { // Skip header
+        const columns = lines[i].split('\t'); // Tab-separated
+        if (columns.length >= 2) {
+          const url = columns[1]?.trim(); // URL is in second column
+          if (url && url.startsWith('http')) {
+            urls.push(url);
+          }
+        }
+      }
+
+      if (urls.length === 0) {
+        setCsvUploadMessage('❌ No valid URLs found in CSV file');
+        setCsvUploading(false);
+        return;
+      }
+
+      // Fetch all questions if not already loaded
+      if (allQuestions.length === 0) {
+        await fetchAllQuestions();
+      }
+
+      // Find matching questions by URL
+      const matchingQuestionIds = [];
+      const notFoundUrls = [];
+
+      urls.forEach(url => {
+        const normalizedUrl = url.replace(/\/$/, ''); // Remove trailing slash
+        const matchingQuestion = allQuestions.find(q => {
+          if (!q.link) return false;
+          const normalizedQuestionUrl = q.link.replace(/\/$/, '');
+          return normalizedQuestionUrl === normalizedUrl;
+        });
+
+        if (matchingQuestion) {
+          // Check if question is not already in the ladder
+          if (!ladder?.questions.includes(matchingQuestion.question_id)) {
+            matchingQuestionIds.push(matchingQuestion.question_id);
+          }
+        } else {
+          notFoundUrls.push(url);
+        }
+      });
+
+      if (matchingQuestionIds.length === 0) {
+        if (notFoundUrls.length === urls.length) {
+          setCsvUploadMessage('❌ No matching problems found in our database');
+        } else {
+          setCsvUploadMessage('❌ All problems are already in the ladder');
+        }
+        setCsvUploading(false);
+        return;
+      }
+
+      // Add matching questions to ladder
+      await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
+        table_id: Number(tableId),
+        questionIds: matchingQuestionIds,
+        action: 'add',
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-username': username
+        }
+      });
+
+      // Update local state
+      setLadder(prev => ({ 
+        ...prev, 
+        questions: [...prev.questions, ...matchingQuestionIds] 
+      }));
+
+      let message = `✅ Successfully added ${matchingQuestionIds.length} problems to the ladder`;
+      if (notFoundUrls.length > 0) {
+        message += `\n⚠️ ${notFoundUrls.length} URLs not found in our database`;
+      }
+      setCsvUploadMessage(message);
+
+      // Clear file input
+      setCsvFile(null);
+      const fileInput = document.getElementById('csv-file-input');
+      if (fileInput) fileInput.value = '';
+
+    } catch (error) {
+      console.error('Error processing CSV:', error);
+      setCsvUploadMessage('❌ Failed to process CSV file. Please check the format and try again.');
+    } finally {
+      setCsvUploading(false);
+    }
+  };
+
+  const handleCsvModalClose = () => {
+    setShowCsvModal(false);
+    setCsvFile(null);
+    setCsvUploadMessage('');
+    setCsvUploading(false);
+    const fileInput = document.getElementById('csv-file-input');
+    if (fileInput) fileInput.value = '';
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white">
@@ -487,6 +617,14 @@ const LadderPage = () => {
               >
                 <i className="fas fa-plus"></i>
                 Add Problems
+              </button>
+              
+              <button
+                onClick={() => setShowCsvModal(true)}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                <i className="fas fa-file-csv"></i>
+                Upload CSV
               </button>
               
               <button
@@ -683,6 +821,88 @@ const LadderPage = () => {
                   <button
                     onClick={handleAddModalClose}
                     className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CSV Upload Modal */}
+        {showCsvModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleCsvModalClose}>
+            <div className="bg-gray-800 rounded-xl p-8 w-[600px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <h3 className="font-bold text-xl mb-4 text-white">Upload Problems via CSV</h3>
+              
+              {/* Instructions */}
+              <div className="mb-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
+                <h4 className="font-semibold text-blue-300 mb-2">CSV Format Instructions:</h4>
+                <div className="text-sm text-blue-200 space-y-1">
+                  <p>• File should be tab-separated (.csv or .tsv)</p>
+                  <p>• URL should be in the second column</p>
+                  <p>• First row should be headers (will be skipped)</p>
+                </div>
+                <div className="mt-3 p-3 bg-gray-900 rounded text-xs font-mono text-gray-300">
+                  <div>ID&nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;&nbsp;&nbsp;&nbsp;Title&nbsp;&nbsp;&nbsp;&nbsp;Difficulty&nbsp;&nbsp;&nbsp;&nbsp;Acceptance %</div>
+                  <div>20&nbsp;&nbsp;&nbsp;&nbsp;https://leetcode.com/problems/valid-parentheses&nbsp;&nbsp;&nbsp;&nbsp;Valid Parentheses&nbsp;&nbsp;&nbsp;&nbsp;Easy&nbsp;&nbsp;&nbsp;&nbsp;42.4%</div>
+                </div>
+              </div>
+
+              {/* File Upload */}
+              <div className="mb-4">
+                <label className="block text-white font-medium mb-2">Select CSV File:</label>
+                <input
+                  id="csv-file-input"
+                  type="file"
+                  accept=".csv,.tsv,.txt"
+                  onChange={handleCsvUpload}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white file:font-medium hover:file:bg-blue-700 transition-colors"
+                  disabled={csvUploading}
+                />
+              </div>
+
+              {/* Upload Status */}
+              {csvUploadMessage && (
+                <div className={`mb-4 p-3 rounded-lg ${
+                  csvUploadMessage.startsWith('✅') 
+                    ? 'bg-green-900/30 border border-green-700 text-green-300' 
+                    : csvUploadMessage.startsWith('⚠️')
+                    ? 'bg-yellow-900/30 border border-yellow-700 text-yellow-300'
+                    : 'bg-red-900/30 border border-red-700 text-red-300'
+                }`}>
+                  <pre className="whitespace-pre-wrap text-sm">{csvUploadMessage}</pre>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center">
+                <div className="text-gray-400 text-sm">
+                  {csvFile ? `Selected: ${csvFile.name}` : 'No file selected'}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={processCsvFile}
+                    disabled={!csvFile || csvUploading}
+                    className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    {csvUploading ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-upload"></i>
+                        Upload & Add
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCsvModalClose}
+                    className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+                    disabled={csvUploading}
                   >
                     Cancel
                   </button>
