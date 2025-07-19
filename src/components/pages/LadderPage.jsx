@@ -423,10 +423,15 @@ const LadderPage = () => {
       const notFoundUrls = [];
 
       urls.forEach(url => {
-        const normalizedUrl = url.replace(/\/$/, ''); // Remove trailing slash
+        // Normalize URL by removing trailing slash and /description
+        let normalizedUrl = url.replace(/\/$/, ''); // Remove trailing slash
+        normalizedUrl = normalizedUrl.replace(/\/description$/, ''); // Remove /description
+        
         const matchingQuestion = allQuestions.find(q => {
           if (!q.link) return false;
-          const normalizedQuestionUrl = q.link.replace(/\/$/, '');
+          // Normalize database URL by removing trailing slash and /description
+          let normalizedQuestionUrl = q.link.replace(/\/$/, '');
+          normalizedQuestionUrl = normalizedQuestionUrl.replace(/\/description$/, '');
           return normalizedQuestionUrl === normalizedUrl;
         });
 
