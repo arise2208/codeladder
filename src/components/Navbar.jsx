@@ -147,7 +147,7 @@ const Navbar = ({ user, setUser }) => {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
+      <div className={`md:hidden transition-all duration-300 overflow-hidden ${
         isMobileMenuOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'
       }`}>
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-lg space-y-2">
