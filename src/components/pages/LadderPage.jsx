@@ -387,9 +387,20 @@ const LadderPage = () => {
       // Parse CSV and extract URLs
       const urls = [];
       for (let i = 1; i < lines.length; i++) { // Skip header
-        const columns = lines[i].split('\t'); // Tab-separated
+        // Try comma-separated first, then tab-separated
+        let columns = lines[i].split(',');
+        if (columns.length < 2) {
+          columns = lines[i].split('\t'); // Fallback to tab-separated
+        }
+        
         if (columns.length >= 2) {
-          const url = columns[1]?.trim(); // URL is in second column
+          let url = columns[1]?.trim(); // URL is in second column
+          
+          // Remove quotes if present (common in CSV files)
+          if (url && (url.startsWith('"') && url.endsWith('"'))) {
+            url = url.slice(1, -1);
+          }
+          
           if (url && url.startsWith('http')) {
             urls.push(url);
           }
@@ -840,13 +851,13 @@ const LadderPage = () => {
               <div className="mb-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
                 <h4 className="font-semibold text-blue-300 mb-2">CSV Format Instructions:</h4>
                 <div className="text-sm text-blue-200 space-y-1">
-                  <p>• File should be tab-separated (.csv or .tsv)</p>
+                  <p>• File can be comma-separated (.csv) or tab-separated (.tsv)</p>
                   <p>• URL should be in the second column</p>
                   <p>• First row should be headers (will be skipped)</p>
                 </div>
                 <div className="mt-3 p-3 bg-gray-900 rounded text-xs font-mono text-gray-300">
-                  <div>ID&nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;&nbsp;&nbsp;&nbsp;Title&nbsp;&nbsp;&nbsp;&nbsp;Difficulty&nbsp;&nbsp;&nbsp;&nbsp;Acceptance %</div>
-                  <div>20&nbsp;&nbsp;&nbsp;&nbsp;https://leetcode.com/problems/valid-parentheses&nbsp;&nbsp;&nbsp;&nbsp;Valid Parentheses&nbsp;&nbsp;&nbsp;&nbsp;Easy&nbsp;&nbsp;&nbsp;&nbsp;42.4%</div>
+                  <div>ID,URL,Title,Difficulty,Acceptance %</div>
+                  <div>20,https://leetcode.com/problems/valid-parentheses,Valid Parentheses,Easy,42.4%</div>
                 </div>
               </div>
 
