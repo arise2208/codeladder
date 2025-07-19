@@ -1,40 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { useParams, useNavigate } from "react-router-dom"
 
 const LadderPage = () => {
-  const { tableId } = useParams();
-  const [ladder, setLadder] = useState(null);
-  const [questions, setQuestions] = useState([]);
-  const [error, setError] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [showCollabModal, setShowCollabModal] = useState(false);
-  const [showCsvModal, setShowCsvModal] = useState(false);
-  const [allQuestions, setAllQuestions] = useState([]);
-  const [selectedToAdd, setSelectedToAdd] = useState([]);
-  const [selectedToRemove, setSelectedToRemove] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [removeSearchQuery, setRemoveSearchQuery] = useState('');
-  const [collabSearchQuery, setCollabSearchQuery] = useState('');
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [expandedSections, setExpandedSections] = useState({});
-  const [groupedQuestions, setGroupedQuestions] = useState({});
-  const [currentView, setCurrentView] = useState('all'); // 'all' or 'revision'
-  const username = localStorage.getItem('username');
-  const token = localStorage.getItem('token');
-  const [newCollaborator, setNewCollaborator] = useState('');
-  const [collabMessage, setCollabMessage] = useState('');
-  const [csvFile, setCsvFile] = useState(null);
-  const [csvUploadMessage, setCsvUploadMessage] = useState('');
-  const [csvUploading, setCsvUploading] = useState(false);
-
-  const navigate = useNavigate();
+  const { tableId } = useParams()
+  const [ladder, setLadder] = useState(null)
+  const [questions, setQuestions] = useState([])
+  const [error, setError] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [showCollabModal, setShowCollabModal] = useState(false)
+  const [showCsvModal, setShowCsvModal] = useState(false)
+  const [allQuestions, setAllQuestions] = useState([])
+  const [selectedToAdd, setSelectedToAdd] = useState([])
+  const [selectedToRemove, setSelectedToRemove] = useState([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [removeSearchQuery, setRemoveSearchQuery] = useState("")
+  const [collabSearchQuery, setCollabSearchQuery] = useState("")
+  const [isAuthorized, setIsAuthorized] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentView, setCurrentView] = useState("all") // 'all' or 'revision'
+  const [mainSearchQuery, setMainSearchQuery] = useState("") // New search state for main questions
+  const username = localStorage.getItem("username")
+  const token = localStorage.getItem("token")
+  const [newCollaborator, setNewCollaborator] = useState("")
+  const [collabMessage, setCollabMessage] = useState("")
+  const [csvFile, setCsvFile] = useState(null)
+  const [csvUploadMessage, setCsvUploadMessage] = useState("")
+  const [csvUploading, setCsvUploading] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (!username || !token) navigate('/login');
-  }, [username, token, navigate]);
+    if (!username || !token) navigate("/login")
+  }, [username, token, navigate])
 
   useEffect(() => {
     const fetchLadder = async () => {
@@ -42,464 +40,433 @@ const LadderPage = () => {
         const res = await axios.get(`https://backendcodeladder-2.onrender.com/ladder/${tableId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'x-username': username
-          }
-        });
-        const ladderData = res.data;
-        setLadder(ladderData);
-        const userHasAccess = ladderData.user && ladderData.user.includes(username);
-        setIsAuthorized(userHasAccess);
-        setError(userHasAccess ? null : 'You do not have permission to access this ladder.');
-        setIsLoading(false);
+            "x-username": username,
+          },
+        })
+        const ladderData = res.data
+        setLadder(ladderData)
+        const userHasAccess = ladderData.user && ladderData.user.includes(username)
+        setIsAuthorized(userHasAccess)
+        setError(userHasAccess ? null : "You do not have permission to access this ladder.")
+        setIsLoading(false)
       } catch (err) {
-        setError('Failed to load ladder');
-        setIsLoading(false);
+        setError("Failed to load ladder")
+        setIsLoading(false)
       }
-    };
-    if (tableId && username && token) fetchLadder();
-  }, [tableId, username, token]);
+    }
+    if (tableId && username && token) fetchLadder()
+  }, [tableId, username, token])
 
   useEffect(() => {
-    if (!ladder || !ladder.questions || !isAuthorized) return;
+    if (!ladder || !ladder.questions || !isAuthorized) return
     const fetchQuestions = async () => {
       try {
         const promises = ladder.questions.map((qId) =>
-          axios.get(`https://backendcodeladder-2.onrender.com/question/${qId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'x-username': username
-            }
-          }).then(res => res.data)
-        );
-        const results = await Promise.all(promises);
-        setQuestions(results);
-        
-        // Group questions by tags for structured display
-        const grouped = groupQuestionsByTags(results);
-        setGroupedQuestions(grouped);
+          axios
+            .get(`https://backendcodeladder-2.onrender.com/question/${qId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "x-username": username,
+              },
+            })
+            .then((res) => res.data),
+        )
+        const results = await Promise.all(promises)
+        setQuestions(results)
       } catch {
-        setError('Failed to load question details');
+        setError("Failed to load question details")
       }
-    };
-    fetchQuestions();
-  }, [ladder, isAuthorized, token, username]);
-
-  const groupQuestionsByTags = (questions) => {
-    const groups = {};
-    
-    questions.forEach((question, index) => {
-      const tags = question.tags || [];
-      
-      // Try to find a main category tag
-      let category = 'Miscellaneous';
-      
-      // Define category mappings
-      const categoryMappings = {
-        'Arrays': ['array', 'arrays'],
-        'Strings': ['string', 'strings'],
-        'Dynamic Programming': ['dp', 'dynamic programming', 'dynamic-programming'],
-        'Graphs': ['graph', 'graphs', 'dfs', 'bfs'],
-        'Trees': ['tree', 'trees', 'binary tree'],
-        'Math': ['math', 'mathematics', 'number theory'],
-        'Greedy': ['greedy'],
-        'Sorting': ['sorting', 'sort'],
-        'Binary Search': ['binary search', 'binary-search'],
-        'Two Pointers': ['two pointers', 'two-pointers'],
-        'Sliding Window': ['sliding window', 'sliding-window'],
-        'Backtracking': ['backtracking'],
-        'Recursion': ['recursion', 'recursive'],
-        'Data Structures': ['data structures', 'stack', 'queue', 'heap'],
-      };
-
-      // Find the best category match
-      for (const [cat, keywords] of Object.entries(categoryMappings)) {
-        if (tags.some(tag => keywords.some(keyword => 
-          tag.toLowerCase().includes(keyword.toLowerCase())
-        ))) {
-          category = cat;
-          break;
-        }
-      }
-
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      
-      groups[category].push({
-        ...question,
-        originalIndex: index
-      });
-    });
-
-    return groups;
-  };
+    }
+    fetchQuestions()
+  }, [ladder, isAuthorized, token, username])
 
   const fetchAllQuestions = async () => {
     try {
-      const res = await axios.get('https://backendcodeladder-2.onrender.com/problemset', {
+      const res = await axios.get("https://backendcodeladder-2.onrender.com/problemset", {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setAllQuestions(res.data);
+          "x-username": username,
+        },
+      })
+      setAllQuestions(res.data)
     } catch {
-      alert('Failed to fetch all questions');
+      alert("Failed to fetch all questions")
     }
-  };
+  }
 
   const handleAddCollaborator = async () => {
-    if (!newCollaborator.trim()) return;
+    if (!newCollaborator.trim()) return
     try {
-      await axios.post('https://backendcodeladder-2.onrender.com/collabtable', {
-        source_table_id: Number(tableId),
-        new_user_id: newCollaborator.trim(),
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setCollabMessage(`✅ ${newCollaborator} added successfully!`);
-      setNewCollaborator('');
+      await axios.post(
+        "https://backendcodeladder-2.onrender.com/collabtable",
+        {
+          source_table_id: Number(tableId),
+          new_user_id: newCollaborator.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+      setCollabMessage(`✅ ${newCollaborator} added successfully!`)
+      setNewCollaborator("")
       const ladderRes = await axios.get(`https://backendcodeladder-2.onrender.com/ladder/${tableId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setLadder(ladderRes.data);
+          "x-username": username,
+        },
+      })
+      setLadder(ladderRes.data)
     } catch (err) {
-      setCollabMessage(`❌ Failed to add collaborator: ${err.response?.data?.error || 'Unknown error'}`);
+      setCollabMessage(`❌ Failed to add collaborator: ${err.response?.data?.error || "Unknown error"}`)
     }
-  };
+  }
 
   const handleRemoveCollaborator = async (userToRemove) => {
     try {
-      const response = await fetch('https://backendcodeladder-2.onrender.com/removecollab', {
-        method: 'POST',
+      const response = await fetch("https://backendcodeladder-2.onrender.com/removecollab", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          'x-username': username
+          "x-username": username,
         },
         body: JSON.stringify({ source_table_id: ladder.table_id, user_to_remove: userToRemove }),
-      });
-      const data = await response.json();
+      })
+      const data = await response.json()
       if (response.ok) {
-        setLadder((prev) => ({ ...prev, user: data.users }));
-        setCollabMessage(`✅ Removed ${userToRemove} successfully`);
+        setLadder((prev) => ({ ...prev, user: data.users }))
+        setCollabMessage(`✅ Removed ${userToRemove} successfully`)
       } else {
-        setCollabMessage(`❌ ${data.error}`);
+        setCollabMessage(`❌ ${data.error}`)
       }
     } catch (error) {
-      setCollabMessage('❌ Internal error');
+      setCollabMessage("❌ Internal error")
     }
-  };
+  }
 
-  const toggleSelectToAdd = (id) => setSelectedToAdd(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  
+  const toggleSelectToAdd = (id) =>
+    setSelectedToAdd((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+
   const handleAddToLadder = async () => {
     try {
-      await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
-        table_id: Number(tableId),
-        questionIds: selectedToAdd,
-        action: 'add',
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setShowAddModal(false);
-      setSelectedToAdd([]);
-      setSearchQuery('');
-      setLadder(prev => ({ ...prev, questions: [...prev.questions, ...selectedToAdd] }));
+      await axios.patch(
+        "https://backendcodeladder-2.onrender.com/edittable",
+        {
+          table_id: Number(tableId),
+          questionIds: selectedToAdd,
+          action: "add",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+      setShowAddModal(false)
+      setSelectedToAdd([])
+      setSearchQuery("")
+      setLadder((prev) => ({ ...prev, questions: [...prev.questions, ...selectedToAdd] }))
     } catch {
-      alert('Failed to add questions');
+      alert("Failed to add questions")
     }
-  };
+  }
 
   const toggleSelectToRemove = (id) =>
-    setSelectedToRemove(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-    
+    setSelectedToRemove((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+
   const handleRemoveSelected = async () => {
     try {
-      await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
-        table_id: Number(tableId),
-        questionIds: selectedToRemove,
-        action: 'remove',
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setLadder(prev => ({
+      await axios.patch(
+        "https://backendcodeladder-2.onrender.com/edittable",
+        {
+          table_id: Number(tableId),
+          questionIds: selectedToRemove,
+          action: "remove",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+      setLadder((prev) => ({
         ...prev,
-        questions: prev.questions.filter(q => !selectedToRemove.includes(q)),
-      }));
-      setQuestions(prev => prev.filter(q => !selectedToRemove.includes(q.question_id)));
-      setSelectedToRemove([]);
-      setShowRemoveModal(false);
-      setRemoveSearchQuery('');
+        questions: prev.questions.filter((q) => !selectedToRemove.includes(q)),
+      }))
+      setQuestions((prev) => prev.filter((q) => !selectedToRemove.includes(q.question_id)))
+      setSelectedToRemove([])
+      setShowRemoveModal(false)
+      setRemoveSearchQuery("")
     } catch {
-      alert('Failed to remove selected questions');
+      alert("Failed to remove selected questions")
     }
-  };
+  }
 
   const handleMarkSolved = async (questionId) => {
     try {
-      await axios.patch(`https://backendcodeladder-2.onrender.com/markquestion`, {
-        questionid: questionId,
-        user: username,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setQuestions(prev =>
-        prev.map(q =>
-          q.question_id === questionId
-            ? { ...q, solved_by: [...(q.solved_by || []), username] }
-            : q
-        )
-      );
+      await axios.patch(
+        `https://backendcodeladder-2.onrender.com/markquestion`,
+        {
+          questionid: questionId,
+          user: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+      setQuestions((prev) =>
+        prev.map((q) => (q.question_id === questionId ? { ...q, solved_by: [...(q.solved_by || []), username] } : q)),
+      )
     } catch {
-      alert('❌ Could not mark as solved');
+      alert("❌ Could not mark as solved")
     }
-  };
+  }
 
   const handleUnmark = async (questionId) => {
     try {
-      await axios.patch(`https://backendcodeladder-2.onrender.com/unmarkquestion`, {
-        questionid: questionId,
-        user: username,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-      setQuestions(prev =>
-        prev.map(q =>
-          q.question_id === questionId
-            ? { ...q, solved_by: (q.solved_by || []).filter(u => u !== username) }
-            : q
-        )
-      );
+      await axios.patch(
+        `https://backendcodeladder-2.onrender.com/unmarkquestion`,
+        {
+          questionid: questionId,
+          user: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.question_id === questionId ? { ...q, solved_by: (q.solved_by || []).filter((u) => u !== username) } : q,
+        ),
+      )
     } catch {
-      alert('❌ Could not unmark the question');
+      alert("❌ Could not unmark the question")
     }
-  };
-
-  const toggleSection = (sectionName) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionName]: !prev[sectionName]
-    }));
-  };
-
-  const getSectionProgress = (sectionQuestions) => {
-    const solved = sectionQuestions.filter(q => q.solved_by?.includes(username)).length;
-    const total = sectionQuestions.length;
-    return { solved, total };
-  };
+  }
 
   const getOverallProgress = () => {
-    const solved = questions.filter(q => q.solved_by?.includes(username)).length;
-    const total = questions.length;
-    return { solved, total };
-  };
+    const solved = questions.filter((q) => q.solved_by?.includes(username)).length
+    const total = questions.length
+    return { solved, total }
+  }
+
+  // Filter questions based on search query
+  const getFilteredQuestions = () => {
+    if (!mainSearchQuery.trim()) return questions
+
+    const query = mainSearchQuery.toLowerCase()
+    return questions.filter((q) => {
+      return (
+        q.title.toLowerCase().includes(query) || (q.tags && q.tags.some((tag) => tag.toLowerCase().includes(query)))
+      )
+    })
+  }
+
+  // Get revision questions (solved questions)
+  const getRevisionQuestions = () => {
+    const solvedQuestions = questions.filter((q) => q.solved_by?.includes(username))
+    if (!mainSearchQuery.trim()) return solvedQuestions
+
+    const query = mainSearchQuery.toLowerCase()
+    return solvedQuestions.filter((q) => {
+      return (
+        q.title.toLowerCase().includes(query) || (q.tags && q.tags.some((tag) => tag.toLowerCase().includes(query)))
+      )
+    })
+  }
+
+  const getDifficultyColor = (tags) => {
+    if (!tags || !Array.isArray(tags)) return "text-white"
+
+    const tagString = tags.join(" ").toLowerCase()
+
+    if (tagString.includes("easy")) {
+      return "text-green-400"
+    } else if (tagString.includes("medium")) {
+      return "text-yellow-400"
+    } else if (tagString.includes("hard")) {
+      return "text-red-400"
+    }
+
+    return "text-white"
+  }
 
   const filteredQuestions = allQuestions
-    .filter(q => !ladder?.questions.includes(q.question_id))
-    .filter(q => {
-      if (!searchQuery) return true;
-      const query = searchQuery.toLowerCase();
+    .filter((q) => !ladder?.questions.includes(q.question_id))
+    .filter((q) => {
+      if (!searchQuery) return true
+      const query = searchQuery.toLowerCase()
       return (
-        q.title.toLowerCase().includes(query) ||
-        (q.tags && q.tags.some(tag => tag.toLowerCase().includes(query)))
-      );
-    });
+        q.title.toLowerCase().includes(query) || (q.tags && q.tags.some((tag) => tag.toLowerCase().includes(query)))
+      )
+    })
 
-  const questionsToRemove = questions.filter(q => {
-    if (!removeSearchQuery) return true;
-    const query = removeSearchQuery.toLowerCase();
-    return (
-      q.title.toLowerCase().includes(query) ||
-      (q.tags && q.tags.some(tag => tag.toLowerCase().includes(query)))
-    );
-  });
+  const questionsToRemove = questions.filter((q) => {
+    if (!removeSearchQuery) return true
+    const query = removeSearchQuery.toLowerCase()
+    return q.title.toLowerCase().includes(query) || (q.tags && q.tags.some((tag) => tag.toLowerCase().includes(query)))
+  })
 
-  const filteredCollabs = ladder?.user?.filter(user => {
-    if (!collabSearchQuery) return true;
-    return user.toLowerCase().includes(collabSearchQuery.toLowerCase());
-  }) || [];
+  const filteredCollabs =
+    ladder?.user?.filter((user) => {
+      if (!collabSearchQuery) return true
+      return user.toLowerCase().includes(collabSearchQuery.toLowerCase())
+    }) || []
 
   const handleAddModalClose = () => {
-    setShowAddModal(false);
-    setSearchQuery('');
-    setSelectedToAdd([]);
-  };
+    setShowAddModal(false)
+    setSearchQuery("")
+    setSelectedToAdd([])
+  }
 
   const handleRemoveModalClose = () => {
-    setShowRemoveModal(false);
-    setRemoveSearchQuery('');
-    setSelectedToRemove([]);
-  };
+    setShowRemoveModal(false)
+    setRemoveSearchQuery("")
+    setSelectedToRemove([])
+  }
 
   const handleCollabModalClose = () => {
-    setShowCollabModal(false);
-    setCollabSearchQuery('');
-    setCollabMessage('');
-    setNewCollaborator('');
-  };
+    setShowCollabModal(false)
+    setCollabSearchQuery("")
+    setCollabMessage("")
+    setNewCollaborator("")
+  }
 
   const handleCsvUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setCsvFile(file);
-  };
+    const file = e.target.files[0]
+    if (!file) return
+    setCsvFile(file)
+  }
 
   const processCsvFile = async () => {
     if (!csvFile) {
-      setCsvUploadMessage('❌ Please select a CSV file first');
-      return;
+      setCsvUploadMessage("❌ Please select a CSV file first")
+      return
     }
-
-    setCsvUploading(true);
-    setCsvUploadMessage('');
-
+    setCsvUploading(true)
+    setCsvUploadMessage("")
     try {
-      const text = await csvFile.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
+      const text = await csvFile.text()
+      const lines = text.split("\n").filter((line) => line.trim())
       if (lines.length < 2) {
-        setCsvUploadMessage('❌ CSV file must have at least a header and one data row');
-        setCsvUploading(false);
-        return;
+        setCsvUploadMessage("❌ CSV file must have at least a header and one data row")
+        setCsvUploading(false)
+        return
       }
-
-      // Parse CSV and extract URLs
-      const urls = [];
-      for (let i = 1; i < lines.length; i++) { // Skip header
-        // Try comma-separated first, then tab-separated
-        let columns = lines[i].split(',');
-        if (columns.length < 2) {
-          columns = lines[i].split('\t'); // Fallback to tab-separated
-        }
-        
-        if (columns.length >= 2) {
-          let url = columns[1]?.trim(); // URL is in second column
-          
-          // Remove quotes if present (common in CSV files)
-          if (url && (url.startsWith('"') && url.endsWith('"'))) {
-            url = url.slice(1, -1);
-          }
-          
-          if (url && url.startsWith('http')) {
-            urls.push(url);
-          }
+      // Robustly extract URLs from each line (handles commas in titles)
+      const urls = []
+      for (let i = 1; i < lines.length; i++) {
+        // Skip header
+        const line = lines[i]
+        // Find the first occurrence of a URL (http...) in the line
+        const match = line.match(/https?:\/\/[^\s,"]+/)
+        if (match && match[0]) {
+          urls.push(match[0].trim())
         }
       }
-
       if (urls.length === 0) {
-        setCsvUploadMessage('❌ No valid URLs found in CSV file');
-        setCsvUploading(false);
-        return;
+        setCsvUploadMessage("❌ No valid URLs found in CSV file")
+        setCsvUploading(false)
+        return
       }
-
       // Fetch all questions if not already loaded
       if (allQuestions.length === 0) {
-        await fetchAllQuestions();
+        await fetchAllQuestions()
       }
-
       // Find matching questions by URL
-      const matchingQuestionIds = [];
-      const notFoundUrls = [];
-
-      urls.forEach(url => {
+      const matchingQuestionIds = []
+      const notFoundUrls = []
+      urls.forEach((url) => {
         // Normalize URL by removing trailing slash and /description
-        let normalizedUrl = url.replace(/\/$/, ''); // Remove trailing slash
-        normalizedUrl = normalizedUrl.replace(/\/description$/, ''); // Remove /description
-        
-        const matchingQuestion = allQuestions.find(q => {
-          if (!q.link) return false;
+        let normalizedUrl = url.replace(/\/$/, "") // Remove trailing slash
+        normalizedUrl = normalizedUrl.replace(/\/description$/, "") // Remove /description
+        const matchingQuestion = allQuestions.find((q) => {
+          if (!q.link) return false
           // Normalize database URL by removing trailing slash and /description
-          let normalizedQuestionUrl = q.link.replace(/\/$/, '');
-          normalizedQuestionUrl = normalizedQuestionUrl.replace(/\/description$/, '');
-          return normalizedQuestionUrl === normalizedUrl;
-        });
-
+          let normalizedQuestionUrl = q.link.replace(/\/$/, "")
+          normalizedQuestionUrl = normalizedQuestionUrl.replace(/\/description$/, "")
+          return normalizedQuestionUrl === normalizedUrl
+        })
         if (matchingQuestion) {
           // Check if question is not already in the ladder
           if (!ladder?.questions.includes(matchingQuestion.question_id)) {
-            matchingQuestionIds.push(matchingQuestion.question_id);
+            matchingQuestionIds.push(matchingQuestion.question_id)
           }
         } else {
-          notFoundUrls.push(url);
+          notFoundUrls.push(url)
         }
-      });
-
+      })
       if (matchingQuestionIds.length === 0) {
         if (notFoundUrls.length === urls.length) {
-          setCsvUploadMessage('❌ No matching problems found in our database');
+          // Show not found URLs in the error message
+          setCsvUploadMessage(
+            `❌ No matching problems found in our database.\n\nNot found URLs:\n` +
+              notFoundUrls.map((url, idx) => `${idx + 1}. ${url}`).join("\n"),
+          )
         } else {
-          setCsvUploadMessage('❌ All problems are already in the ladder');
+          setCsvUploadMessage(
+            `❌ All problems are already in the ladder.\n\nThe following URLs were not found in our database:\n` +
+              notFoundUrls.map((url, idx) => `${idx + 1}. ${url}`).join("\n"),
+          )
         }
-        setCsvUploading(false);
-        return;
+        setCsvUploading(false)
+        return
       }
-
       // Add matching questions to ladder
-      await axios.patch('https://backendcodeladder-2.onrender.com/edittable', {
-        table_id: Number(tableId),
-        questionIds: matchingQuestionIds,
-        action: 'add',
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'x-username': username
-        }
-      });
-
+      await axios.patch(
+        "https://backendcodeladder-2.onrender.com/edittable",
+        {
+          table_id: Number(tableId),
+          questionIds: matchingQuestionIds,
+          action: "add",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-username": username,
+          },
+        },
+      )
       // Update local state
-      setLadder(prev => ({ 
-        ...prev, 
-        questions: [...prev.questions, ...matchingQuestionIds] 
-      }));
-
-      let message = `✅ Successfully added ${matchingQuestionIds.length} problems to the ladder`;
+      setLadder((prev) => ({ ...prev, questions: [...prev.questions, ...matchingQuestionIds] }))
+      let message = `✅ Successfully added ${matchingQuestionIds.length} problems to the ladder`
       if (notFoundUrls.length > 0) {
-        message += `\n⚠️ ${notFoundUrls.length} URLs not found in our database`;
+        message +=
+          `\n⚠️ ${notFoundUrls.length} URLs not found in our database:\n` +
+          notFoundUrls.map((url, idx) => `${idx + 1}. ${url}`).join("\n")
       }
-      setCsvUploadMessage(message);
-
+      setCsvUploadMessage(message)
       // Clear file input
-      setCsvFile(null);
-      const fileInput = document.getElementById('csv-file-input');
-      if (fileInput) fileInput.value = '';
-
+      setCsvFile(null)
+      const fileInput = document.getElementById("csv-file-input")
+      if (fileInput) fileInput.value = ""
     } catch (error) {
-      console.error('Error processing CSV:', error);
-      setCsvUploadMessage('❌ Failed to process CSV file. Please check the format and try again.');
+      console.error("Error processing CSV:", error)
+      setCsvUploadMessage("❌ Failed to process CSV file. Please check the format and try again.")
     } finally {
-      setCsvUploading(false);
+      setCsvUploading(false)
     }
-  };
+  }
 
   const handleCsvModalClose = () => {
-    setShowCsvModal(false);
-    setCsvFile(null);
-    setCsvUploadMessage('');
-    setCsvUploading(false);
-    const fileInput = document.getElementById('csv-file-input');
-    if (fileInput) fileInput.value = '';
-  };
+    setShowCsvModal(false)
+    setCsvFile(null)
+    setCsvUploadMessage("")
+    setCsvUploading(false)
+    const fileInput = document.getElementById("csv-file-input")
+    if (fileInput) fileInput.value = ""
+  }
 
   if (isLoading) {
     return (
@@ -514,7 +481,7 @@ const LadderPage = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (!isAuthorized) {
@@ -526,7 +493,7 @@ const LadderPage = () => {
               <h2 className="text-3xl font-bold text-red-400 mb-4">🚫 Access Denied</h2>
               <p className="text-gray-400 mb-6">You do not have permission to access this ladder.</p>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
                 ← Go Back to Dashboard
@@ -535,7 +502,7 @@ const LadderPage = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (error && isAuthorized) {
@@ -556,11 +523,11 @@ const LadderPage = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  const overallProgress = getOverallProgress();
-  const progressPercentage = overallProgress.total > 0 ? (overallProgress.solved / overallProgress.total) * 100 : 0;
+  const overallProgress = getOverallProgress()
+  const displayQuestions = currentView === "all" ? getFilteredQuestions() : getRevisionQuestions()
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -569,12 +536,9 @@ const LadderPage = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">
-                {ladder?.table_title || `Ladder ${tableId}`}
-              </h1>
+              <h1 className="text-4xl font-bold text-white mb-2">{ladder?.table_title || `Ladder ${tableId}`}</h1>
               <p className="text-gray-400">Structured learning path</p>
             </div>
-            
             {/* Progress Stats */}
             <div className="flex items-center gap-8">
               <div className="text-center">
@@ -589,26 +553,22 @@ const LadderPage = () => {
           {/* Navigation Tabs */}
           <div className="flex items-center gap-4 mb-6">
             <button
-              onClick={() => setCurrentView('all')}
+              onClick={() => setCurrentView("all")}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                currentView === 'all'
-                  ? 'bg-white text-gray-900'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                currentView === "all" ? "bg-white text-gray-900" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
             >
               All Problems
             </button>
             <button
-              onClick={() => setCurrentView('revision')}
+              onClick={() => setCurrentView("revision")}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                currentView === 'revision'
-                  ? 'bg-white text-gray-900'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                currentView === "revision" ? "bg-white text-gray-900" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
             >
               Revision
             </button>
-            
+
             {/* Search and Actions */}
             <div className="flex items-center gap-4 ml-auto">
               <div className="relative">
@@ -616,25 +576,21 @@ const LadderPage = () => {
                 <input
                   type="text"
                   placeholder="Search problems..."
+                  value={mainSearchQuery}
+                  onChange={(e) => setMainSearchQuery(e.target.value)}
                   className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 />
               </div>
-              
-              <select className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                <option>Difficulty</option>
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
-              </select>
-              
               <button
-                onClick={() => { fetchAllQuestions(); setShowAddModal(true); }}
+                onClick={() => {
+                  fetchAllQuestions()
+                  setShowAddModal(true)
+                }}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
               >
                 <i className="fas fa-plus"></i>
                 Add Problems
               </button>
-              
               <button
                 onClick={() => setShowCsvModal(true)}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
@@ -642,7 +598,6 @@ const LadderPage = () => {
                 <i className="fas fa-file-csv"></i>
                 Upload CSV
               </button>
-              
               <button
                 onClick={() => setShowCollabModal(true)}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
@@ -655,131 +610,111 @@ const LadderPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
-          {Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => {
-            const { solved, total } = getSectionProgress(sectionQuestions);
-            const sectionProgress = total > 0 ? (solved / total) * 100 : 0;
-            const isExpanded = expandedSections[sectionName] !== false; // Default to expanded
+        <div className="bg-gray-800 rounded-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-700">
+            <h3 className="text-xl font-semibold text-white">
+              {currentView === "all" ? "All Problems" : "Revision Problems"}
+              <span className="ml-2 text-gray-400">({displayQuestions.length})</span>
+            </h3>
+          </div>
 
-            return (
-              <div key={sectionName} className="bg-gray-800 rounded-lg overflow-hidden">
-                {/* Section Header */}
-                <button
-                  onClick={() => toggleSection(sectionName)}
-                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-750 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'} text-gray-400`}></i>
-                    <h3 className="text-xl font-semibold text-white">{sectionName}</h3>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="text-white font-medium">{solved} / {total}</div>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
-                        style={{ width: `${sectionProgress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Section Content */}
-                {isExpanded && (
-                  <div className="px-6 pb-6">
-                    <div className="space-y-3">
-                      {sectionQuestions.map((question, index) => {
-                        const isSolved = question.solved_by?.includes(username);
-                        return (
-                          <div
-                            key={question.question_id}
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                              isSolved ? 'bg-green-900/30' : 'bg-gray-700/50 hover:bg-gray-700'
-                            }`}
-                          >
-                            {/* Problem Number */}
-                            <div className="w-8 text-center text-gray-400 font-mono text-sm">
-                              {index + 1}
-                            </div>
-
-                            {/* Status Checkbox */}
-                            <button
-                              onClick={() =>
-                                isSolved
-                                  ? handleUnmark(question.question_id)
-                                  : handleMarkSolved(question.question_id)
-                              }
-                              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                                isSolved
-                                  ? 'bg-green-500 border-green-500'
-                                  : 'border-gray-500 hover:border-gray-400'
-                              }`}
-                            >
-                              {isSolved && <i className="fas fa-check text-white text-xs"></i>}
-                            </button>
-
-                            {/* Problem Title */}
-                            <div className="flex-1">
-                              <a
-                                href={question.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className={`font-medium hover:underline transition-colors ${
-                                  isSolved ? 'text-green-400' : 'text-white hover:text-blue-400'
-                                }`}
-                              >
-                                {question.title}
-                              </a>
-                              
-                              {/* Tags */}
-                              {question.tags && question.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {question.tags.slice(0, 3).map(tag => (
-                                    <span
-                                      key={tag}
-                                      className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                  {question.tags.length > 3 && (
-                                    <span className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">
-                                      +{question.tags.length - 3}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => toggleSelectToRemove(question.question_id)}
-                                className="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                                title="Remove from ladder"
-                              >
-                                <i className="fas fa-trash text-sm"></i>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+          <div className="px-6 pb-6">
+            {displayQuestions.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 text-lg mb-2">
+                  {mainSearchQuery
+                    ? "No problems match your search."
+                    : currentView === "revision"
+                      ? "No solved problems yet."
+                      : "No problems in this ladder."}
+                </div>
+                {mainSearchQuery && (
+                  <button
+                    onClick={() => setMainSearchQuery("")}
+                    className="text-blue-400 hover:text-blue-300 underline"
+                  >
+                    Clear search
+                  </button>
                 )}
               </div>
-            );
-          })}
+            ) : (
+              <div className="space-y-3 mt-4">
+                {displayQuestions.map((question, index) => {
+                  const isSolved = question.solved_by?.includes(username)
+                  return (
+                    <div
+                      key={question.question_id}
+                      className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                        isSolved ? "bg-green-900/30" : "bg-gray-700/50 hover:bg-gray-700"
+                      }`}
+                    >
+                      {/* Problem Number */}
+                      <div className="w-8 text-center text-gray-400 font-mono text-sm">{index + 1}</div>
+
+                      {/* Status Checkbox */}
+                      <button
+                        onClick={() =>
+                          isSolved ? handleUnmark(question.question_id) : handleMarkSolved(question.question_id)
+                        }
+                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                          isSolved ? "bg-green-500 border-green-500" : "border-gray-500 hover:border-gray-400"
+                        }`}
+                      >
+                        {isSolved && <i className="fas fa-check text-white text-xs"></i>}
+                      </button>
+
+                      {/* Problem Title */}
+                      <div className="flex-1">
+                        <a
+                          href={question.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`font-medium hover:underline transition-colors ${
+                            isSolved ? "text-green-400" : `${getDifficultyColor(question.tags)} hover:opacity-80`
+                          }`}
+                        >
+                          {question.title}
+                        </a>
+                        {/* Tags */}
+                        {question.tags && question.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {question.tags.map((tag) => (
+                              <span key={tag} className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleSelectToRemove(question.question_id)}
+                          className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                          title="Remove from ladder"
+                        >
+                          <i className="fas fa-trash text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Add Question Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleAddModalClose}>
-            <div className="bg-gray-800 rounded-xl p-8 w-[520px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+            onClick={handleAddModalClose}
+          >
+            <div
+              className="bg-gray-800 rounded-xl p-8 w-[520px] shadow-2xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3 className="font-bold text-xl mb-4 text-white">Select Questions to Add</h3>
               <input
                 type="text"
@@ -789,15 +724,15 @@ const LadderPage = () => {
                 className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 w-full mb-4 focus:outline-none focus:border-blue-500"
               />
               <div className="text-gray-400 text-sm mb-3">
-                {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''} found
+                {filteredQuestions.length} question{filteredQuestions.length !== 1 ? "s" : ""} found
               </div>
               <div className="max-h-60 overflow-y-auto border border-gray-600 rounded-lg bg-gray-700">
                 {filteredQuestions.length === 0 ? (
                   <div className="p-8 text-center text-gray-400">
-                    {searchQuery ? 'No questions match your search.' : 'No questions available to add.'}
+                    {searchQuery ? "No questions match your search." : "No questions available to add."}
                   </div>
                 ) : (
-                  filteredQuestions.map(q => (
+                  filteredQuestions.map((q) => (
                     <div
                       key={q.question_id}
                       className="flex justify-between items-center px-4 py-3 border-b border-gray-600 hover:bg-gray-600 transition-colors"
@@ -806,9 +741,11 @@ const LadderPage = () => {
                         <div className="font-medium text-white">{q.title}</div>
                         {q.tags && q.tags.length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {q.tags.map(tag =>
-                              <span key={tag} className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">{tag}</span>
-                            )}
+                            {q.tags.map((tag) => (
+                              <span key={tag} className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded">
+                                {tag}
+                              </span>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -823,9 +760,7 @@ const LadderPage = () => {
                 )}
               </div>
               <div className="mt-6 flex justify-between items-center">
-                <div className="text-gray-400">
-                  {selectedToAdd.length} selected
-                </div>
+                <div className="text-gray-400">{selectedToAdd.length} selected</div>
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToLadder}
@@ -848,24 +783,33 @@ const LadderPage = () => {
 
         {/* CSV Upload Modal */}
         {showCsvModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleCsvModalClose}>
-            <div className="bg-gray-800 rounded-xl p-8 w-[600px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+            onClick={handleCsvModalClose}
+          >
+            <div
+              className="bg-gray-800 rounded-xl p-8 w-[600px] shadow-2xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3 className="font-bold text-xl mb-4 text-white">Upload Problems via CSV</h3>
-              
               {/* Instructions */}
               <div className="mb-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
                 <h4 className="font-semibold text-blue-300 mb-2">CSV Format Instructions:</h4>
                 <div className="text-sm text-blue-200 space-y-1">
                   <p>• File can be comma-separated (.csv) or tab-separated (.tsv)</p>
-                  <p>• URL should be in the second column</p>
+                  <p>
+                    • URL should be in the <b>second column</b>
+                  </p>
                   <p>• First row should be headers (will be skipped)</p>
+                  <p>
+                    • Supported columns: <b>ID, URL, Title, Difficulty, Acceptance %, Frequency %</b>
+                  </p>
                 </div>
                 <div className="mt-3 p-3 bg-gray-900 rounded text-xs font-mono text-gray-300">
-                  <div>ID,URL,Title,Difficulty,Acceptance %</div>
-                  <div>20,https://leetcode.com/problems/valid-parentheses,Valid Parentheses,Easy,42.4%</div>
+                  <div>ID,URL,Title,Difficulty,Acceptance %,Frequency %</div>
+                  <div>1,https://leetcode.com/problems/two-sum,Two Sum,Easy,55.9%,100.0%</div>
                 </div>
               </div>
-
               {/* File Upload */}
               <div className="mb-4">
                 <label className="block text-white font-medium mb-2">Select CSV File:</label>
@@ -878,24 +822,24 @@ const LadderPage = () => {
                   disabled={csvUploading}
                 />
               </div>
-
               {/* Upload Status */}
               {csvUploadMessage && (
-                <div className={`mb-4 p-3 rounded-lg ${
-                  csvUploadMessage.startsWith('✅') 
-                    ? 'bg-green-900/30 border border-green-700 text-green-300' 
-                    : csvUploadMessage.startsWith('⚠️')
-                    ? 'bg-yellow-900/30 border border-yellow-700 text-yellow-300'
-                    : 'bg-red-900/30 border border-red-700 text-red-300'
-                }`}>
+                <div
+                  className={`mb-4 p-3 rounded-lg ${
+                    csvUploadMessage.startsWith("✅")
+                      ? "bg-green-900/30 border border-green-700 text-green-300"
+                      : csvUploadMessage.startsWith("⚠️")
+                        ? "bg-yellow-900/30 border border-yellow-700 text-yellow-300"
+                        : "bg-red-900/30 border border-red-700 text-red-300"
+                  }`}
+                >
                   <pre className="whitespace-pre-wrap text-sm">{csvUploadMessage}</pre>
                 </div>
               )}
-
               {/* Action Buttons */}
               <div className="flex justify-between items-center">
                 <div className="text-gray-400 text-sm">
-                  {csvFile ? `Selected: ${csvFile.name}` : 'No file selected'}
+                  {csvFile ? `Selected: ${csvFile.name}` : "No file selected"}
                 </div>
                 <div className="flex gap-3">
                   <button
@@ -930,8 +874,14 @@ const LadderPage = () => {
 
         {/* Collaborators Modal */}
         {showCollabModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={handleCollabModalClose}>
-            <div className="bg-gray-800 rounded-xl p-8 w-[500px] shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+            onClick={handleCollabModalClose}
+          >
+            <div
+              className="bg-gray-800 rounded-xl p-8 w-[500px] shadow-2xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3 className="font-bold text-xl mb-4 text-white">Current Collaborators</h3>
               <input
                 type="text"
@@ -947,11 +897,14 @@ const LadderPage = () => {
                 <div className="max-h-60 overflow-y-auto border border-gray-600 rounded-lg bg-gray-700">
                   {filteredCollabs.length === 0 ? (
                     <div className="p-8 text-center text-gray-400">
-                      {collabSearchQuery ? 'No collaborators match your search.' : 'No collaborators found.'}
+                      {collabSearchQuery ? "No collaborators match your search." : "No collaborators found."}
                     </div>
                   ) : (
                     filteredCollabs.map((user, idx) => (
-                      <div key={user} className="flex items-center justify-between px-4 py-3 border-b border-gray-600 hover:bg-gray-600 transition-colors">
+                      <div
+                        key={user}
+                        className="flex items-center justify-between px-4 py-3 border-b border-gray-600 hover:bg-gray-600 transition-colors"
+                      >
                         <div>
                           <span className="font-medium text-white">{user}</span>
                           {idx === 0 && <span className="ml-2 text-blue-400 font-medium">(Owner)</span>}
@@ -986,7 +939,11 @@ const LadderPage = () => {
                     Add Collaborator
                   </button>
                   {collabMessage && (
-                    <div className={`mt-3 text-center font-medium ${collabMessage.startsWith('✅') ? 'text-green-400' : 'text-red-400'}`}>
+                    <div
+                      className={`mt-3 text-center font-medium ${
+                        collabMessage.startsWith("✅") ? "text-green-400" : "text-red-400"
+                      }`}
+                    >
                       {collabMessage}
                     </div>
                   )}
@@ -1005,7 +962,7 @@ const LadderPage = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LadderPage;
+export default LadderPage
