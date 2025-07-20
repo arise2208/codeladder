@@ -29,10 +29,130 @@ const LadderPage = () => {
   const [csvUploadMessage, setCsvUploadMessage] = useState("")
   const [csvUploading, setCsvUploading] = useState(false)
   const navigate = useNavigate()
+  const [revisionLadderId, setRevisionLadderId] = useState(null)
+  const [revisionQuestions, setRevisionQuestions] = useState([])
+  const [loadingRevision, setLoadingRevision] = useState(false)
 
   useEffect(() => {
     if (!username || !token) navigate("/login")
   }, [username, token, navigate])
+
+  // Fetch or create revision ladder
+  useEffect(() => {
+    const fetchRevisionLadder = async () => {
+      if (!username || !token) return
+      
+      try {
+        setLoadingRevision(true)
+        // First, try to find existing revision ladder
+        const laddersRes = await axios.post(
+          'https://backendcodeladder-2.onrender.com/ladders',
+          { username },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-username': username
+            }
+          }
+        )
+        
+        const revisionLadder = laddersRes.data.find(l => 
+          l.table_title.toLowerCase() === 'revision'
+        )
+        
+        if (revisionLadder) {
+          setRevisionLadderId(revisionLadder.table_id)
+          setRevisionQuestions(revisionLadder.questions || [])
+        }
+      } catch (err) {
+        console.error('Error fetching revision ladder:', err)
+      } finally {
+        setLoadingRevision(false)
+      }
+    }
+    
+    fetchRevisionLadder()
+  }, [username, token])
+
+  // Create revision ladder if it doesn't exist
+  const createRevisionLadder = async () => {
+    try {
+      const response = await axios.post(
+        'https://backendcodeladder-2.onrender.com/createtable',
+        {
+          table_title: 'Revision',
+          user: username
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-username': username
+          }
+        }
+      )
+      
+      if (response.status === 201) {
+        const newLadderId = response.data.table_id
+        setRevisionLadderId(newLadderId)
+        setRevisionQuestions([])
+        return newLadderId
+      }
+    } catch (err) {
+      console.error('Error creating revision ladder:', err)
+      setError('Failed to create revision ladder')
+      return null
+    }
+  }
+
+  // Toggle problem in revision ladder
+  const toggleRevisionStar = async (questionId) => {
+    try {
+      let targetLadderId = revisionLadderId
+      
+      // Create revision ladder if it doesn't exist
+      if (!targetLadderId) {
+        targetLadderId = await createRevisionLadder()
+        if (!targetLadderId) return
+      }
+      
+      const isInRevision = revisionQuestions.includes(questionId)
+      const action = isInRevision ? 'remove' : 'add'
+      
+      await axios.patch(
+        'https://backendcodeladder-2.onrender.com/edittable',
+        {
+          table_id: Number(targetLadderId),
+          questionIds: [questionId],
+          action: action
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-username': username
+          }
+        }
+      )
+      
+      // Update local state
+      if (isInRevision) {
+        setRevisionQuestions(prev => prev.filter(id => id !== questionId))
+      } else {
+        setRevisionQuestions(prev => [...prev, questionId])
+      }
+      
+      setError('')
+    } catch (error) {
+      console.error('Error toggling revision star:', error)
+      setError('Failed to update revision ladder')
+    }
+  }
+
+  // Navigate to revision ladder
+  const goToRevisionLadder = () => {
+    if (revisionLadderId) {
+      navigate(`/ladder/${revisionLadderId}`)
+    }
+  }
 
   useEffect(() => {
     const fetchLadder = async () => {
@@ -599,6 +719,15 @@ const LadderPage = () => {
                 Upload CSV
               </button>
               <button
+                onClick={goToRevisionLadder}
+                disabled={!revisionLadderId || loadingRevision}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                title={!revisionLadderId ? "No revision ladder found" : "Go to your revision ladder"}
+              >
+                <i className="fas fa-star"></i>
+                Go to Revision
+              </button>
+              <button
                 onClick={() => setShowCollabModal(true)}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
               >
@@ -689,6 +818,23 @@ const LadderPage = () => {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleRevisionStar(question.question_id)}
+                          className={`p-2 rounded transition-colors ${
+                            revisionQuestions.includes(question.question_id)
+                              ? 'text-yellow-500 hover:text-yellow-600'
+                              : 'text-gray-400 hover:text-yellow-500'
+                          }`}
+                          title={
+                            revisionQuestions.includes(question.question_id)
+                              ? "Remove from revision ladder"
+                              : "Add to revision ladder"
+                          }
+                        >
+                          <i className={`fas fa-star text-sm ${
+                            revisionQuestions.includes(question.question_id) ? '' : 'far'
+                          }`}></i>
+                        </button>
                         <button
                           onClick={() => toggleSelectToRemove(question.question_id)}
                           className="p-2 text-gray-400 hover:text-red-400 transition-colors"
