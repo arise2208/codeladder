@@ -836,6 +836,23 @@ const LadderPage = () => {
                           }`}></i>
                         </button>
                         <button
+                          onClick={() => toggleRevisionStar(question.question_id)}
+                          className={`p-2 rounded transition-colors ${
+                            revisionQuestions.includes(question.question_id)
+                              ? 'text-yellow-500 hover:text-yellow-600'
+                              : 'text-gray-400 hover:text-yellow-500'
+                          }`}
+                          title={
+                            revisionQuestions.includes(question.question_id)
+                              ? "Remove from revision ladder"
+                              : "Add to revision ladder"
+                          }
+                        >
+                          <i className={`fas fa-star text-sm ${
+                            revisionQuestions.includes(question.question_id) ? '' : 'far'
+                          }`}></i>
+                        </button>
+                        <button
                           onClick={() => toggleSelectToRemove(question.question_id)}
                           className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                           title="Remove from ladder"
