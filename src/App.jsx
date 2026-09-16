@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { RequireAuth, RequireRole } from './auth/RouteGuards';
 import Sidebar from './components/layout/Sidebar';
@@ -31,8 +31,23 @@ const SuspenseFallback = () => <LoadingSpinner fullScreen />;
 
 export default function App() {
   const { loading } = useAuth();
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   if (loading) return <LoadingSpinner fullScreen text="Restoring session..." />;
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-[#1a1a1a] text-[#eff2f6]">
+        <Suspense fallback={<SuspenseFallback />}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Routes>
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-[#eff2f6]">
