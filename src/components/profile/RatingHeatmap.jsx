@@ -849,8 +849,14 @@ export default function RatingHeatmap({
             <div className="space-y-2">
               {/* Display named problems first */}
               {(() => {
-                const namedProblems = selectedDateQuestions.filter((q) => q.isNamedProblem || (q.metadata?.contest || (q.title && !q.title.includes('Submission'))));
-                const genericSubmissions = selectedDateQuestions.filter((q) => !namedProblems.includes(q));
+                const isGeneric = (q) =>
+                  q.isGenericSubmission ||
+                  (!q.isNamedProblem &&
+                    !q.metadata?.contest &&
+                    (q.title?.toLowerCase().includes('submission') || q.title?.toLowerCase().includes('activity')));
+
+                const namedProblems = selectedDateQuestions.filter((q) => !isGeneric(q));
+                const genericSubmissions = selectedDateQuestions.filter((q) => isGeneric(q));
 
                 return (
                   <>
@@ -931,13 +937,25 @@ export default function RatingHeatmap({
                     )}
 
                     {genericSubmissions.length > 0 && (
-                      <div className="text-xs text-[#8b949e] bg-[#282828] p-2 rounded-lg border border-[#383838] flex items-center justify-between">
-                        <span>
-                          {namedProblems.length > 0
-                            ? `+ ${genericSubmissions.length} other submission attempt${genericSubmissions.length > 1 ? 's' : ''} on this date`
-                            : `${genericSubmissions.length} submission attempt${genericSubmissions.length > 1 ? 's' : ''} logged on this date`}
+                      <div className="text-xs text-[#8b949e] bg-[#282828] p-2.5 rounded-lg border border-[#383838] flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <Activity size={14} className="text-[#ffa116]" />
+                          <span>
+                            {namedProblems.length > 0
+                              ? `+ ${genericSubmissions.length} other practice submission attempt${genericSubmissions.length > 1 ? 's' : ''} on this date`
+                              : `${genericSubmissions.length} practice submission attempt${genericSubmissions.length > 1 ? 's' : ''} logged on this date`}
+                          </span>
                         </span>
-                        <span className="text-[11px] font-mono text-gray-400">Activity Logged</span>
+                        {genericSubmissions[0]?.url && (
+                          <a
+                            href={genericSubmissions[0].url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[11px] font-mono text-[#58a6ff] hover:underline flex items-center gap-1"
+                          >
+                            View Submissions <ExternalLink size={11} />
+                          </a>
+                        )}
                       </div>
                     )}
                   </>
@@ -1135,7 +1153,13 @@ export default function RatingHeatmap({
               <div className="space-y-1.5">
                 {(() => {
                   const named = hoveredDay.entry.questions.filter(
-                    (q) => q.isNamedProblem || (q.metadata?.contest || (q.title && !q.title.toLowerCase().includes('submission')))
+                    (q) =>
+                      q.isNamedProblem ||
+                      (!q.isGenericSubmission &&
+                        (q.metadata?.contest ||
+                          (q.title &&
+                            !q.title.toLowerCase().includes('submission') &&
+                            !q.title.toLowerCase().includes('activity'))))
                   );
                   const totalCount = hoveredDay.entry.questions.length;
 

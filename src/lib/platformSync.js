@@ -541,6 +541,7 @@ export async function fetchCodeChefData(handleInput) {
             const probTags = (Array.isArray(prob.tags) && prob.tags.length > 0) ? prob.tags : [];
             questions.push({
               _id: `cc-${prob.code}-${dateStr}-${idx}`,
+              code: prob.code,
               title: prob.title,
               platform: 'CODECHEF',
               url: prob.url,
@@ -560,6 +561,44 @@ export async function fetchCodeChefData(handleInput) {
             });
           });
         }
+      });
+
+      // 3. Ensure all confirmed solved problems are included for tags & rating charts
+      const existingCodes = new Set(questions.map((q) => (q.code || q.title || '').toUpperCase()));
+      (userSolved.solvedCodes || []).forEach((code, idx) => {
+        const cUpper = code.toUpperCase();
+        if (existingCodes.has(cUpper)) return;
+        existingCodes.add(cUpper);
+
+        const detail = detailsByCode.get(cUpper);
+        const item = contestMap.get(cUpper);
+        const title = (detail?.name && detail.name !== cUpper) ? detail.name : (item?.name || detail?.name || cUpper);
+        const url = item?.url || `https://www.codechef.com/problems/${cUpper}`;
+        const itemRating = (item?.rating && !isNaN(Number(item.rating))) ? Number(item.rating) : (item?.difficulty && !isNaN(Number(item.difficulty)) ? Number(item.difficulty) : null);
+        const detailRating = (detail?.rating && !isNaN(Number(detail.rating)) && detail.rating !== userSolved.userRating) ? Number(detail.rating) : null;
+        const rating = itemRating || detailRating || null;
+        const probTags = (Array.isArray(item?.tags) && item.tags.length > 0) ? item.tags : (Array.isArray(detail?.tags) ? detail.tags : []);
+
+        questions.push({
+          _id: `cc-solved-${cUpper}-${idx}`,
+          code: cUpper,
+          title,
+          platform: 'CODECHEF',
+          url,
+          difficulty: rating ? `${rating}` : 'Practice',
+          metadata: {
+            rating: rating || null,
+            contest: item?.contest || detail?.contest || null,
+            tags: probTags
+          },
+          tags: probTags,
+          solvedAt: detail?.solvedAt || null,
+          isNamedProblem: true,
+          state: {
+            solved: true,
+            solvedAt: detail?.solvedAt || null
+          }
+        });
       });
 
       const totalCcSubmissions = (userSolved.dailySubmissions || []).reduce((acc, cur) => acc + (Number(cur.value) || 0), 0);
