@@ -230,12 +230,23 @@ export default function ContestUpsolverView({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-4 py-3 bg-[#21262d] border border-[#30363d] rounded-lg w-full">
-              <span className="text-xs text-[#8b949e]">
-                Connect your <span className="font-semibold text-[#e6edf3]">{handleLabel.replace(' Handle', '').replace(' Username', '')}</span> account in{' '}
-                <a href="/settings" className="text-[#58a6ff] hover:underline font-semibold">Settings</a>
-                {' '}to sync solved problems.
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-[#1e1e24] border border-[#30363d] rounded-lg w-full">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-medium text-[#8b949e]">{handleLabel}:</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-500/15 text-gray-400 border border-gray-600/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                  Not connected
+                </span>
+                <span className="text-xs text-[#8b949e] ml-2 hidden sm:inline">
+                  Connect your account in Settings to sync and track your solved problems.
+                </span>
+              </div>
+              <a
+                href="/settings"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#58a6ff]/10 text-[#58a6ff] hover:bg-[#58a6ff]/20 border border-[#58a6ff]/30 transition-colors cursor-pointer"
+              >
+                Go to Settings &rarr;
+              </a>
             </div>
           )}
         </div>
