@@ -181,29 +181,12 @@ export default function CodeChefContestPage() {
     });
   };
 
-  // Load connected CodeChef handle if exists
+  // Load handle from Settings (localStorage only — set via Settings page)
   useEffect(() => {
     const saved = localStorage.getItem('cc_handle');
     if (saved) {
       setHandle(saved);
-      if (solvedCodes.size === 0) {
-        handleSync(saved, true);
-      }
-      return;
     }
-    api
-      .get('/platform-accounts')
-      .then(({ data }) => {
-        const cc = (data.accounts || []).find((a) => a.platform === 'CODECHEF');
-        if (cc?.handle) {
-          setHandle(cc.handle);
-          localStorage.setItem('cc_handle', cc.handle);
-          if (solvedCodes.size === 0) {
-            handleSync(cc.handle, true);
-          }
-        }
-      })
-      .catch(() => {});
   }, []);
 
   const handleSync = async (targetHandle = handle, silent = false) => {

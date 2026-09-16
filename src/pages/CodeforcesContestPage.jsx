@@ -194,29 +194,12 @@ export default function CodeforcesContestPage() {
     }
   };
 
-  // Auto-fill connected handle from platform accounts & auto-fetch if empty
+  // Load handle from Settings (localStorage only — set via Settings page)
   useEffect(() => {
     const saved = localStorage.getItem('cf_handle');
     if (saved) {
       setHandle(saved);
-      if (solvedSet.size === 0) {
-        handleFetch(saved, true);
-      }
-      return;
     }
-    api
-      .get('/platform-accounts')
-      .then(({ data }) => {
-        const cf = (data.accounts || []).find((a) => a.platform === 'CODEFORCES');
-        if (cf?.handle) {
-          setHandle(cf.handle);
-          localStorage.setItem('cf_handle', cf.handle);
-          if (solvedSet.size === 0) {
-            handleFetch(cf.handle, true);
-          }
-        }
-      })
-      .catch(() => {});
   }, []);
 
   const matrixContests = useMemo(() => {

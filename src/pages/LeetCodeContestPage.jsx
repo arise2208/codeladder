@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useLeetCodeData } from '../hooks/useContestData';
 import { fetchLeetCodeUserSolved } from '../lib/leetcodeSync';
 import { LeetCodeIcon } from '../components/ui/PlatformIcon';
-import api from '../lib/api';
+
 import { useStarred } from '../context/StarredContext';
 
 function parseContestInfo(url) {
@@ -140,29 +140,12 @@ export default function LeetCodeContestPage() {
     setPage(1);
   };
 
-  // Load saved handle
+  // Load handle from Settings (localStorage only — set via Settings page)
   useEffect(() => {
-    const savedHandle = localStorage.getItem('lc_handle');
-    if (savedHandle) {
-      setHandle(savedHandle);
-      if (solvedSet.size === 0) {
-        handleSync(savedHandle, true);
-      }
-      return;
+    const saved = localStorage.getItem('lc_handle');
+    if (saved) {
+      setHandle(saved);
     }
-    api
-      .get('/auth/me')
-      .then((res) => {
-        const lcAcc = res.data?.user?.platformAccounts?.find((a) => a.platform === 'leetcode');
-        if (lcAcc?.handle) {
-          setHandle(lcAcc.handle);
-          localStorage.setItem('lc_handle', lcAcc.handle);
-          if (solvedSet.size === 0) {
-            handleSync(lcAcc.handle, true);
-          }
-        }
-      })
-      .catch(() => {});
   }, []);
 
 
