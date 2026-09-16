@@ -27,8 +27,9 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long.');
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.');
       return;
     }
 
@@ -107,15 +108,20 @@ export default function RegisterPage() {
             autoComplete="email"
           />
 
-          <Input
-            label="Password"
-            type="password"
-            placeholder="At least 8 characters"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="new-password"
-          />
+          <div>
+            <Input
+              label="Password"
+              type="password"
+              placeholder="e.g. CodeLadder123!"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+            <p className="text-[11px] text-[#8b949e] mt-1.5 ml-1">
+              At least 8 characters with 1 uppercase, 1 lowercase &amp; 1 number.
+            </p>
+          </div>
 
           <Button
             type="submit"
