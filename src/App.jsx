@@ -17,6 +17,7 @@ const CodeChefContestPage = lazy(() => import('./pages/CodeChefContestPage'));
 const LeetCodeContestPage = lazy(() => import('./pages/LeetCodeContestPage'));
 const LaddersPage = lazy(() => import('./pages/LaddersPage'));
 const LadderDetailPage = lazy(() => import('./pages/LadderDetailPage'));
+const StarredProblemsPage = lazy(() => import('./pages/StarredProblemsPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const BlogsPage = lazy(() => import('./pages/BlogsPage'));
@@ -34,7 +35,7 @@ export default function App() {
   if (loading) return <LoadingSpinner fullScreen text="Restoring session..." />;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB]">
+    <div className="min-h-screen bg-[#1a1a1a] text-[#eff2f6]">
       <Sidebar />
 
       <main className="lg:ml-[260px] min-h-screen">
@@ -59,6 +60,8 @@ export default function App() {
               <Route path="/blogs/:blogId/edit" element={<RequireAuth><BlogEditorPage /></RequireAuth>} />
 
               {/* Protected - User */}
+              <Route path="/starred" element={<RequireAuth><StarredProblemsPage /></RequireAuth>} />
+              <Route path="/favorites" element={<RequireAuth><StarredProblemsPage /></RequireAuth>} />
               <Route path="/ladders" element={<RequireAuth><LaddersPage /></RequireAuth>} />
               <Route path="/ladder/:ladderId" element={<RequireAuth><LadderDetailPage /></RequireAuth>} />
               <Route path="/ladders/:ladderId" element={<RequireAuth><LadderDetailPage /></RequireAuth>} />

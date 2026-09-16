@@ -15,7 +15,7 @@ function renderInline(text) {
     const codeMatch = remaining.match(/^`([^`]+)`/);
     if (codeMatch) {
       parts.push(
-        <code key={key++} className="px-1.5 py-0.5 rounded bg-gray-100 text-[#6C5CE7] font-mono text-[13px] border border-gray-200">
+        <code key={key++} className="px-1.5 py-0.5 rounded bg-[#1a1a1a] text-[#ffa116] font-mono text-[13px] border border-[#383838]">
           {codeMatch[1]}
         </code>
       );
@@ -26,7 +26,7 @@ function renderInline(text) {
     // 2. Bold: **text** or __text__
     const boldMatch = remaining.match(/^(\*\*|__)(.*?)\1/);
     if (boldMatch) {
-      parts.push(<strong key={key++} className="font-bold text-gray-900">{renderInline(boldMatch[2])}</strong>);
+      parts.push(<strong key={key++} className="font-bold text-[#eff2f6]">{renderInline(boldMatch[2])}</strong>);
       remaining = remaining.slice(boldMatch[0].length);
       continue;
     }
@@ -34,7 +34,7 @@ function renderInline(text) {
     // 3. Italic: *text* or _text_
     const italicMatch = remaining.match(/^(\*|_)(.*?)\1/);
     if (italicMatch && !italicMatch[2].startsWith(' ')) {
-      parts.push(<em key={key++} className="italic text-gray-800">{renderInline(italicMatch[2])}</em>);
+      parts.push(<em key={key++} className="italic text-gray-300">{renderInline(italicMatch[2])}</em>);
       remaining = remaining.slice(italicMatch[0].length);
       continue;
     }
@@ -42,7 +42,7 @@ function renderInline(text) {
     // 4. Strikethrough: ~~text~~
     const strikeMatch = remaining.match(/^~~(.*?)~~/);
     if (strikeMatch) {
-      parts.push(<del key={key++} className="line-through text-gray-400">{renderInline(strikeMatch[1])}</del>);
+      parts.push(<del key={key++} className="line-through text-gray-500">{renderInline(strikeMatch[1])}</del>);
       remaining = remaining.slice(strikeMatch[0].length);
       continue;
     }
@@ -51,7 +51,7 @@ function renderInline(text) {
     const mathMatch = remaining.match(/^\$([^$]+)\$/);
     if (mathMatch) {
       parts.push(
-        <span key={key++} className="px-1 py-0.5 rounded bg-indigo-50/70 text-indigo-900 font-mono text-[13px] border border-indigo-100">
+        <span key={key++} className="px-1 py-0.5 rounded bg-[#6C5CE7]/15 text-[#A29BFE] font-mono text-[13px] border border-[#6C5CE7]/30">
           {mathMatch[1]}
         </span>
       );
@@ -70,7 +70,7 @@ function renderInline(text) {
           href={href}
           target={isExternal ? '_blank' : undefined}
           rel={isExternal ? 'noopener noreferrer' : undefined}
-          className="text-[#6C5CE7] hover:underline font-medium"
+          className="text-[#ffa116] hover:underline font-medium"
         >
           {linkMatch[1]}
         </a>
@@ -154,13 +154,13 @@ export default function NotionRenderer({ content }) {
     if (listItems.length > 0) {
       if (listType === 'ol') {
         elements.push(
-          <ol key={`ol-${elements.length}`} className="my-3 pl-6 space-y-1.5 list-decimal text-gray-800 text-[15px] leading-relaxed">
+          <ol key={`ol-${elements.length}`} className="my-3 pl-6 space-y-1.5 list-decimal text-gray-300 text-[15px] leading-relaxed">
             {listItems.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ol>
         );
       } else {
         elements.push(
-          <ul key={`ul-${elements.length}`} className="my-3 pl-6 space-y-1.5 list-disc text-gray-800 text-[15px] leading-relaxed">
+          <ul key={`ul-${elements.length}`} className="my-3 pl-6 space-y-1.5 list-disc text-gray-300 text-[15px] leading-relaxed">
             {listItems.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ul>
         );
@@ -205,7 +205,7 @@ export default function NotionRenderer({ content }) {
       flushList();
       const formula = line.trim().slice(2, -2).trim();
       elements.push(
-        <div key={`math-${elements.length}`} className="my-4 p-4 text-center bg-indigo-50/50 rounded-xl border border-indigo-100 font-mono text-indigo-950 text-sm overflow-x-auto shadow-xs">
+        <div key={`math-${elements.length}`} className="my-4 p-4 text-center bg-[#1a1a1a] rounded-xl border border-[#383838] font-mono text-[#A29BFE] text-sm overflow-x-auto shadow-xs">
           {formula}
         </div>
       );
@@ -215,7 +215,7 @@ export default function NotionRenderer({ content }) {
     // Horizontal Rule: --- or ***
     if (/^(\s*[-*_]\s*){3,}$/.test(line)) {
       flushList();
-      elements.push(<hr key={`hr-${elements.length}`} className="my-6 border-gray-200" />);
+      elements.push(<hr key={`hr-${elements.length}`} className="my-6 border-[#383838]" />);
       continue;
     }
 
@@ -225,7 +225,7 @@ export default function NotionRenderer({ content }) {
       const rawText = line.slice(2).trim();
       const headingId = rawText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       elements.push(
-        <h1 id={headingId} key={`h1-${elements.length}`} className="text-2xl sm:text-3xl font-black text-[#1E1F25] mt-7 mb-3 tracking-tight border-b border-gray-100 pb-2 scroll-mt-20">
+        <h1 id={headingId} key={`h1-${elements.length}`} className="text-2xl sm:text-3xl font-black text-[#eff2f6] mt-7 mb-3 tracking-tight border-b border-[#383838] pb-2 scroll-mt-20">
           {renderInline(rawText)}
         </h1>
       );
@@ -237,7 +237,7 @@ export default function NotionRenderer({ content }) {
       const rawText = line.slice(3).trim();
       const headingId = rawText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       elements.push(
-        <h2 id={headingId} key={`h2-${elements.length}`} className="text-xl sm:text-2xl font-bold text-[#1E1F25] mt-6 mb-2.5 tracking-tight scroll-mt-20">
+        <h2 id={headingId} key={`h2-${elements.length}`} className="text-xl sm:text-2xl font-bold text-[#eff2f6] mt-6 mb-2.5 tracking-tight scroll-mt-20">
           {renderInline(rawText)}
         </h2>
       );
@@ -249,7 +249,7 @@ export default function NotionRenderer({ content }) {
       const rawText = line.slice(4).trim();
       const headingId = rawText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       elements.push(
-        <h3 id={headingId} key={`h3-${elements.length}`} className="text-lg font-bold text-[#1E1F25] mt-5 mb-2 scroll-mt-20">
+        <h3 id={headingId} key={`h3-${elements.length}`} className="text-lg font-bold text-[#eff2f6] mt-5 mb-2 scroll-mt-20">
           {renderInline(rawText)}
         </h3>
       );
@@ -269,18 +269,18 @@ export default function NotionRenderer({ content }) {
         alertLines.push(lines[i].replace(/^>\s*/, ''));
       }
 
-      let icon = <Info size={16} className="text-blue-600" />;
-      let style = 'bg-blue-50/80 border-blue-200 text-blue-950';
+      let icon = <Info size={16} className="text-blue-400" />;
+      let style = 'bg-blue-950/40 border-blue-800/60 text-blue-200';
 
       if (alertType === 'TIP') {
-        icon = <Lightbulb size={16} className="text-emerald-600" />;
-        style = 'bg-emerald-50/80 border-emerald-200 text-emerald-950';
+        icon = <Lightbulb size={16} className="text-emerald-400" />;
+        style = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-200';
       } else if (alertType === 'WARNING') {
-        icon = <AlertTriangle size={16} className="text-amber-600" />;
-        style = 'bg-amber-50/80 border-amber-200 text-amber-950';
+        icon = <AlertTriangle size={16} className="text-amber-400" />;
+        style = 'bg-amber-950/40 border-amber-800/60 text-amber-200';
       } else if (alertType === 'IMPORTANT' || alertType === 'CAUTION') {
-        icon = <ShieldAlert size={16} className="text-rose-600" />;
-        style = 'bg-rose-50/80 border-rose-200 text-rose-950';
+        icon = <ShieldAlert size={16} className="text-rose-400" />;
+        style = 'bg-rose-950/40 border-rose-800/60 text-rose-200';
       }
 
       elements.push(
@@ -302,7 +302,7 @@ export default function NotionRenderer({ content }) {
       flushList();
       const quoteText = line.replace(/^>\s*/, '');
       elements.push(
-        <blockquote key={`quote-${elements.length}`} className="my-3 pl-4 border-l-3 border-[#6C5CE7] italic text-gray-700 text-[15px] bg-purple-50/20 py-1.5 rounded-r-lg">
+        <blockquote key={`quote-${elements.length}`} className="my-3 pl-4 border-l-3 border-[#ffa116] italic text-gray-300 text-[15px] bg-[#ffa116]/5 py-1.5 rounded-r-lg">
           {renderInline(quoteText)}
         </blockquote>
       );
@@ -340,7 +340,7 @@ export default function NotionRenderer({ content }) {
     // Regular paragraph
     flushList();
     elements.push(
-      <p key={`p-${elements.length}`} className="my-2.5 text-gray-800 text-[15px] leading-relaxed">
+      <p key={`p-${elements.length}`} className="my-2.5 text-gray-300 text-[15px] leading-relaxed">
         {renderInline(line)}
       </p>
     );
@@ -349,7 +349,7 @@ export default function NotionRenderer({ content }) {
   flushList();
 
   return (
-    <article className="notion-article max-w-none font-sans text-[#1E1F25]">
+    <article className="notion-article max-w-none font-sans text-[#eff2f6]">
       {elements}
     </article>
   );

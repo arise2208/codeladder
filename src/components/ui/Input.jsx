@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 
 const Input = forwardRef(({ label, error, className = '', ...props }, ref) => (
   <div className="space-y-1.5">
-    {label && <label className="block text-sm font-medium text-[#1E1F25]">{label}</label>}
+    {label && <label className="block text-sm font-medium text-[#e6edf3]">{label}</label>}
     <input
       ref={ref}
       className={`input-field ${error ? 'border-red-400 focus:ring-red-400/20 focus:border-red-400' : ''} ${className}`}

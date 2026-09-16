@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
-import { MessageSquare, Globe, ArrowRight, Sparkles } from 'lucide-react';
+import { MessageSquare, Globe, ArrowRight } from 'lucide-react';
+import { CodeforcesIcon } from '../ui/PlatformIcon';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function RecentActionsWidget({ maxItems = 12 }) {
@@ -27,29 +28,29 @@ export default function RecentActionsWidget({ maxItems = 12 }) {
   }, [maxItems]);
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs overflow-hidden flex flex-col">
+    <div className="bg-[#282828] rounded-2xl border border-[#383838] shadow-xs overflow-hidden flex flex-col">
       {/* Codeforces-style header */}
-      <div className="px-4 py-3 bg-[#F8F9FB] border-b border-[#E5E7EB] flex items-center justify-between">
-        <div className="flex items-center gap-1.5 font-bold text-sm text-[#1E1F25]">
-          <span className="text-[#6C5CE7] font-black">→</span>
+      <div className="px-4 py-3 bg-[#1a1a1a] border-b border-[#383838] flex items-center justify-between">
+        <div className="flex items-center gap-2 font-bold text-sm text-[#eff2f6]">
+          <CodeforcesIcon size={16} />
           <span>Recent actions</span>
         </div>
-        <Link to="/blogs" className="text-[11px] font-semibold text-[#6C5CE7] hover:underline flex items-center gap-0.5">
+        <Link to="/blogs" className="text-[11px] font-semibold text-[#ffa116] hover:underline flex items-center gap-0.5">
           <span>All</span>
           <ArrowRight size={11} />
         </Link>
       </div>
 
-      <div className="divide-y divide-gray-100 p-2 overflow-y-auto max-h-[500px]">
+      <div className="divide-y divide-[#383838] p-2 overflow-y-auto max-h-[500px]">
         {loading ? (
           <div className="py-8 text-center text-xs text-gray-400">Loading recent actions...</div>
         ) : actions.length === 0 ? (
           <div className="py-8 text-center px-4 space-y-2">
-            <Globe size={24} className="mx-auto text-gray-300" />
-            <p className="text-xs font-semibold text-gray-600">No community activity yet</p>
-            <p className="text-[11px] text-gray-400">Be the first to publish a blog editorial!</p>
+            <Globe size={24} className="mx-auto text-gray-400" />
+            <p className="text-xs font-semibold text-gray-300">No community activity yet</p>
+            <p className="text-[11px] text-[#8b949e]">Be the first to publish a blog editorial!</p>
             <Link to="/blogs/create" className="inline-block mt-2">
-              <span className="text-xs font-bold text-[#6C5CE7] hover:underline">+ Write a Blog</span>
+              <span className="text-xs font-bold text-[#ffa116] hover:underline">+ Write a Blog</span>
             </Link>
           </div>
         ) : (
@@ -59,13 +60,13 @@ export default function RecentActionsWidget({ maxItems = 12 }) {
               : '';
 
             return (
-              <div key={action.id} className="p-2.5 hover:bg-gray-50/80 rounded-xl transition-colors text-xs leading-snug">
+              <div key={action.id} className="p-2.5 hover:bg-[#333333] rounded-xl transition-colors text-xs leading-snug">
                 <div className="flex items-start gap-1.5">
                   <span className="shrink-0 mt-0.5">
                     {action.type === 'COMMENT' ? (
-                      <MessageSquare size={13} className="text-sky-500" />
+                      <MessageSquare size={13} className="text-sky-400" />
                     ) : (
-                      <Globe size={13} className="text-[#6C5CE7]" />
+                      <Globe size={13} className="text-[#ffa116]" />
                     )}
                   </span>
 
@@ -73,14 +74,14 @@ export default function RecentActionsWidget({ maxItems = 12 }) {
                     <div>
                       <Link
                         to={`/profile/${action.authorUsername}`}
-                        className="font-bold text-[#6C5CE7] hover:underline hover:text-[#5A4AD1]"
+                        className="font-bold text-[#ffa116] hover:underline"
                       >
                         {action.authorUsername}
                       </Link>
-                      <span className="text-gray-400 mx-1">→</span>
+                      <span className="text-[#8b949e] mx-1">→</span>
                       <Link
                         to={`/blog/${action.blogId}`}
-                        className="font-semibold text-gray-800 hover:text-[#6C5CE7] hover:underline"
+                        className="font-semibold text-[#eff2f6] hover:text-[#ffa116] hover:underline"
                         title={action.blogTitle}
                       >
                         {action.blogTitle}
@@ -88,15 +89,15 @@ export default function RecentActionsWidget({ maxItems = 12 }) {
                     </div>
 
                     {action.type === 'COMMENT' && action.snippet && (
-                      <p className="text-[11px] text-gray-500 italic mt-0.5 truncate">
+                      <p className="text-[11px] text-[#8b949e] italic mt-0.5 truncate">
                         "{action.snippet}"
                       </p>
                     )}
 
-                    <div className="text-[10px] text-gray-400 mt-1 flex items-center gap-2">
+                    <div className="text-[10px] text-[#8b949e] mt-1 flex items-center gap-2">
                       <span>{timeAgo}</span>
                       {action.score !== undefined && (
-                        <span className={`font-bold ${action.score >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                        <span className={`font-bold ${action.score >= 0 ? 'text-[#2cbb5d]' : 'text-[#ef4743]'}`}>
                           {action.score >= 0 ? `+${action.score}` : action.score}
                         </span>
                       )}
@@ -109,8 +110,8 @@ export default function RecentActionsWidget({ maxItems = 12 }) {
         )}
       </div>
 
-      <div className="p-2.5 bg-gray-50/50 border-t border-gray-100 text-center">
-        <Link to="/blogs" className="text-xs font-bold text-[#6C5CE7] hover:underline inline-flex items-center gap-1">
+      <div className="p-2.5 bg-[#1a1a1a] border-t border-[#383838] text-center">
+        <Link to="/blogs" className="text-xs font-bold text-[#ffa116] hover:underline inline-flex items-center gap-1">
           Explore Trending Blogs <ArrowRight size={12} />
         </Link>
       </div>

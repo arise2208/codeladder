@@ -40,6 +40,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
+  const logoutAll = useCallback(async () => {
+    try {
+      await api.post("/auth/logout-all");
+    } catch (err) {
+      console.warn("Failed to call /auth/logout-all on server:", err);
+    } finally {
+      clearSession();
+      setUser(null);
+    }
+  }, []);
+
   const saveSession = useCallback(({ token, user: nextUser }) => {
     const normalized = normalizeUser(nextUser);
     if (!normalized) return;
@@ -92,9 +103,14 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.get("/auth/me");
         const normalized = normalizeUser(data.user || { username });
         saveSession({ token, user: normalized });
-      } catch {
-        const savedRole = localStorage.getItem("role") || (username.toLowerCase() === "admin" ? "ADMIN" : "USER");
-        setUser({ username, role: savedRole });
+      } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 403 || err.response?.status === 404) {
+          clearSession();
+          setUser(null);
+        } else {
+          const savedRole = localStorage.getItem("role") || (username.toLowerCase() === "admin" ? "ADMIN" : "USER");
+          setUser({ username, role: savedRole });
+        }
       } finally {
         setLoading(false);
       }
@@ -103,8 +119,8 @@ export const AuthProvider = ({ children }) => {
   }, [saveSession, logout]);
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout, saveSession, promoteToAdmin }),
-    [user, loading, login, register, logout, saveSession, promoteToAdmin]
+    () => ({ user, loading, login, register, logout, logoutAll, saveSession, promoteToAdmin }),
+    [user, loading, login, register, logout, logoutAll, saveSession, promoteToAdmin]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -14,16 +14,16 @@ export default function Modal({ open, isOpen, onClose, title, children, footer, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative bg-white rounded-xl shadow-xl border border-[#E5E7EB] w-full ${maxWidth} mx-4 max-h-[90vh] overflow-y-auto ${className}`}>
-        <div className="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
-          <h3 className="text-base font-semibold text-[#1E1F25]">{title}</h3>
-          <button onClick={onClose} className="text-[#9CA3AF] hover:text-[#1E1F25] transition-colors">
+      <div className="fixed inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
+      <div className={`relative bg-[#282828] text-[#eff2f6] rounded-xl shadow-2xl border border-[#383838] w-full ${maxWidth} mx-4 max-h-[90vh] overflow-y-auto ${className}`}>
+        <div className="flex items-center justify-between p-5 border-b border-[#383838]">
+          <h3 className="text-base font-semibold text-[#eff2f6]">{title}</h3>
+          <button onClick={onClose} className="text-[#8b949e] hover:text-[#ffa116] transition-colors">
             <X size={18} />
           </button>
         </div>
         <div className="p-5">{children}</div>
-        {footer && <div className="flex items-center justify-end gap-2 p-5 border-t border-[#E5E7EB]">{footer}</div>}
+        {footer && <div className="flex items-center justify-end gap-2 p-5 border-t border-[#383838]">{footer}</div>}
       </div>
     </div>
   );

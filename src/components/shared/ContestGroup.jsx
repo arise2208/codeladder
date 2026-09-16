@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import BaseTable from './BaseTable';
 
 export default function ContestGroup({
   title,
@@ -19,7 +20,7 @@ export default function ContestGroup({
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 bg-[#1E1F25] text-white hover:bg-[#2D2E36] transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 bg-[#1E1F25] text-white hover:bg-[#2D2E36] transition-colors text-left cursor-pointer"
       >
         <div className="flex flex-col items-start">
           <h3 className="font-semibold text-base md:text-lg text-white">{title}</h3>
@@ -37,32 +38,32 @@ export default function ContestGroup({
         children ? (
           children
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-[#1E1F25]">
-              <thead className="bg-[#F8F9FB] text-[#6B7280] border-b border-[#E5E7EB]">
-                <tr>
-                  <th className="px-6 py-3 font-medium">Problem</th>
-                  <th className="px-6 py-3 font-medium">Platform</th>
-                  <th className="px-6 py-3 font-medium">Difficulty</th>
-                  <th className="px-6 py-3 font-medium">Tags</th>
-                </tr>
-              </thead>
-              <tbody>
-                {problems.map((problem, idx) => (
-                  <React.Fragment key={problem._id || idx}>
-                    {renderProblem ? renderProblem(problem) : null}
-                  </React.Fragment>
-                ))}
-                {problems.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-[#6B7280]">
-                      No problems found in this contest.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <BaseTable
+            variant="light"
+            className="rounded-none border-0 shadow-none"
+            headerClassName="bg-[#F8F9FB] text-[#6B7280] border-b border-[#E5E7EB]"
+            headers={
+              <tr>
+                <th className="px-6 py-3 font-medium">Problem</th>
+                <th className="px-6 py-3 font-medium w-28">Platform</th>
+                <th className="px-6 py-3 font-medium w-32">Difficulty</th>
+                <th className="px-6 py-3 font-medium">Tags</th>
+              </tr>
+            }
+          >
+            {problems.map((problem, idx) => (
+              <React.Fragment key={problem._id || idx}>
+                {renderProblem ? renderProblem(problem) : null}
+              </React.Fragment>
+            ))}
+            {problems.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-[#6B7280]">
+                  No problems found in this contest.
+                </td>
+              </tr>
+            )}
+          </BaseTable>
         )
       )}
     </div>

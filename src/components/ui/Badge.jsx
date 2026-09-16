@@ -1,11 +1,11 @@
 const colorMap = {
-  purple: 'bg-[#6C5CE7]/10 text-[#6C5CE7] border-[#6C5CE7]/20',
-  green: 'bg-[#00B894]/10 text-[#00B894] border-[#00B894]/20',
-  blue: 'bg-blue-50 text-blue-600 border-blue-200',
-  orange: 'bg-orange-50 text-orange-600 border-orange-200',
-  red: 'bg-red-50 text-red-600 border-red-200',
-  gray: 'bg-gray-100 text-gray-600 border-gray-200',
-  yellow: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  purple: 'bg-[#a855f7]/15 text-[#c084fc] border-[#a855f7]/30',
+  green: 'bg-[#2cbb5d]/15 text-[#2cbb5d] border-[#2cbb5d]/40',
+  blue: 'bg-[#388bfd]/15 text-[#58a6ff] border-[#388bfd]/30',
+  orange: 'bg-[#ffa116]/15 text-[#ffa116] border-[#ffa116]/40',
+  red: 'bg-[#ef4743]/15 text-[#ef4743] border-[#ef4743]/40',
+  gray: 'bg-[#282828] text-[#8b949e] border-[#383838]',
+  yellow: 'bg-[#ffa116]/15 text-[#ffa116] border-[#ffa116]/40',
 };
 
 export default function Badge({ children, color = 'gray', className = '' }) {

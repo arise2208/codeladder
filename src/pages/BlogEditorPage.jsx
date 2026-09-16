@@ -333,7 +333,7 @@ export default function BlogEditorPage() {
       <div className="flex items-center justify-between gap-4">
         <Link
           to={isEditing ? `/blog/${blogId}` : '/blogs'}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#6C5CE7] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#ffa116] transition-colors"
         >
           <ArrowLeft size={14} />
           <span>{isEditing ? 'Cancel & Return' : 'Back to Blogs'}</span>
@@ -345,8 +345,8 @@ export default function BlogEditorPage() {
             {!isEditing && quota && (
               <span className={`px-2.5 py-1 rounded-lg font-bold border ${
                 quota.count >= 5
-                  ? 'bg-rose-50 text-rose-700 border-rose-200'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  ? 'bg-rose-950/40 text-rose-400 border-rose-800/50'
+                  : 'bg-emerald-950/40 text-emerald-400 border-emerald-800/50'
               }`}>
                 {quota.count} / {quota.max} Blogs Used
               </span>
@@ -354,10 +354,10 @@ export default function BlogEditorPage() {
 
             <span className={`px-2.5 py-1 rounded-lg font-mono font-semibold border ${
               isOverLimit
-                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                ? 'bg-rose-950/40 text-rose-400 border-rose-800/50'
                 : charCount > 40000
-                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                : 'bg-gray-100 text-gray-600 border-gray-200'
+                ? 'bg-amber-950/40 text-amber-400 border-amber-800/50'
+                : 'bg-[#282828] text-gray-400 border-[#383838]'
             }`}>
               {charCount.toLocaleString()} / {maxChars.toLocaleString()} chars
             </span>
@@ -366,7 +366,7 @@ export default function BlogEditorPage() {
           <Button
             onClick={handlePublish}
             disabled={saving || isOverLimit || !title.trim() || !content.trim()}
-            className="bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#6C5CE7]/20 disabled:opacity-50"
+            className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#ffa116]/20 disabled:opacity-50"
           >
             <Save size={14} />
             <span>{saving ? 'Publishing...' : isEditing ? 'Save Changes' : 'Publish Blog'}</span>
@@ -376,8 +376,8 @@ export default function BlogEditorPage() {
 
       {/* Quota warning banner if at limit */}
       {!isEditing && quota && quota.count >= 5 && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start gap-3 text-xs">
-          <AlertCircle size={18} className="text-rose-600 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-800/50 text-rose-300 flex items-start gap-3 text-xs">
+          <AlertCircle size={18} className="text-rose-400 shrink-0 mt-0.5" />
           <div>
             <strong>Blog Quota Reached:</strong> You have reached your limit of 5 active blogs. Please edit or delete one of your existing blogs before publishing a new one.
           </div>
@@ -385,34 +385,34 @@ export default function BlogEditorPage() {
       )}
 
       {/* 2. Main Editor Paper */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
+      <div className="bg-[#282828] rounded-3xl border border-[#383838] shadow-xs overflow-hidden">
         {/* Title Input */}
-        <div className="p-6 sm:p-8 border-b border-gray-100 space-y-4">
+        <div className="p-6 sm:p-8 border-b border-[#383838] space-y-4">
           <input
             type="text"
             placeholder="Untitled Blog Post..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-2xl sm:text-4xl font-black text-[#1E1F25] placeholder:text-gray-300 border-none outline-hidden focus:ring-0"
+            className="w-full text-2xl sm:text-4xl font-black text-[#eff2f6] placeholder:text-gray-500 bg-transparent border-none outline-hidden focus:ring-0"
           />
 
           {/* Tags Selector */}
           <div className="space-y-2 pt-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-gray-500 flex items-center gap-1">
+              <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
                 <Tag size={12} /> Tags:
               </span>
 
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#6C5CE7]/10 text-[#6C5CE7] text-xs font-semibold"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#ffa116]/10 text-[#ffa116] border border-[#ffa116]/30 text-xs font-semibold"
                 >
                   #{tag}
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(tag)}
-                    className="hover:text-rose-600 cursor-pointer"
+                    className="hover:text-rose-400 cursor-pointer"
                   >
                     <X size={12} />
                   </button>
@@ -430,19 +430,19 @@ export default function BlogEditorPage() {
                     handleAddTag(tagInput);
                   }
                 }}
-                className="text-xs px-2 py-1 border border-gray-200 rounded-md focus:outline-hidden focus:ring-1 focus:ring-[#6C5CE7] text-gray-700 placeholder:text-gray-400 w-44"
+                className="text-xs px-2.5 py-1 border border-[#383838] bg-[#1a1a1a] rounded-md focus:outline-hidden focus:ring-1 focus:ring-[#ffa116] text-[#eff2f6] placeholder:text-gray-500 w-44"
               />
             </div>
 
             {/* Suggested Tags Chips */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[10px] text-gray-400 font-semibold">Suggestions:</span>
+              <span className="text-[10px] text-gray-500 font-semibold">Suggestions:</span>
               {SUGGESTED_TAGS.map((st) => (
                 <button
                   key={st}
                   type="button"
                   onClick={() => handleAddTag(st)}
-                  className="text-[10px] px-2 py-0.5 rounded bg-gray-50 hover:bg-purple-50 text-gray-500 hover:text-[#6C5CE7] border border-gray-100 transition-colors"
+                  className="text-[10px] px-2 py-0.5 rounded bg-[#1a1a1a] hover:bg-[#383838] text-gray-400 hover:text-[#ffa116] border border-[#383838] transition-colors"
                 >
                   +{st}
                 </button>
@@ -452,13 +452,13 @@ export default function BlogEditorPage() {
         </div>
 
         {/* 3. Notion-Style Toolbar & Tabs */}
-        <div className="flex items-center justify-between px-4 py-2 bg-[#F8F9FB] border-b border-gray-200 text-xs overflow-x-auto">
+        <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1a] border-b border-[#383838] text-xs overflow-x-auto">
           {/* Formatting Shortcuts */}
           <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={() => insertText('# ', '', 'Heading 1')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Heading 1"
             >
               <Heading1 size={16} />
@@ -466,7 +466,7 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('## ', '', 'Heading 2')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Heading 2"
             >
               <Heading2 size={16} />
@@ -474,18 +474,18 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('### ', '', 'Heading 3')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Heading 3"
             >
               <Heading3 size={16} />
             </button>
 
-            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <div className="w-px h-4 bg-[#383838] mx-1" />
 
             <button
               type="button"
               onClick={() => insertText('**', '**', 'bold text')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer font-bold"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer font-bold"
               title="Bold"
             >
               <Bold size={16} />
@@ -493,18 +493,18 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('*', '*', 'italic text')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer italic"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer italic"
               title="Italic"
             >
               <Italic size={16} />
             </button>
 
-            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <div className="w-px h-4 bg-[#383838] mx-1" />
 
             <button
               type="button"
               onClick={() => insertText('```cpp\n', '\n```', '// Your solution here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Code Block"
             >
               <Code size={16} />
@@ -513,7 +513,7 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('$', '$', 'O(N \\log N)')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer font-mono"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer font-mono"
               title="LaTeX Math Formula"
             >
               <Sigma size={16} />
@@ -522,18 +522,18 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('> [!NOTE]\n> ', '', 'Here is a key insight or hint.')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Callout Note"
             >
               <Info size={16} />
             </button>
 
-            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <div className="w-px h-4 bg-[#383838] mx-1" />
 
             <button
               type="button"
               onClick={() => insertText('- ', '', 'List item')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Bulleted List"
             >
               <List size={16} />
@@ -541,7 +541,7 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('1. ', '', 'First item')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Numbered List"
             >
               <ListOrdered size={16} />
@@ -549,13 +549,13 @@ export default function BlogEditorPage() {
             <button
               type="button"
               onClick={() => insertText('\n---\n\n', '')}
-              className="p-1.5 rounded hover:bg-gray-200 text-gray-700 cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#282828] text-gray-300 hover:text-[#eff2f6] cursor-pointer"
               title="Divider"
             >
               <Minus size={16} />
             </button>
 
-            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <div className="w-px h-4 bg-[#383838] mx-1" />
 
             <button
               type="button"
@@ -566,8 +566,8 @@ export default function BlogEditorPage() {
               }}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 slashMenuOpen
-                  ? 'bg-[#6C5CE7] text-white shadow-xs'
-                  : 'bg-purple-50 text-[#6C5CE7] hover:bg-purple-100 border border-[#6C5CE7]/30'
+                  ? 'bg-[#ffa116] text-[#1a1a1a] shadow-xs'
+                  : 'bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 border border-[#ffa116]/30'
               }`}
               title="Open Notion Slash Commands Menu (/)"
             >
@@ -577,14 +577,14 @@ export default function BlogEditorPage() {
           </div>
 
           {/* Write vs Preview Toggle */}
-          <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-gray-200 shrink-0">
+          <div className="flex items-center gap-1 bg-[#282828] p-0.5 rounded-lg border border-[#383838] shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('write')}
               className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
                 activeTab === 'write'
-                  ? 'bg-[#6C5CE7] text-white shadow-2xs'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[#383838] text-[#ffa116] shadow-2xs'
+                  : 'text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
               <span className="flex items-center gap-1">
@@ -596,8 +596,8 @@ export default function BlogEditorPage() {
               onClick={() => setActiveTab('preview')}
               className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
                 activeTab === 'preview'
-                  ? 'bg-[#6C5CE7] text-white shadow-2xs'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[#383838] text-[#ffa116] shadow-2xs'
+                  : 'text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
               <span className="flex items-center gap-1">
@@ -609,10 +609,10 @@ export default function BlogEditorPage() {
 
         {/* Notion Slash Commands Palette */}
         {slashMenuOpen && activeTab === 'write' && (
-          <div className="bg-[#181920] text-white p-4 border-b border-gray-800 shadow-xl transition-all">
-            <div className="flex items-center justify-between gap-3 pb-3 border-b border-gray-800/80">
+          <div className="bg-[#1f1f1f] text-[#eff2f6] p-4 border-b border-[#383838] shadow-xl transition-all">
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#383838]">
               <div className="flex items-center gap-2 flex-1">
-                <Search size={14} className="text-gray-400 shrink-0" />
+                <Search size={14} className="text-gray-500 shrink-0" />
                 <input
                   type="text"
                   placeholder="Filter slash commands (e.g. heading, math, code, callout, list)..."
@@ -622,7 +622,7 @@ export default function BlogEditorPage() {
                     setSlashSelectedIndex(0);
                   }}
                   autoFocus
-                  className="w-full bg-transparent text-xs text-white placeholder:text-gray-500 border-none outline-hidden focus:ring-0"
+                  className="w-full bg-transparent text-xs text-[#eff2f6] placeholder:text-gray-500 border-none outline-hidden focus:ring-0"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -633,7 +633,7 @@ export default function BlogEditorPage() {
                     setSlashMenuOpen(false);
                     setSlashFilter('');
                   }}
-                  className="text-gray-400 hover:text-white p-1 rounded-md hover:bg-white/10"
+                  className="text-gray-400 hover:text-[#eff2f6] p-1 rounded-md hover:bg-[#282828]"
                 >
                   <X size={14} />
                 </button>
@@ -656,16 +656,16 @@ export default function BlogEditorPage() {
                       onClick={() => handleSelectSlashCommand(cmd)}
                       className={`flex items-start gap-2.5 p-2.5 rounded-xl text-left text-xs transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-[#6C5CE7] text-white shadow-md'
-                          : 'hover:bg-white/10 text-gray-300'
+                          ? 'bg-[#ffa116] text-[#1a1a1a] shadow-md font-bold'
+                          : 'hover:bg-[#282828] text-gray-300'
                       }`}
                     >
-                      <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${isSelected ? 'bg-white/20 text-white' : 'bg-white/10 text-[#A29BFE]'}`}>
+                      <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${isSelected ? 'bg-[#1a1a1a]/20 text-[#1a1a1a]' : 'bg-[#1a1a1a] text-[#ffa116]'}`}>
                         <IconComponent size={15} />
                       </div>
                       <div className="overflow-hidden">
                         <div className="font-bold text-[12px]">{cmd.label}</div>
-                        <div className={`text-[10px] truncate ${isSelected ? 'text-purple-100' : 'text-gray-400'}`}>
+                        <div className={`text-[10px] truncate ${isSelected ? 'text-[#1a1a1a]/80' : 'text-gray-400'}`}>
                           {cmd.description}
                         </div>
                       </div>
@@ -687,19 +687,19 @@ export default function BlogEditorPage() {
               onChange={handleContentChange}
               onKeyDown={handleTextareaKeyDown}
               placeholder="Write your article in Notion-style markdown... Type '/' for instant slash command blocks, use headers, code blocks (```cpp), LaTeX math ($O(N)$), callouts (> [!NOTE]), and more."
-              className="w-full h-full text-[15px] font-mono leading-relaxed text-gray-800 placeholder:text-gray-300 border-none outline-hidden resize-y focus:ring-0"
+              className="w-full h-full text-[15px] font-mono leading-relaxed text-[#eff2f6] placeholder:text-gray-500 bg-transparent border-none outline-hidden resize-y focus:ring-0"
             />
           ) : (
             <div className="space-y-6">
               {title && (
-                <h1 className="text-2xl sm:text-4xl font-black text-[#1E1F25] tracking-tight pb-3 border-b border-gray-100">
+                <h1 className="text-2xl sm:text-4xl font-black text-[#eff2f6] tracking-tight pb-3 border-b border-[#383838]">
                   {title}
                 </h1>
               )}
               {content.trim() ? (
                 <NotionRenderer content={content} />
               ) : (
-                <div className="text-center py-12 text-gray-400 text-xs italic">
+                <div className="text-center py-12 text-gray-500 text-xs italic">
                   Nothing to preview yet. Switch back to Write tab to begin writing!
                 </div>
               )}

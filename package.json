@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "download-questions": "node scripts/download_all_questions.mjs",
+    "update-contests": "node scripts/update_contests.mjs",
+    "sync-codechef": "node scripts/sync_codechef_contests.mjs"
   },
   "dependencies": {
     "axios": "^1.9.0",

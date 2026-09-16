@@ -119,8 +119,8 @@ export default function BlogsPage() {
       {/* 1. Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#181920] via-[#232532] to-[#181920] text-white p-7 sm:p-10 border border-gray-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6C5CE7]/20 border border-[#6C5CE7]/40 text-[#A29BFE] text-xs font-semibold">
-            <BookOpen size={14} className="text-[#6C5CE7]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ffa116]/10 border border-[#ffa116]/30 text-[#ffa116] text-xs font-semibold">
+            <BookOpen size={14} className="text-[#ffa116]" />
             <span>Community Knowledge & Editorials</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
@@ -135,7 +135,7 @@ export default function BlogsPage() {
           <Button
             size="lg"
             onClick={handleCreateBlogClick}
-            className="bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#6C5CE7]/25"
+            className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#ffa116]/20"
           >
             <PenTool size={16} />
             <span>Write a Blog</span>
@@ -158,17 +158,17 @@ export default function BlogsPage() {
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Tabs: Trending vs Recent vs My Blogs */}
-          <div className="inline-flex p-1 rounded-xl bg-gray-100 border border-gray-200 self-start">
+          <div className="inline-flex p-1 rounded-xl bg-[#282828] border border-[#383838] self-start">
             <button
               type="button"
               onClick={() => setActiveTab('trending')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'trending'
-                  ? 'bg-white text-[#6C5CE7] shadow-xs'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[#383838] text-[#ffa116] shadow-xs'
+                  : 'text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
-              <Flame size={14} className={activeTab === 'trending' ? 'text-amber-500' : ''} />
+              <Flame size={14} className={activeTab === 'trending' ? 'text-[#ffa116]' : ''} />
               <span>Trending</span>
             </button>
             <button
@@ -176,11 +176,11 @@ export default function BlogsPage() {
               onClick={() => setActiveTab('recent')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'recent'
-                  ? 'bg-white text-[#6C5CE7] shadow-xs'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[#383838] text-[#ffa116] shadow-xs'
+                  : 'text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
-              <Clock size={14} className={activeTab === 'recent' ? 'text-[#6C5CE7]' : ''} />
+              <Clock size={14} className={activeTab === 'recent' ? 'text-[#ffa116]' : ''} />
               <span>Recent</span>
             </button>
             {user && (
@@ -189,11 +189,11 @@ export default function BlogsPage() {
                 onClick={() => setActiveTab('my')}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'my'
-                    ? 'bg-white text-[#6C5CE7] shadow-xs'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#383838] text-[#ffa116] shadow-xs'
+                    : 'text-gray-400 hover:text-[#eff2f6]'
                 }`}
               >
-                <User size={14} className={activeTab === 'my' ? 'text-[#6C5CE7]' : ''} />
+                <User size={14} className={activeTab === 'my' ? 'text-[#ffa116]' : ''} />
                 <span>My Blogs {quota ? `(${quota.count}/5)` : ''}</span>
               </button>
             )}
@@ -201,19 +201,19 @@ export default function BlogsPage() {
 
           {/* Search Input */}
           <div className="relative w-full md:w-80">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               placeholder="Search blogs, topics, author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#6C5CE7] text-gray-800 placeholder:text-gray-400"
+              className="w-full text-xs pl-9 pr-8 py-2.5 bg-[#1a1a1a] border border-[#383838] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#ffa116] text-[#eff2f6] placeholder:text-gray-500"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 p-1"
               >
                 <X size={13} />
               </button>
@@ -230,8 +230,8 @@ export default function BlogsPage() {
               onClick={() => setSelectedTag(t)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                 selectedTag === t
-                  ? 'bg-[#6C5CE7] text-white shadow-xs'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'bg-[#ffa116] text-[#1a1a1a] shadow-xs font-bold'
+                  : 'bg-[#282828] border border-[#383838] text-gray-400 hover:text-[#eff2f6] hover:bg-[#383838]'
               }`}
             >
               {t}
@@ -246,13 +246,13 @@ export default function BlogsPage() {
         <div className="lg:col-span-8 space-y-4">
           {/* My Blogs Banner if on 'my' tab */}
           {activeTab === 'my' && (
-            <div className="bg-[#6C5CE7]/5 border border-[#6C5CE7]/20 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-[#ffa116]/5 border border-[#ffa116]/20 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                  <User size={16} className="text-[#6C5CE7]" />
+                <h3 className="text-sm font-bold text-[#eff2f6] flex items-center gap-2">
+                  <User size={16} className="text-[#ffa116]" />
                   <span>My Published Articles ({blogs.length} / 5 Slots)</span>
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   Manage your authored blogs and monitor community feedback and upvotes.
                 </p>
               </div>
@@ -260,7 +260,7 @@ export default function BlogsPage() {
                 size="sm"
                 onClick={handleCreateBlogClick}
                 disabled={quota && quota.count >= 5}
-                className="bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-bold text-xs flex items-center gap-1.5 shrink-0"
+                className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold text-xs flex items-center gap-1.5 shrink-0"
               >
                 <PenTool size={13} />
                 <span>{quota && quota.count >= 5 ? 'Quota Reached (5/5)' : 'Write New Blog'}</span>
@@ -269,13 +269,13 @@ export default function BlogsPage() {
           )}
 
           {loading ? (
-            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xs text-gray-400">
+            <div className="bg-[#282828] rounded-2xl border border-[#383838] p-12 text-center text-xs text-gray-400">
               Loading community blogs...
             </div>
           ) : blogs.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center space-y-3">
-              <BookOpen size={36} className="mx-auto text-gray-300" />
-              <h3 className="text-base font-bold text-gray-700">
+            <div className="bg-[#282828] rounded-2xl border border-dashed border-[#383838] p-12 text-center space-y-3">
+              <BookOpen size={36} className="mx-auto text-gray-500" />
+              <h3 className="text-base font-bold text-[#eff2f6]">
                 {activeTab === 'my' ? "You haven't written any blogs yet" : 'No blogs found'}
               </h3>
               <p className="text-xs text-gray-400 max-w-sm mx-auto">
@@ -286,7 +286,7 @@ export default function BlogsPage() {
                   : 'No blogs have been published yet. Be the pioneer and share your knowledge with the community!'}
               </p>
               <div className="pt-2">
-                <Button size="sm" onClick={handleCreateBlogClick} className="bg-[#6C5CE7] text-white font-bold text-xs">
+                <Button size="sm" onClick={handleCreateBlogClick} className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold text-xs">
                   Write First Blog
                 </Button>
               </div>
@@ -301,15 +301,15 @@ export default function BlogsPage() {
               return (
                 <div
                   key={blog._id}
-                  className="bg-white rounded-2xl border border-gray-200 hover:border-[#6C5CE7]/40 hover:shadow-md transition-all p-5 sm:p-6 space-y-3 group"
+                  className="bg-[#282828] rounded-2xl border border-[#383838] hover:border-[#ffa116]/50 hover:shadow-md transition-all p-5 sm:p-6 space-y-3 group"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1.5 flex-1">
                       {/* Author & Timestamp */}
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
                         <Link
                           to={`/profile/${blog.authorUsername}`}
-                          className="font-bold text-[#6C5CE7] hover:underline"
+                          className="font-bold text-[#ffa116] hover:underline"
                         >
                           @{blog.authorUsername}
                         </Link>
@@ -327,7 +327,7 @@ export default function BlogsPage() {
 
                       {/* Title */}
                       <Link to={`/blog/${blog._id}`} className="block">
-                        <h2 className="text-lg sm:text-xl font-bold text-[#1E1F25] group-hover:text-[#6C5CE7] transition-colors line-clamp-2">
+                        <h2 className="text-lg sm:text-xl font-bold text-[#eff2f6] group-hover:text-[#ffa116] transition-colors line-clamp-2">
                           {blog.title}
                         </h2>
                       </Link>
@@ -335,10 +335,10 @@ export default function BlogsPage() {
 
                     <div className="flex items-center gap-2 shrink-0">
                       {canManage && (
-                        <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200">
+                        <div className="flex items-center gap-1 bg-[#1a1a1a] p-1 rounded-xl border border-[#383838]">
                           <Link
                             to={`/blogs/${blog._id}/edit`}
-                            className="p-1 rounded-lg text-gray-500 hover:text-[#6C5CE7] hover:bg-white transition-colors"
+                            className="p-1 rounded-lg text-gray-400 hover:text-[#ffa116] hover:bg-[#282828] transition-colors"
                             title="Edit Blog"
                           >
                             <Edit size={13} />
@@ -346,7 +346,7 @@ export default function BlogsPage() {
                           <button
                             type="button"
                             onClick={() => setDeleteModalBlog(blog)}
-                            className="p-1 rounded-lg text-gray-500 hover:text-rose-600 hover:bg-white transition-colors cursor-pointer"
+                            className="p-1 rounded-lg text-gray-400 hover:text-rose-400 hover:bg-[#282828] transition-colors cursor-pointer"
                             title="Delete Blog"
                           >
                             <Trash2 size={13} />
@@ -357,12 +357,12 @@ export default function BlogsPage() {
                       {/* Net Score Pill */}
                       <div className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1 ${
                         blog.score > 0
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/50'
                           : blog.score < 0
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : 'bg-gray-50 text-gray-600 border-gray-200'
+                          ? 'bg-rose-950/40 text-rose-400 border-rose-800/50'
+                          : 'bg-[#1a1a1a] text-gray-400 border-[#383838]'
                       }`}>
-                        <ThumbsUp size={11} className={blog.score > 0 ? 'fill-emerald-600' : ''} />
+                        <ThumbsUp size={11} className={blog.score > 0 ? 'fill-emerald-400' : ''} />
                         <span>{blog.score > 0 ? `+${blog.score}` : blog.score}</span>
                       </div>
                     </div>
@@ -370,27 +370,27 @@ export default function BlogsPage() {
 
                   {/* Summary */}
                   {blog.summary && (
-                    <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-300 line-clamp-2 leading-relaxed">
                       {blog.summary}
                     </p>
                   )}
 
                   {/* Tags & Actions */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#383838] text-xs">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {blog.tags.map((t) => (
                         <button
                           key={t}
                           type="button"
                           onClick={() => setSelectedTag(t)}
-                          className="px-2 py-0.5 rounded-md bg-gray-100 hover:bg-purple-50 hover:text-[#6C5CE7] text-[11px] font-semibold text-gray-600 transition-colors"
+                          className="px-2 py-0.5 rounded-md bg-[#1a1a1a] border border-[#383838] hover:border-[#ffa116]/50 hover:text-[#ffa116] text-[11px] font-semibold text-gray-400 transition-colors"
                         >
                           #{t}
                         </button>
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-4 text-gray-500">
+                    <div className="flex items-center gap-4 text-gray-400">
                       <span className="flex items-center gap-1 text-[11px]">
                         <MessageSquare size={13} />
                         <strong>{blog.commentsCount}</strong> comments
@@ -398,7 +398,7 @@ export default function BlogsPage() {
 
                       <Link
                         to={`/blog/${blog._id}`}
-                        className="font-bold text-[#6C5CE7] hover:underline inline-flex items-center gap-1"
+                        className="font-bold text-[#ffa116] hover:underline inline-flex items-center gap-1"
                       >
                         Read Article <ArrowRight size={12} />
                       </Link>
@@ -416,9 +416,9 @@ export default function BlogsPage() {
           <RecentActionsWidget maxItems={12} />
 
           {/* Blogging Guidelines & Limits */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3 text-xs text-gray-600 shadow-2xs">
-            <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-              <Sparkles size={16} className="text-[#6C5CE7]" />
+          <div className="bg-[#282828] rounded-2xl border border-[#383838] p-5 space-y-3 text-xs text-gray-400 shadow-2xs">
+            <div className="flex items-center gap-2 font-bold text-[#eff2f6] text-sm">
+              <Sparkles size={16} className="text-[#ffa116]" />
               <span>CodeLadder Blogs</span>
             </div>
             <ul className="space-y-2 list-disc pl-4 text-[12px] leading-relaxed">
@@ -429,7 +429,7 @@ export default function BlogsPage() {
                 <strong>Size Limit:</strong> Max 50,000 characters per blog (~10,000 words).
               </li>
               <li>
-                <strong>Notion & Math:</strong> Supports LaTeX math (<code className="text-[#6C5CE7]">$O(N)$</code>), code blocks, and markdown callouts.
+                <strong>Notion & Math:</strong> Supports LaTeX math (<code className="text-[#ffa116]">$O(N)$</code>), code blocks, and markdown callouts.
               </li>
               <li>
                 <strong>Upvote Rule:</strong> Votes lock 2 minutes after casting.
@@ -441,10 +441,10 @@ export default function BlogsPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteModalBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 space-y-4">
-            <h3 className="text-base font-bold text-gray-900">Delete Blog Post?</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="bg-[#282828] rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-[#383838] space-y-4">
+            <h3 className="text-base font-bold text-[#eff2f6]">Delete Blog Post?</h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
               Are you sure you want to permanently delete <strong>"{deleteModalBlog.title}"</strong>? This will free up 1 slot in your 5-blog quota. This action cannot be undone.
             </p>
             <div className="flex justify-end gap-2 pt-2">
@@ -452,7 +452,7 @@ export default function BlogsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setDeleteModalBlog(null)}
-                className="text-xs"
+                className="text-xs border-[#383838] text-gray-300 hover:bg-[#383838]"
               >
                 Cancel
               </Button>

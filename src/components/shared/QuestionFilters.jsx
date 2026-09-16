@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { Search, Shuffle, X } from 'lucide-react';
@@ -9,12 +9,36 @@ export default function QuestionFilters({
   onFilterChange,
   onPickRandom
 }) {
+  const [localSearch, setLocalSearch] = useState(filters.search || '');
+  const debounceTimerRef = useRef(null);
+
+  useEffect(() => {
+    setLocalSearch(filters.search || '');
+  }, [filters.search]);
 
   const handleChange = (key, value) => {
     const callback = onFilterChange || onChange;
     if (callback) {
       callback({ ...filters, [key]: value });
     }
+  };
+
+  const handleSearchChange = (val) => {
+    setLocalSearch(val);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      handleChange('search', val);
+    }, 300);
+  };
+
+  const handleClearSearch = () => {
+    setLocalSearch('');
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    handleChange('search', '');
   };
 
   const handlePlatformChange = (newPlatform) => {
@@ -35,16 +59,16 @@ export default function QuestionFilters({
       <div className="relative flex-1 max-w-lg">
         <Input
           placeholder="Search problems by title, ID, or slug..."
-          value={filters.search || ''}
-          onChange={(e) => handleChange('search', e.target.value)}
-          icon={<Search size={18} className="text-[#6B7280]" />}
+          value={localSearch}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          icon={<Search size={18} className="text-[#8b949e]" />}
           className="pr-8"
         />
-        {filters.search && (
+        {localSearch && (
           <button
             type="button"
-            onClick={() => handleChange('search', '')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            onClick={handleClearSearch}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 cursor-pointer"
           >
             <X size={16} />
           </button>
@@ -57,7 +81,7 @@ export default function QuestionFilters({
         <select
           value={filters.platform || 'ALL'}
           onChange={(e) => handlePlatformChange(e.target.value)}
-          className="rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm font-medium text-[#1E1F25] bg-white focus:border-[#6C5CE7] focus:outline-none"
+          className="rounded-lg border border-[#383838] px-3 py-2 text-sm font-medium text-[#eff2f6] bg-[#1a1a1a] focus:border-[#ffa116] focus:outline-none"
         >
           <option value="ALL">All Platforms</option>
           <option value="LEETCODE">LeetCode</option>
@@ -68,8 +92,8 @@ export default function QuestionFilters({
 
         {/* Platform-Specific Difficulty / Rating Filter */}
         {filters.platform === 'CODEFORCES' || filters.platform === 'CODECHEF' ? (
-          <div className="flex items-center gap-1.5 bg-gray-50 border border-[#E5E7EB] rounded-lg px-2.5 py-1.5">
-            <span className="text-xs font-semibold text-gray-600">
+          <div className="flex items-center gap-1.5 bg-[#1a1a1a] border border-[#383838] rounded-lg px-2.5 py-1.5">
+            <span className="text-xs font-semibold text-[#8b949e]">
               {filters.platform === 'CODEFORCES' ? 'CF Rating:' : 'CC Rating:'}
             </span>
             <input
@@ -80,9 +104,9 @@ export default function QuestionFilters({
               step={filters.platform === 'CODEFORCES' ? '100' : '50'}
               value={filters.minRating || ''}
               onChange={(e) => handleChange('minRating', e.target.value)}
-              className="w-16 rounded border border-gray-200 bg-white px-2 py-0.5 text-xs text-[#1E1F25] focus:outline-none focus:ring-1 focus:ring-[#6C5CE7]"
+              className="w-16 rounded border border-[#383838] bg-[#282828] px-2 py-0.5 text-xs text-[#eff2f6] focus:outline-none focus:ring-1 focus:ring-[#ffa116]"
             />
-            <span className="text-gray-400 text-xs">–</span>
+            <span className="text-[#8b949e] text-xs">–</span>
             <input
               type="number"
               placeholder="Max"
@@ -91,7 +115,7 @@ export default function QuestionFilters({
               step={filters.platform === 'CODEFORCES' ? '100' : '50'}
               value={filters.maxRating || ''}
               onChange={(e) => handleChange('maxRating', e.target.value)}
-              className="w-16 rounded border border-gray-200 bg-white px-2 py-0.5 text-xs text-[#1E1F25] focus:outline-none focus:ring-1 focus:ring-[#6C5CE7]"
+              className="w-16 rounded border border-[#383838] bg-[#282828] px-2 py-0.5 text-xs text-[#eff2f6] focus:outline-none focus:ring-1 focus:ring-[#ffa116]"
             />
             {(filters.minRating || filters.maxRating) && (
               <button
@@ -100,7 +124,7 @@ export default function QuestionFilters({
                   const next = { ...filters, minRating: '', maxRating: '' };
                   (onFilterChange || onChange)?.(next);
                 }}
-                className="text-gray-400 hover:text-red-500 p-0.5 ml-0.5"
+                className="text-[#8b949e] hover:text-[#ef4743] p-0.5 ml-0.5"
                 title="Reset rating filter"
               >
                 <X size={13} />
@@ -111,7 +135,7 @@ export default function QuestionFilters({
           <select
             value={filters.difficulty || 'ALL'}
             onChange={(e) => handleChange('difficulty', e.target.value === 'ALL' ? '' : e.target.value)}
-            className="rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm text-[#1E1F25] bg-white focus:border-[#6C5CE7] focus:outline-none"
+            className="rounded-lg border border-[#383838] px-3 py-2 text-sm text-[#eff2f6] bg-[#1a1a1a] focus:border-[#ffa116] focus:outline-none"
           >
             <option value="ALL">All Difficulties</option>
             <option value="EASY">Easy</option>
@@ -121,12 +145,12 @@ export default function QuestionFilters({
         ) : null}
 
         {/* Hide Solved Toggle */}
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#1E1F25] select-none pl-1">
+        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#eff2f6] select-none pl-1">
           <input
             type="checkbox"
             checked={Boolean(filters.hideSolved)}
             onChange={(e) => handleChange('hideSolved', e.target.checked)}
-            className="rounded border-[#E5E7EB] text-[#6C5CE7] focus:ring-[#6C5CE7] w-4 h-4 cursor-pointer"
+            className="rounded border-[#383838] bg-[#1a1a1a] text-[#ffa116] focus:ring-[#ffa116] w-4 h-4 cursor-pointer"
           />
           <span>Hide Solved</span>
         </label>
@@ -137,7 +161,7 @@ export default function QuestionFilters({
             type="button"
             variant="outline"
             onClick={onPickRandom}
-            className="flex items-center gap-1.5 border-[#E5E7EB] text-[#6C5CE7] hover:bg-purple-50"
+            className="flex items-center gap-1.5 border-[#383838] bg-[#282828] text-[#eff2f6] hover:bg-[#333333]"
             title="Pick a random problem from current list"
           >
             <Shuffle size={15} />

@@ -27,11 +27,33 @@ export default function usePlatformAccounts() {
 
   const saveAccount = async (platform, handle) => {
     await api.put(`/platform-accounts/${platform.toLowerCase()}`, { handle });
+    const p = platform.toUpperCase();
+    if (p === 'CODEFORCES') {
+      localStorage.setItem('cf_handle', handle);
+      localStorage.removeItem('cf_solved_problems');
+    } else if (p === 'LEETCODE') {
+      localStorage.setItem('lc_handle', handle);
+      localStorage.removeItem('lc_solved_problems');
+    } else if (p === 'CODECHEF') {
+      localStorage.setItem('cc_handle', handle);
+      localStorage.removeItem('cc_solved_problems');
+    }
     await fetchAccounts();
   };
 
   const removeAccount = async (platform) => {
     await api.delete(`/platform-accounts/${platform.toLowerCase()}`);
+    const p = platform.toUpperCase();
+    if (p === 'CODEFORCES') {
+      localStorage.removeItem('cf_handle');
+      localStorage.removeItem('cf_solved_problems');
+    } else if (p === 'LEETCODE') {
+      localStorage.removeItem('lc_handle');
+      localStorage.removeItem('lc_solved_problems');
+    } else if (p === 'CODECHEF') {
+      localStorage.removeItem('cc_handle');
+      localStorage.removeItem('cc_solved_problems');
+    }
     await fetchAccounts();
   };
 

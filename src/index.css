@@ -1,3 +1,4 @@
+@import './styles/globals.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -12,8 +13,8 @@
 
   body {
     min-height: 100vh;
-    background: #F8F9FB;
-    color: #1E1F25;
+    background: #1a1a1a;
+    color: #eff2f6;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -22,11 +23,27 @@
   code, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  /* LeetCode Dark custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #383838;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #484848;
+  }
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-xl border border-[#E5E7EB] shadow-sm;
+    @apply bg-[#282828] rounded-xl border border-[#383838] shadow-sm text-[#eff2f6];
   }
 
   .card-padded {
@@ -34,34 +51,34 @@
   }
 
   .table-header {
-    @apply bg-[#1E1F25] text-white text-xs font-semibold uppercase tracking-wider;
+    @apply bg-[#282828] text-[#8b949e] text-xs font-semibold uppercase tracking-wider border-b border-[#383838];
   }
 
   .table-row {
-    @apply bg-white border-b border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors;
+    @apply bg-[#282828] border-b border-[#383838] hover:bg-[#333333] text-[#eff2f6] transition-colors;
   }
 
   .table-row-alt {
-    @apply bg-[#FAFBFC] border-b border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors;
+    @apply bg-[#1a1a1a] border-b border-[#383838] hover:bg-[#333333] text-[#eff2f6] transition-colors;
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-[#A0A3B1] hover:text-white hover:bg-[#2D2E36] transition-all duration-150;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-[#8b949e] hover:text-[#eff2f6] hover:bg-[#333333] transition-all duration-150;
   }
 
   .sidebar-link-active {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[#2D2E36] border-l-2 border-[#6C5CE7];
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-[#eff2f6] bg-[#333333] border-l-2 border-[#ffa116];
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 rounded-lg border border-[#E5E7EB] bg-white text-[#1E1F25] placeholder-[#9CA3AF] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20 focus:border-[#6C5CE7] transition-all duration-200;
+    @apply w-full px-4 py-2.5 rounded-lg border border-[#383838] bg-[#1a1a1a] text-[#eff2f6] placeholder-[#6e7681] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#ffa116]/20 focus:border-[#ffa116] transition-all duration-200;
   }
 
   .contest-round-boundary td {
-    border-bottom: 3.5px solid #1E1F25 !important;
+    border-bottom: 3.5px solid #383838 !important;
   }
 
   .contest-sub-row td {
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #333333;
   }
 }

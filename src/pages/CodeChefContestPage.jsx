@@ -1,12 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import PageHeader from '../components/layout/PageHeader';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import Pagination from '../components/ui/Pagination';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { ExternalLink, Search, CheckCircle2 } from 'lucide-react';
-import { useCodeChefData } from '../hooks/useContestData';
+import ContestUpsolverView, { UpsolverProblemCard } from '../components/shared/ContestUpsolverView';
+import AddToLadderModal from '../components/shared/AddToLadderModal';
+import { CodeChefIcon } from '../components/ui/PlatformIcon';
+import { useCodeChefData, fetchCodeChefSubmissions } from '../hooks/useContestData';
+import toast from 'react-hot-toast';
 import api from '../lib/api';
+import { useStarred } from '../context/StarredContext';
 
 const PROBLEM_COLUMNS = ['P1 (A)', 'P2 (B)', 'P3 (C)', 'P4 (D)', 'P5 (E)', 'P6 (F)', 'P7 (G)', 'P8+'];
 
@@ -21,71 +20,244 @@ const CATEGORIES = [
   { id: 'LUNCHTIME', label: 'Lunchtime', filter: (c) => c.contest?.startsWith('LTIME') },
 ];
 
-// Difficulty estimation using submissions count and accuracy
-export function getCodeChefProblemStyle(problem, divisionStr = '') {
-  const subs = Number(problem?.submissions) || 0;
-  const acc = Number(problem?.accuracy) || 0;
+// Official CodeChef rating tiers and colors from exact color schema
+export function getCodeChefRatingStyle(rating) {
+  if (!rating || rating <= 0 || rating === 9999) {
+    return {
+      text: '#8b949e',
+      bg: '#21262d',
+      border: '#30363d',
+      badgeBg: '#30363d',
+      badgeText: '#ffffff',
+      stars: 0,
+      label: 'Unrated',
+      ratingText: 'Unrated',
+    };
+  }
+  if (rating <= 1399) {
+    return {
+      text: '#8b949e',
+      bg: '#5A5A5A',
+      border: '#5A5A5A',
+      badgeBg: '#5A5A5A',
+      badgeText: '#ffffff',
+      stars: 1,
+      label: '1★',
+      ratingText: String(rating),
+    };
+  }
+  if (rating <= 1599) {
+    return {
+      text: '#3fb950',
+      bg: '#2E7D32',
+      border: '#2E7D32',
+      badgeBg: '#2E7D32',
+      badgeText: '#ffffff',
+      stars: 2,
+      label: '2★',
+      ratingText: String(rating),
+    };
+  }
+  if (rating <= 1799) {
+    return {
+      text: '#58a6ff',
+      bg: '#1976D2',
+      border: '#1976D2',
+      badgeBg: '#1976D2',
+      badgeText: '#ffffff',
+      stars: 3,
+      label: '3★',
+      ratingText: String(rating),
+    };
+  }
+  if (rating <= 1999) {
+    return {
+      text: '#bc8cff',
+      bg: '#683A83',
+      border: '#683A83',
+      badgeBg: '#683A83',
+      badgeText: '#ffffff',
+      stars: 4,
+      label: '4★',
+      ratingText: String(rating),
+    };
+  }
+  if (rating <= 2199) {
+    return {
+      text: '#e5a910',
+      bg: '#E5A910',
+      border: '#E5A910',
+      badgeBg: '#E5A910',
+      badgeText: '#ffffff',
+      stars: 5,
+      label: '5★',
+      ratingText: String(rating),
+    };
+  }
+  if (rating <= 2499) {
+    return {
+      text: '#f0883e',
+      bg: '#E65100',
+      border: '#E65100',
+      badgeBg: '#E65100',
+      badgeText: '#ffffff',
+      stars: 6,
+      label: '6★',
+      ratingText: String(rating),
+    };
+  }
+  return {
+    text: '#f85149',
+    bg: '#C62828',
+    border: '#C62828',
+    badgeBg: '#C62828',
+    badgeText: '#ffffff',
+    stars: 7,
+    label: '7★',
+    ratingText: String(rating),
+  };
+}
 
-  // Very high solves or Div 4 early problems
-  if (subs >= 600 || (subs >= 200 && acc >= 50) || (divisionStr.includes('Division 4') && subs >= 300)) {
-    return { text: '#10B981', bg: '#ECFDF5', border: '#A7F3D0', label: '1★ Easy' };
+export function getCodeChefProblemStyle(problem) {
+  const rating = problem?.rating || (typeof problem === 'number' ? problem : null);
+  if (rating && rating > 0 && rating !== 9999) {
+    return getCodeChefRatingStyle(rating);
   }
-  if (subs >= 300 || (divisionStr.includes('Division 4') && subs >= 100)) {
-    return { text: '#06B6D4', bg: '#ECFEFF', border: '#A5F3FC', label: '2★ Medium-Easy' };
-  }
-  if (subs >= 150 || divisionStr.includes('Division 3')) {
-    return { text: '#3B82F6', bg: '#EFF6FF', border: '#BFDBFE', label: '3★ Medium' };
-  }
-  if (subs >= 60 || divisionStr.includes('Division 2')) {
-    return { text: '#8B5CF6', bg: '#FAF5FF', border: '#E9D5FF', label: '4★ Hard' };
-  }
-  if (subs >= 20) {
-    return { text: '#F59E0B', bg: '#FFFBEB', border: '#FDE68A', label: '5★ Very Hard' };
-  }
-  if (subs >= 5) {
-    return { text: '#F97316', bg: '#FFF7ED', border: '#FED7AA', label: '6★ Master' };
-  }
-  return { text: '#EF4444', bg: '#FEF2F2', border: '#FECACA', label: '7★ Grandmaster' };
+  return getCodeChefRatingStyle(null);
+}
+
+export function matchesRatingFilter(p, minRating, maxRating) {
+  if (!minRating && !maxRating) return true;
+  const rating = p?.rating;
+  if (!rating || rating === 9999) return false;
+  if (minRating && rating < Number(minRating)) return false;
+  if (maxRating && rating > Number(maxRating)) return false;
+  return true;
 }
 
 export default function CodeChefContestPage() {
   const { contests, loading, error } = useCodeChefData();
-  const [handle, setHandle] = useState('');
+  const [handle, setHandle] = useState(() => localStorage.getItem('cc_handle') || '');
+  const [isFetching, setIsFetching] = useState(false);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
   const [mergeDivisions, setMergeDivisions] = useState(false);
-  const [showMetrics, setShowMetrics] = useState(true);
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const [minRating, setMinRating] = useState('');
+  const [maxRating, setMaxRating] = useState('');
+  const [userStats, setUserStats] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 20;
 
-  // Track locally checked/solved problems
-  const [solvedCodes, setSolvedCodes] = useState(new Set());
+  // Centralized global backend starring
+  const { isStarred: checkStarred, toggleStar } = useStarred();
+
+  // Modal to add problem to any ladder
+  const [ladderModal, setLadderModal] = useState({ isOpen: false, question: null });
+
+  // Track locally checked/solved problems persisted in localStorage
+  const [solvedCodes, setSolvedCodes] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cc_solved_problems');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  // Toggle solve state manually
+  const toggleSolved = (code) => {
+    if (!code) return;
+    const c = code.toUpperCase();
+    setSolvedCodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(c)) {
+        next.delete(c);
+      } else {
+        next.add(c);
+      }
+      localStorage.setItem('cc_solved_problems', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   // Load connected CodeChef handle if exists
   useEffect(() => {
+    const saved = localStorage.getItem('cc_handle');
+    if (saved) {
+      setHandle(saved);
+      if (solvedCodes.size === 0) {
+        handleSync(saved, true);
+      }
+      return;
+    }
     api
       .get('/platform-accounts')
       .then(({ data }) => {
         const cc = (data.accounts || []).find((a) => a.platform === 'CODECHEF');
-        if (cc?.handle) setHandle(cc.handle);
+        if (cc?.handle) {
+          setHandle(cc.handle);
+          localStorage.setItem('cc_handle', cc.handle);
+          if (solvedCodes.size === 0) {
+            handleSync(cc.handle, true);
+          }
+        }
       })
       .catch(() => {});
   }, []);
 
-  const toggleSolved = (code) => {
-    setSolvedCodes((prev) => {
-      const next = new Set(prev);
-      if (next.has(code)) next.delete(code);
-      else next.add(code);
-      return next;
-    });
+  const handleSync = async (targetHandle = handle, silent = false) => {
+    const clean = targetHandle?.trim();
+    if (!clean) {
+      if (!silent) toast.error('Please enter a CodeChef username to sync');
+      return;
+    }
+
+    setIsFetching(true);
+    const toastId = !silent ? toast.loading(`Syncing CodeChef submissions for @${clean}...`) : null;
+    try {
+      const res = await fetchCodeChefSubmissions(clean);
+      const newSolved = new Set((res.solvedCodes || []).map((c) => c.toUpperCase()));
+      setSolvedCodes(newSolved);
+      setUserStats({
+        rating: res.userRating,
+        stars: res.stars,
+        count: newSolved.size
+      });
+      localStorage.setItem('cc_handle', clean);
+      localStorage.setItem('cc_solved_problems', JSON.stringify([...newSolved]));
+
+      // Persist to backend database
+      let matchedCount = 0;
+      try {
+        const syncRes = await api.post('/platform-accounts/sync-solved', {
+          codechef: [...newSolved].slice(0, 2000)
+        });
+        matchedCount = syncRes.data?.matchedCount || 0;
+      } catch (postErr) {
+        console.warn('Backend sync-solved error in CodeChef page:', postErr);
+      }
+
+      if (!silent) {
+        toast.success(
+          `Synced ${res.solvedCodes?.length || 0} solved problems for @${clean} (${matchedCount} catalog matches)!`,
+          { id: toastId }
+        );
+      }
+    } catch (err) {
+      if (!silent) {
+        toast.error(err.message || 'Failed to sync CodeChef submissions.', { id: toastId });
+      }
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   // Prepare table data
   const matrixRows = useMemo(() => {
     if (!contests || !contests.length) return [];
 
-    let filtered = contests.filter((c) => {
+    const filtered = contests.filter((c) => {
       const name = c.contest || c.code || '';
       const div = c.division || '';
 
@@ -106,6 +278,8 @@ export default function CodeChefContestPage() {
 
       return true;
     });
+
+    let result = [];
 
     if (mergeDivisions) {
       // Group by root contest code (e.g. START192 from START192A, START192B, etc.)
@@ -130,6 +304,7 @@ export default function CodeChefContestPage() {
         if (c.division) roundObj.subtitles.add(c.division.replace('Scorable Problems for ', ''));
 
         (c.problems || []).forEach((p, idx) => {
+          if (!matchesRatingFilter(p, minRating, maxRating)) return;
           const colIndex = Math.min(idx, PROBLEM_COLUMNS.length - 1);
           const colName = PROBLEM_COLUMNS[colIndex];
           // Avoid duplicate problems in same cell if already added from another division
@@ -139,40 +314,66 @@ export default function CodeChefContestPage() {
         });
       });
 
-      return Array.from(roundMap.values()).map((r) => ({
-        id: r.id,
-        title: r.title,
-        subtitle: Array.from(r.subtitles).join(' · '),
-        columns: r.problemsByCol,
-        totalProblems: Object.values(r.problemsByCol).reduce((sum, list) => sum + list.length, 0),
-      }));
+      result = Array.from(roundMap.values()).map((r) => {
+        const allProbs = Object.values(r.problemsByCol).flat();
+        const totalProblems = allProbs.length;
+        const solvedCount = allProbs.filter((p) => solvedCodes.has(p.code?.toUpperCase())).length;
+        const isCompleted = totalProblems > 0 && solvedCount === totalProblems;
+        return {
+          id: r.id,
+          title: r.title,
+          subtitle: Array.from(r.subtitles).join(' · '),
+          columns: r.problemsByCol,
+          totalProblems,
+          solvedCount,
+          isCompleted,
+        };
+      });
+    } else {
+      // Standard unmerged: each contest division is its own row
+      result = filtered.map((c) => {
+        const colMap = {};
+        PROBLEM_COLUMNS.forEach((col) => {
+          colMap[col] = [];
+        });
+
+        (c.problems || []).forEach((p, idx) => {
+          if (!matchesRatingFilter(p, minRating, maxRating)) return;
+          const colIndex = Math.min(idx, PROBLEM_COLUMNS.length - 1);
+          const colName = PROBLEM_COLUMNS[colIndex];
+          colMap[colName].push({ ...p, division: c.division });
+        });
+
+        const contestCode = c.contest || c.code || 'Contest';
+        const rootRound = contestCode.replace(/[A-D]$/i, '');
+        const allProbs = Object.values(colMap).flat();
+        const totalProblems = allProbs.length;
+        const solvedCount = allProbs.filter((p) => solvedCodes.has(p.code?.toUpperCase())).length;
+        const isCompleted = totalProblems > 0 && solvedCount === totalProblems;
+
+        return {
+          id: contestCode,
+          title: contestCode,
+          rootRound,
+          subtitle: c.division?.replace('Scorable Problems for ', '') || '',
+          columns: colMap,
+          totalProblems,
+          solvedCount,
+          isCompleted,
+        };
+      });
     }
 
-    // Standard unmerged: each contest division is its own row
-    return filtered.map((c) => {
-      const colMap = {};
-      PROBLEM_COLUMNS.forEach((col) => {
-        colMap[col] = [];
-      });
+    if (minRating || maxRating) {
+      result = result.filter((row) => row.totalProblems > 0);
+    }
 
-      (c.problems || []).forEach((p, idx) => {
-        const colIndex = Math.min(idx, PROBLEM_COLUMNS.length - 1);
-        const colName = PROBLEM_COLUMNS[colIndex];
-        colMap[colName].push({ ...p, division: c.division });
-      });
+    if (hideCompleted) {
+      result = result.filter((row) => !row.isCompleted);
+    }
 
-      const contestCode = c.contest || c.code || 'Contest';
-      const rootRound = contestCode.replace(/[A-D]$/i, '');
-      return {
-        id: contestCode,
-        title: contestCode,
-        rootRound,
-        subtitle: c.division?.replace('Scorable Problems for ', '') || '',
-        columns: colMap,
-        totalProblems: c.problems?.length || 0,
-      };
-    });
-  }, [contests, search, category, mergeDivisions]);
+    return result;
+  }, [contests, search, category, mergeDivisions, hideCompleted, solvedCodes, minRating, maxRating]);
 
   const totalPages = Math.ceil(matrixRows.length / limit);
   const paginatedRows = useMemo(() => {
@@ -180,281 +381,145 @@ export default function CodeChefContestPage() {
   }, [matrixRows, page, limit]);
 
   return (
-    <div className="w-full max-w-[1550px] mx-auto space-y-6">
-      <PageHeader
-        title="CodeChef Contest Upsolver"
-        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'CodeChef Upsolver' }]}
-      />
-
-      {/* Top Controls Card */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-5 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 w-full max-w-md">
-            <Input
-              label="CodeChef Handle"
-              placeholder="e.g. your_codechef_username"
-              value={handle}
-              onChange={(e) => setHandle(e.target.value)}
-            />
-          </div>
-          {handle && (
-            <div className="text-xs font-semibold text-[#6C5CE7] bg-[#6C5CE7]/10 px-3 py-2 rounded-lg">
-              Tracking: @{handle}
-            </div>
+    <>
+      <ContestUpsolverView
+      title={
+        <span className="flex items-center gap-2.5">
+          <CodeChefIcon size={26} />
+          <span>CodeChef Contest Upsolver</span>
+        </span>
+      }
+      breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'CodeChef Upsolver' }]}
+      handle={handle}
+      onHandleChange={setHandle}
+      onSync={() => handleSync()}
+      isSyncing={isFetching}
+      handleLabel="CodeChef Handle"
+      handlePlaceholder="e.g. your_codechef_username"
+      syncButtonText="Sync Solved"
+      trackingText={
+        handle
+          ? userStats?.rating
+            ? `Tracking: @${handle} · ${userStats.rating} (${userStats.stars || 'Rated'})`
+            : `Tracking: @${handle}`
+          : null
+      }
+      solvedCount={solvedCodes.size}
+      search={search}
+      onSearchChange={(val) => {
+        setSearch(val);
+        setPage(1);
+      }}
+      searchPlaceholder="Search contest, division, or problem..."
+      showRatingFilter={true}
+      minRating={minRating}
+      maxRating={maxRating}
+      onMinRatingChange={(val) => {
+        setMinRating(val);
+        setPage(1);
+      }}
+      onMaxRatingChange={(val) => {
+        setMaxRating(val);
+        setPage(1);
+      }}
+      hideCompleted={hideCompleted}
+      onHideCompletedChange={(val) => {
+        setHideCompleted(val);
+        setPage(1);
+      }}
+      mergeDivisionsToggle={{
+        checked: mergeDivisions,
+        onChange: (val) => {
+          setMergeDivisions(val);
+          setPage(1);
+        },
+      }}
+      categories={CATEGORIES}
+      selectedCategory={category}
+      onCategoryChange={(cat) => {
+        setCategory(cat);
+        setPage(1);
+      }}
+      columns={PROBLEM_COLUMNS}
+      contests={paginatedRows}
+      totalContests={matrixRows.length}
+      loading={loading}
+      loadingText="Loading CodeChef contests dataset..."
+      error={error}
+      emptyMessage="No CodeChef contests matched your filters."
+      page={page}
+      totalPages={totalPages}
+      onPageChange={setPage}
+      renderContestInfo={(contest) => (
+        <div className="flex flex-col gap-1">
+          <a
+            href={`https://www.codechef.com/${contest.title || contest.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="font-bold text-[#e6edf3] hover:text-[#ffa116] hover:underline transition-colors leading-tight"
+          >
+            {contest.title || contest.id}
+          </a>
+          {contest.subtitle && (
+            <span className="text-[11px] text-[#8b949e] line-clamp-1" title={contest.subtitle}>
+              {contest.subtitle}
+            </span>
           )}
-          {solvedCodes.size > 0 && (
-            <div className="text-xs font-semibold text-[#00B894] bg-[#00B894]/10 px-3 py-2 rounded-lg flex items-center gap-1">
-              <CheckCircle2 size={14} />
-              <span>{solvedCodes.size} solved</span>
-            </div>
-          )}
-        </div>
-
-        {/* Search, Toggles, and Category Tabs */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#E5E7EB]">
-          {/* Search */}
-          <div className="w-full sm:w-72">
-            <Input
-              placeholder="Search contest, division, or problem..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          {/* Toggles */}
-          <div className="flex items-center gap-5">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showMetrics}
-                onChange={(e) => setShowMetrics(e.target.checked)}
-                className="w-4 h-4 rounded text-[#6C5CE7] focus:ring-[#6C5CE7] border-gray-300"
-              />
-              <span className="text-xs font-medium text-[#1E1F25]">Show Accuracy & Solves</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={mergeDivisions}
-                onChange={(e) => {
-                  setMergeDivisions(e.target.checked);
-                  setPage(1);
-                }}
-                className="w-4 h-4 rounded text-[#6C5CE7] focus:ring-[#6C5CE7] border-gray-300"
-              />
-              <span className="text-xs font-medium text-[#1E1F25]">Merge Divisions into Single Round</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex flex-wrap gap-1.5 pt-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => {
-                setCategory(cat.id);
-                setPage(1);
-              }}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                category === cat.id
-                  ? 'bg-[#1E1F25] text-white shadow-xs'
-                  : 'bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB] hover:text-[#1E1F25]'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Kenkoooo Matrix Table */}
-      {loading ? (
-        <div className="py-24 flex justify-center">
-          <LoadingSpinner text="Loading CodeChef contests dataset..." />
-        </div>
-      ) : error ? (
-        <div className="py-20 text-center text-red-500 font-medium">{error}</div>
-      ) : matrixRows.length === 0 ? (
-        <div className="bg-white p-12 text-center rounded-xl border border-[#E5E7EB]">
-          <p className="text-sm text-[#6B7280]">No CodeChef contests matched your filters.</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              {/* Table Header */}
-              <thead>
-                <tr className="bg-[#1E1F25] text-white">
-                  <th className="p-3 font-bold border-r border-[#2D2E36] min-w-[200px] max-w-[240px]">
-                    Contest
-                  </th>
-                  {PROBLEM_COLUMNS.map((col) => (
-                    <th
-                      key={col}
-                      className="p-3 font-bold text-center border-r border-[#2D2E36] min-w-[135px]"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              {/* Table Rows */}
-              <tbody>
-                {paginatedRows.map((contest, rowIndex) => {
-                  const nextContest = paginatedRows[rowIndex + 1];
-                  const isLastOfRound = !nextContest || (contest.rootRound && nextContest.rootRound !== contest.rootRound);
-                  const boundaryClass = isLastOfRound ? 'contest-round-boundary' : 'contest-sub-row';
-
-                  return (
-                    <tr key={contest.id} className={`hover:bg-[#F8F9FB] transition-colors ${boundaryClass}`}>
-                      {/* Contest Info Column */}
-                      <td className="p-3 border-r border-[#E5E7EB] align-top bg-white">
-                        <div className="flex flex-col gap-1">
-                          <a
-                            href={`https://www.codechef.com/${contest.title}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-bold text-[#1E1F25] hover:text-[#6C5CE7] hover:underline transition-colors text-sm"
-                            title={contest.title}
-                          >
-                            {contest.title}
-                          </a>
-                          {contest.subtitle && (
-                            <span className="text-[11px] text-[#6B7280] font-medium leading-tight">
-                              {contest.subtitle}
-                            </span>
-                          )}
-                          <span className="text-[10px] text-[#9CA3AF] mt-0.5">
-                            {contest.totalProblems} problems
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Problem Columns (P1 to P8+) */}
-                      {PROBLEM_COLUMNS.map((col) => {
-                        const cellProblems = contest.columns[col] || [];
-                        if (cellProblems.length === 0) {
-                          return (
-                            <td
-                              key={col}
-                              className="p-2 border-r border-[#E5E7EB] text-center text-gray-300 align-middle bg-[#FAFBFC]"
-                            >
-                              -
-                            </td>
-                          );
-                        }
-
-                        const allSolved =
-                          cellProblems.length > 0 &&
-                          cellProblems.every((p) => solvedCodes.has(p.code));
-
-                        return (
-                          <td
-                            key={col}
-                            className={`p-1.5 border-r border-[#E5E7EB] align-top transition-colors ${
-                              allSolved ? 'bg-[#00B894]/10' : 'bg-white'
-                            }`}
-                          >
-                          {/* Stack sub-problems vertically at different heights inside the same cell */}
-                          <div className="flex flex-col gap-1.5 h-full justify-start">
-                            {cellProblems.map((p) => {
-                              const isSolved = solvedCodes.has(p.code);
-                              const style = getCodeChefProblemStyle(p, p.division);
-
-                              return (
-                                <div
-                                  key={p.code}
-                                  className={`p-2 rounded border transition-all ${
-                                    isSolved
-                                      ? 'bg-[#00B894]/15 border-[#00B894]/50'
-                                      : 'bg-white border-[#E5E7EB] hover:border-gray-400 hover:shadow-xs'
-                                  }`}
-                                >
-                                  <div className="flex items-start justify-between gap-1">
-                                    <div className="flex items-start gap-1 min-w-0">
-                                      {/* Solved toggle checkbox/dot */}
-                                      <button
-                                        type="button"
-                                        onClick={() => toggleSolved(p.code)}
-                                        className="shrink-0 mt-0.5"
-                                        title={isSolved ? 'Mark as Unsolved' : 'Mark as Solved'}
-                                      >
-                                        {isSolved ? (
-                                          <CheckCircle2
-                                            size={13}
-                                            className="text-[#00B894] fill-[#00B894]/20"
-                                          />
-                                        ) : (
-                                          <span
-                                            className="w-2.5 h-2.5 rounded-full border block"
-                                            style={{
-                                              borderColor: style.text,
-                                              backgroundColor: `${style.text}25`,
-                                            }}
-                                            title={style.label}
-                                          />
-                                        )}
-                                      </button>
-
-                                      {/* Problem Link */}
-                                      <a
-                                        href={p.url || `https://www.codechef.com/problems/${p.code}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="text-xs font-semibold truncate hover:underline"
-                                        style={{ color: isSolved ? '#00A381' : style.text }}
-                                        title={`${p.name || p.code} (${style.label})`}
-                                      >
-                                        {p.name || p.code}
-                                      </a>
-                                    </div>
-
-                                    {/* Problem code pill */}
-                                    <span className="font-mono text-[9px] text-[#6B7280] font-bold shrink-0 bg-gray-100 px-1 py-0.2 rounded">
-                                      {p.code}
-                                    </span>
-                                  </div>
-
-                                  {/* Metrics: Submissions & Accuracy */}
-                                  {showMetrics && (p.submissions || p.accuracy) && (
-                                    <div className="mt-1 flex items-center justify-between text-[10px] text-[#6B7280] font-medium pt-1 border-t border-gray-100">
-                                      <span>{p.submissions || 0} solves</span>
-                                      <span>{p.accuracy ? `${p.accuracy}%` : '-'}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="p-4 border-t border-[#E5E7EB] flex items-center justify-between">
-              <span className="text-xs text-[#6B7280]">
-                Showing {(page - 1) * limit + 1} -{' '}
-                {Math.min(page * limit, matrixRows.length)} of {matrixRows.length} contests
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[10px] text-[#8b949e]">
+              {contest.solvedCount}/{contest.totalProblems} solved
+            </span>
+            {contest.isCompleted && (
+              <span className="inline-flex items-center text-[10px] text-[#3fb950] font-bold">
+                All Solved
               </span>
-              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
-    </div>
+      renderProblemCell={(p) => {
+        const isSolved = solvedCodes.has(p.code?.toUpperCase());
+        const style = getCodeChefProblemStyle(p);
+        const hasRating = p.rating && p.rating > 0 && p.rating !== 9999;
+        const questionObj = {
+          _id: p.questionId || undefined,
+          platform: 'CODECHEF',
+          code: p.code,
+          externalId: p.code,
+          title: p.name || p.code,
+          url: p.url || `https://www.codechef.com/problems/${p.code}`,
+          rating: p.rating,
+        };
+        const isStarred = checkStarred(questionObj);
+        return (
+          <UpsolverProblemCard
+            key={p.code}
+            title={p.name || p.code}
+            url={p.url || `https://www.codechef.com/problems/${p.code}`}
+            isSolved={isSolved}
+            isStarred={isStarred}
+            onStar={() => toggleStar(questionObj)}
+            onBookmark={() =>
+              setLadderModal({
+                isOpen: true,
+                question: questionObj,
+              })
+            }
+            titleColor={style.text}
+            badgeTitle={
+              hasRating
+                ? `CodeChef Rating: ${p.rating} (${style.label})`
+                : 'Unrated'
+            }
+          />
+        );
+      }}
+    />
+    <AddToLadderModal
+      isOpen={ladderModal.isOpen}
+      onClose={() => setLadderModal({ isOpen: false, question: null })}
+      question={ladderModal.question}
+    />
+    </>
   );
 }

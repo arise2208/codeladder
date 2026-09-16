@@ -1,12 +1,13 @@
 import { Loader2 } from 'lucide-react';
 
 const variants = {
-  primary: 'bg-[#6C5CE7] hover:bg-[#5A4BD1] text-white',
-  secondary: 'bg-[#E5E7EB] hover:bg-[#D1D5DB] text-[#1E1F25]',
-  danger: 'bg-red-500 hover:bg-red-600 text-white',
-  ghost: 'bg-transparent hover:bg-[#F3F4F6] text-[#6B7280]',
-  success: 'bg-[#00B894] hover:bg-[#00A381] text-white',
-  outline: 'border border-[#E5E7EB] bg-white hover:bg-[#F8F9FB] text-[#1E1F25]',
+  primary: 'bg-[#ffa116] hover:bg-[#ffb84d] text-[#1a1a1a] font-semibold border border-[#ffa116]/30 shadow-xs',
+  secondary: 'bg-[#282828] hover:bg-[#333333] text-[#eff2f6] border border-[#383838]',
+  danger: 'bg-[#ef4743] hover:bg-[#d83a37] text-white border border-red-500/20',
+  ghost: 'bg-transparent hover:bg-[#282828] text-[#8b949e] hover:text-[#eff2f6]',
+  success: 'bg-[#2cbb5d] hover:bg-[#38cf6e] text-white',
+  outline: 'border border-[#383838] bg-[#282828] hover:bg-[#333333] text-[#eff2f6]',
+  accent: 'bg-[#ffa116] hover:bg-[#ffb84d] text-[#1a1a1a] font-semibold shadow-xs',
 };
 
 const sizes = {

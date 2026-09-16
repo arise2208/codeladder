@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LoadingSpinner, Badge, Button } from '../components/ui';
 import PlatformInsights from '../components/profile/PlatformInsights';
@@ -21,13 +21,14 @@ import {
   BookOpen,
   MessageSquare,
   Eye,
-  PenLine
+  PenLine,
+  Star,
 } from 'lucide-react';
 import { format, subDays, startOfDay, formatDistanceToNow } from 'date-fns';
 
 export default function ProfilePage() {
   const { username: paramUsername } = useParams();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const targetUsername = paramUsername || user?.username;
   const isOwnProfile = !paramUsername || (user && user.username === paramUsername);
@@ -41,32 +42,56 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!targetUsername) return;
+  const fetchProfileData = useCallback(async (silent = false) => {
+    let resolvedUsername = targetUsername;
+    if (!resolvedUsername && isOwnProfile) {
       try {
-        setLoading(true);
-        setNotFound(false);
+        const { data: meData } = await api.get('/auth/me');
+        resolvedUsername = meData.user?.username;
+      } catch (_) {}
+    }
+    if (!resolvedUsername) return;
 
-        const { data } = await api.get(`/users/${targetUsername}`);
+    try {
+      if (!silent) setLoading(true);
+      setNotFound(false);
 
-        setProfile(data.user || null);
-        setStats(data.stats || { solved: 0, starred: 0, publicLaddersCount: 0, blogsCount: 0, totalLikesReceived: 0, totalUpvotesReceived: 0 });
-        setContributedLadders(data.contributedLadders || []);
-        setBlogs(data.blogs || []);
-        setSolvedQuestions(data.solvedQuestions || []);
-        setPlatforms(data.user?.accounts || []);
-      } catch (err) {
-        console.error('Failed to load profile data', err);
-        if (err.response?.status === 404) {
-          setNotFound(true);
+      const { data } = await api.get(`/users/${resolvedUsername}`);
+
+      setProfile(data.user || null);
+      setStats(data.stats || { solved: 0, starred: 0, publicLaddersCount: 0, blogsCount: 0, totalLikesReceived: 0, totalUpvotesReceived: 0 });
+      setContributedLadders(data.contributedLadders || []);
+      setBlogs(data.blogs || []);
+      setSolvedQuestions(data.solvedQuestions || []);
+      setPlatforms(data.user?.accounts || []);
+    } catch (err) {
+      console.error('Failed to load profile data', err);
+      if (err.response?.status === 404) {
+        if (isOwnProfile) {
+          try {
+            const { data: meData } = await api.get('/auth/me');
+            if (meData.user?.username && meData.user.username !== resolvedUsername) {
+              const retryRes = await api.get(`/users/${meData.user.username}`);
+              setProfile(retryRes.data.user || null);
+              setStats(retryRes.data.stats || { solved: 0, starred: 0, publicLaddersCount: 0, blogsCount: 0, totalLikesReceived: 0, totalUpvotesReceived: 0 });
+              setContributedLadders(retryRes.data.contributedLadders || []);
+              setBlogs(retryRes.data.blogs || []);
+              setSolvedQuestions(retryRes.data.solvedQuestions || []);
+              setPlatforms(retryRes.data.user?.accounts || []);
+              return;
+            }
+          } catch (_) {}
         }
-      } finally {
-        setLoading(false);
+        setNotFound(true);
       }
-    };
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, [targetUsername, isOwnProfile]);
+
+  useEffect(() => {
     fetchProfileData();
-  }, [targetUsername]);
+  }, [fetchProfileData]);
 
   const currentYear = new Date().getFullYear();
   const signupYear = profile?.createdAt ? new Date(profile.createdAt).getFullYear() : currentYear;
@@ -143,20 +168,33 @@ export default function ProfilePage() {
   if (notFound) {
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
-        <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto text-2xl font-bold">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto text-2xl font-bold">
           ?
         </div>
-        <h2 className="text-xl font-bold text-gray-800">User Not Found</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-gray-200">User Not Found</h2>
+        <p className="text-sm text-gray-400">
           We couldn't find a user profile for <strong>@{targetUsername}</strong>.
         </p>
-        <div className="pt-2">
-          <Link to="/ladders">
-            <Button variant="primary" size="sm">
-              Explore Community Ladders
+        {isOwnProfile ? (
+          <div className="pt-3 flex items-center justify-center gap-3">
+            <Button variant="outline" size="sm" onClick={() => logout()}>
+              Log Out & Sign In Again
             </Button>
-          </Link>
-        </div>
+            <Link to="/problemset">
+              <Button variant="primary" size="sm">
+                Explore Problemset
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="pt-2">
+            <Link to="/ladders">
+              <Button variant="primary" size="sm">
+                Explore Community Ladders
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     );
   }
@@ -221,6 +259,11 @@ export default function ProfilePage() {
                     <Settings size={14} /> Settings
                   </Button>
                 </Link>
+                <Link to="/starred" className="flex-1 sm:flex-none">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto border-gray-700 text-amber-400 hover:bg-white/10 flex items-center gap-1.5">
+                    <Star size={14} className="fill-amber-400" /> Starred
+                  </Button>
+                </Link>
                 <Link to="/problemset" className="flex-1 sm:flex-none">
                   <Button variant="primary" size="sm" className="w-full sm:w-auto flex items-center gap-1.5">
                     <Code2 size={14} /> Practice
@@ -254,8 +297,12 @@ export default function ProfilePage() {
               <CheckCircle2 size={20} />
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-bold text-white">{stats.solved}</div>
-              <div className="text-xs text-gray-400">Total Solved</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">
+                {stats.verifiedSolved !== undefined ? stats.verifiedSolved : stats.solved}
+              </div>
+              <div className="text-xs text-gray-400">
+                {stats.verifiedSolved !== undefined ? 'Verified Solved' : 'Total Solved'}
+              </div>
             </div>
           </div>
 
@@ -321,225 +368,233 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* 2. Community Contributions Section */}
-      <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E7EB] shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <Globe size={18} className="text-[#6C5CE7]" />
-              <h2 className="text-base sm:text-lg font-extrabold text-[#1E1F25]">Community Contributions</h2>
-              <span className="text-xs font-mono font-bold bg-[#6C5CE7]/10 text-[#6C5CE7] px-2 py-0.5 rounded-full">
-                {contributedLadders.length} {contributedLadders.length === 1 ? 'Ladder' : 'Ladders'}
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Publicly curated problem collections shared with the community
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-              <ThumbsUp size={13} className="text-emerald-600 fill-emerald-600" />
-              <span>{stats.totalUpvotesReceived ?? stats.totalLikesReceived ?? 0} Total Upvotes Received</span>
-            </div>
-          </div>
+      {/* 3:1 Horizontal Split Grid: Left 3 cols (Platform Insights & Heatmaps), Right 1 col (Ladders & Blogs) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        {/* Left Column: Platform Insights & Analytics Suite (3 parts) */}
+        <div className="lg:col-span-3 space-y-6">
+          <PlatformInsights
+            solvedQuestions={solvedQuestions}
+            platformAccounts={platforms}
+            currentUser={profile || user}
+            availableYears={availableYears}
+            onRefresh={() => fetchProfileData(true)}
+            isOwnProfile={isOwnProfile}
+          />
         </div>
 
-        {contributedLadders.length === 0 ? (
-          <div className="text-center py-10 px-4 bg-gray-50/60 rounded-xl border border-dashed border-gray-200">
-            <Globe size={32} className="mx-auto text-gray-300 mb-2" />
-            <h3 className="text-sm font-bold text-gray-700">No public ladders yet</h3>
-            <p className="text-xs text-gray-400 max-w-sm mx-auto mt-1">
-              {isOwnProfile
-                ? 'You have not listed any ladders on Community Ladders yet. Go to My Ladders and click "Publish" on any ladder!'
-                : `@${profile?.username || targetUsername} hasn't published any public ladders to the community yet.`}
-            </p>
-            {isOwnProfile && (
-              <Link to="/ladders" className="inline-block mt-4">
-                <Button size="sm" variant="primary" className="text-xs">
-                  Go to My Ladders
-                </Button>
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contributedLadders.map((ladder) => (
-              <div
-                key={ladder._id}
-                className="bg-white rounded-xl border border-gray-200 hover:border-[#6C5CE7]/40 hover:shadow-md transition-all p-5 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <Link
-                      to={`/ladders/${ladder._id}`}
-                      className="font-bold text-sm text-[#1E1F25] group-hover:text-[#6C5CE7] transition-colors line-clamp-1 flex-1"
-                    >
-                      {ladder.title}
-                    </Link>
-                    <span className="text-[10px] font-mono text-gray-400 shrink-0">
-                      {ladder.publishedAt ? formatDistanceToNow(new Date(ladder.publishedAt), { addSuffix: true }) : ''}
-                    </span>
-                  </div>
-
-                  {ladder.description && (
-                    <p className="text-xs text-gray-600 line-clamp-2 bg-gray-50 p-2 rounded-lg border border-gray-100 mb-3">
-                      “{ladder.description}”
-                    </p>
-                  )}
+        {/* Right Column: Ladders & Blogs (1 part) */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Community Contributions (Ladders) */}
+          <div className="bg-[#282828] rounded-xl p-5 border border-[#383838] shadow-xs space-y-4">
+            <div className="flex items-center justify-between gap-2 border-b border-[#383838] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Globe size={16} className="text-[#6C5CE7]" />
+                  <h2 className="text-sm sm:text-base font-bold text-[#eff2f6]">Ladders</h2>
+                  <span className="text-[11px] font-mono font-bold bg-[#6C5CE7]/15 text-[#A29BFE] px-2 py-0.5 rounded-full">
+                    {contributedLadders.length}
+                  </span>
                 </div>
+                <p className="text-[11px] text-[#8b949e] mt-0.5">
+                  Public problem collections
+                </p>
+              </div>
 
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-2 text-xs">
-                  <div className="flex items-center gap-3 text-gray-500">
+              {isOwnProfile && (
+                <Link to="/ladders">
+                  <Button size="sm" variant="outline" className="text-[11px] px-2 py-1 h-7 border-[#383838] text-gray-300 hover:bg-[#383838]">
+                    Manage
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {contributedLadders.length === 0 ? (
+              <div className="text-center py-6 px-3 bg-[#1a1a1a] rounded-xl border border-dashed border-[#383838]">
+                <Globe size={24} className="mx-auto text-gray-500 mb-2" />
+                <h3 className="text-xs font-bold text-gray-300">No public ladders yet</h3>
+                <p className="text-[11px] text-[#8b949e] max-w-xs mx-auto mt-1">
+                  {isOwnProfile
+                    ? 'Publish ladders from "My Ladders" to showcase them here!'
+                    : `@${profile?.username || targetUsername} has not published any public ladders.`}
+                </p>
+                {isOwnProfile && (
+                  <Link to="/ladders" className="inline-block mt-3">
+                    <Button size="sm" variant="primary" className="text-[11px] px-2.5 py-1">
+                      Go to Ladders
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {contributedLadders.map((ladder) => (
+                  <div
+                    key={ladder._id}
+                    className="bg-[#1a1a1a] rounded-xl border border-[#383838] hover:border-[#6C5CE7]/50 hover:shadow-md transition-all p-3.5 flex flex-col justify-between group"
+                  >
                     <div>
-                      <span className="font-semibold text-gray-800">{ladder.questionCount || 0}</span> problems
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded">
-                        <ThumbsUp size={11} className="fill-emerald-600" /> {ladder.upvotesCount ?? ladder.likesCount ?? 0}
-                      </span>
-                      {(ladder.downvotesCount > 0 || ladder.dislikesCount > 0) && (
-                        <span className="inline-flex items-center gap-1 text-rose-500 font-semibold bg-rose-50 px-1.5 py-0.5 rounded">
-                          <ThumbsDown size={11} className="fill-rose-500" /> {ladder.downvotesCount ?? ladder.dislikesCount}
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <Link
+                          to={`/ladders/${ladder._id}`}
+                          className="font-bold text-xs sm:text-sm text-[#eff2f6] group-hover:text-[#A29BFE] transition-colors line-clamp-1 flex-1"
+                        >
+                          {ladder.title}
+                        </Link>
+                        <span className="text-[10px] font-mono text-[#8b949e] shrink-0">
+                          {ladder.publishedAt ? formatDistanceToNow(new Date(ladder.publishedAt), { addSuffix: true }) : ''}
                         </span>
+                      </div>
+
+                      {ladder.description && (
+                        <p className="text-[11px] text-[#8b949e] line-clamp-2 bg-[#222222] p-2 rounded-lg border border-[#333333] mb-2.5">
+                          “{ladder.description}”
+                        </p>
                       )}
                     </div>
+
+                    <div className="pt-2 border-t border-[#383838] flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2.5 text-[#8b949e] text-[11px]">
+                        <div>
+                          <span className="font-semibold text-[#eff2f6]">{ladder.questionCount || 0}</span> problems
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex items-center gap-1 text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                            <ThumbsUp size={10} className="fill-emerald-400" /> {ladder.upvotesCount ?? ladder.likesCount ?? 0}
+                          </span>
+                          {(ladder.downvotesCount > 0 || ladder.dislikesCount > 0) && (
+                            <span className="inline-flex items-center gap-1 text-rose-400 font-semibold bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded">
+                              <ThumbsDown size={10} className="fill-rose-400" /> {ladder.downvotesCount ?? ladder.dislikesCount}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <Link
+                        to={`/ladders/${ladder._id}`}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#A29BFE] hover:underline"
+                      >
+                        <span>Open</span>
+                        <ArrowRight size={11} />
+                      </Link>
+                    </div>
                   </div>
-
-                  <Link
-                    to={`/ladders/${ladder._id}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#6C5CE7] hover:underline"
-                  >
-                    <span>Explore</span>
-                    <ArrowRight size={12} />
-                  </Link>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 2.5 Blogs & Community Editorials Section */}
-      <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E7EB] shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <BookOpen size={18} className="text-[#6C5CE7]" />
-              <h2 className="text-base sm:text-lg font-extrabold text-[#1E1F25]">Blogs & Community Editorials</h2>
-              <span className="text-xs font-mono font-bold bg-[#6C5CE7]/10 text-[#6C5CE7] px-2 py-0.5 rounded-full">
-                {blogs.length} / 5 Slots
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Author insights, algorithmic guides, and contest problem write-ups
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            {isOwnProfile && (
-              <Link to="/blogs/create">
-                <Button size="sm" variant="primary" className="flex items-center gap-1.5 text-xs">
-                  <PenLine size={13} /> Write Blog
-                </Button>
-              </Link>
             )}
-            <Link to="/blogs">
-              <Button size="sm" variant="outline" className="flex items-center gap-1.5 text-xs border-gray-200">
-                Explore All Blogs <ArrowRight size={13} />
-              </Button>
-            </Link>
+          </div>
+
+          {/* Blogs & Community Editorials */}
+          <div className="bg-[#282828] rounded-xl p-5 border border-[#383838] shadow-xs space-y-4">
+            <div className="flex items-center justify-between gap-2 border-b border-[#383838] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BookOpen size={16} className="text-[#6C5CE7]" />
+                  <h2 className="text-sm sm:text-base font-bold text-[#eff2f6]">Blogs</h2>
+                  <span className="text-[11px] font-mono font-bold bg-[#6C5CE7]/15 text-[#A29BFE] px-2 py-0.5 rounded-full">
+                    {blogs.length} / 5
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#8b949e] mt-0.5">
+                  Editorials & write-ups
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {isOwnProfile && (
+                  <Link to="/blogs/create">
+                    <Button size="sm" variant="primary" className="flex items-center gap-1 text-[11px] px-2 py-1 h-7">
+                      <PenLine size={11} /> Write
+                    </Button>
+                  </Link>
+                )}
+                <Link to="/blogs">
+                  <Button size="sm" variant="outline" className="text-[11px] px-2 py-1 h-7 border-[#383838] text-gray-300 hover:bg-[#383838]">
+                    All
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {blogs.length === 0 ? (
+              <div className="text-center py-6 px-3 bg-[#1a1a1a] rounded-xl border border-dashed border-[#383838]">
+                <BookOpen size={24} className="mx-auto text-gray-500 mb-2" />
+                <h3 className="text-xs font-bold text-gray-300">No blogs yet</h3>
+                <p className="text-[11px] text-[#8b949e] max-w-xs mx-auto mt-1">
+                  {isOwnProfile
+                    ? 'Share your problem breakdown with the community.'
+                    : `@${profile?.username || targetUsername} has not authored any blogs.`}
+                </p>
+                {isOwnProfile && (
+                  <Link to="/blogs/create" className="inline-block mt-3">
+                    <Button size="sm" variant="primary" className="text-[11px] px-2.5 py-1 flex items-center gap-1 mx-auto">
+                      <PenLine size={11} /> Write First Blog
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {blogs.map((blog) => (
+                  <div
+                    key={blog._id}
+                    className="bg-[#1a1a1a] rounded-xl border border-[#383838] hover:border-[#6C5CE7]/50 hover:shadow-md transition-all p-3.5 flex flex-col justify-between group"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <Link
+                          to={`/blogs/${blog._id}`}
+                          className="font-bold text-xs sm:text-sm text-[#eff2f6] group-hover:text-[#A29BFE] transition-colors line-clamp-1 flex-1"
+                        >
+                          {blog.title}
+                        </Link>
+                      </div>
+
+                      {blog.summary && (
+                        <p className="text-[11px] text-[#8b949e] line-clamp-2 bg-[#222222] p-2 rounded-lg border border-[#333333] mb-2.5">
+                          {blog.summary}
+                        </p>
+                      )}
+
+                      {blog.tags && blog.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2.5">
+                          {blog.tags.slice(0, 3).map((t, idx) => (
+                            <span key={idx} className="text-[10px] font-medium bg-[#282828] text-gray-300 border border-[#383838] px-1.5 py-0.5 rounded">
+                              #{t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-[#383838] flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 text-[#8b949e] text-[11px]">
+                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                          <ThumbsUp size={10} className="fill-emerald-400" /> {blog.score ?? 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <MessageSquare size={10} /> {blog.commentsCount || 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-gray-500">
+                          <Eye size={10} /> {blog.viewsCount || 0}
+                        </span>
+                      </div>
+
+                      <Link
+                        to={`/blogs/${blog._id}`}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#A29BFE] hover:underline"
+                      >
+                        <span>Read</span>
+                        <ArrowRight size={11} />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {blogs.length === 0 ? (
-          <div className="text-center py-10 px-4 bg-gray-50/60 rounded-xl border border-dashed border-gray-200">
-            <BookOpen size={32} className="mx-auto text-gray-300 mb-2" />
-            <h3 className="text-sm font-bold text-gray-700">No blogs published yet</h3>
-            <p className="text-xs text-gray-400 max-w-sm mx-auto mt-1">
-              {isOwnProfile
-                ? 'You have not authored any blogs or editorials yet. Share your problem breakdowns and algorithmic techniques with the community (up to 5 blogs per user).'
-                : `@${profile?.username || targetUsername} hasn't published any blogs or editorials yet.`}
-            </p>
-            {isOwnProfile && (
-              <Link to="/blogs/create" className="inline-block mt-4">
-                <Button size="sm" variant="primary" className="text-xs flex items-center gap-1.5 mx-auto">
-                  <PenLine size={13} /> Write Your First Blog
-                </Button>
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {blogs.map((blog) => (
-              <div
-                key={blog._id}
-                className="bg-white rounded-xl border border-gray-200 hover:border-[#6C5CE7]/40 hover:shadow-md transition-all p-5 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <Link
-                      to={`/blogs/${blog._id}`}
-                      className="font-bold text-sm text-[#1E1F25] group-hover:text-[#6C5CE7] transition-colors line-clamp-2 flex-1"
-                    >
-                      {blog.title}
-                    </Link>
-                  </div>
-
-                  {blog.summary && (
-                    <p className="text-xs text-gray-600 line-clamp-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100 mb-3">
-                      {blog.summary}
-                    </p>
-                  )}
-
-                  {blog.tags && blog.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {blog.tags.slice(0, 3).map((t, idx) => (
-                        <span key={idx} className="text-[10px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                          #{t}
-                        </span>
-                      ))}
-                      {blog.tags.length > 3 && (
-                        <span className="text-[10px] text-gray-400 self-center">+{blog.tags.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-2 text-xs">
-                  <div className="flex items-center gap-3 text-gray-500">
-                    <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                      <ThumbsUp size={11} className="fill-emerald-600" /> {blog.score ?? 0}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-gray-500">
-                      <MessageSquare size={11} /> {blog.commentsCount || 0}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-gray-400">
-                      <Eye size={11} /> {blog.viewsCount || 0}
-                    </span>
-                  </div>
-
-                  <Link
-                    to={`/blogs/${blog._id}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#6C5CE7] hover:underline"
-                  >
-                    <span>Read</span>
-                    <ArrowRight size={12} />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
-
-      {/* 3. Platform Insights & Analytics Suite */}
-      <PlatformInsights
-        solvedQuestions={solvedQuestions}
-        platformAccounts={platforms}
-        currentUser={profile || user}
-        availableYears={availableYears}
-      />
     </div>
   );
 }

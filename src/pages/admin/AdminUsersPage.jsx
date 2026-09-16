@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/layout/PageHeader';
 import { Input, Button, Badge, LoadingSpinner, Modal, Pagination, StatCard } from '../../components/ui';
+import BaseTable from '../../components/shared/BaseTable';
+import StatusBadge from '../../components/shared/StatusBadge';
 import api, { getErrorMessage } from '../../lib/api';
 import { useAuth } from '../../auth/AuthContext';
 import toast from 'react-hot-toast';
@@ -39,8 +41,17 @@ export default function AdminUsersPage() {
 
   // Action modals
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, username: null });
-  const [resetPassModal, setResetPassModal] = useState({ isOpen: false, username: null, password: '', loading: false });
-  const [detailsModal, setDetailsModal] = useState({ isOpen: false, loading: false, data: null });
+  const [resetPassModal, setResetPassModal] = useState({
+    isOpen: false,
+    username: null,
+    password: '',
+    loading: false
+  });
+  const [detailsModal, setDetailsModal] = useState({
+    isOpen: false,
+    loading: false,
+    data: null
+  });
 
   // Fetch admin stats
   const fetchStats = useCallback(async () => {
@@ -99,7 +110,11 @@ export default function AdminUsersPage() {
     try {
       setDetailsModal({ isOpen: true, loading: true, data: null });
       const { data } = await api.get(`/admin/users/${username}`);
-      setDetailsModal({ isOpen: true, loading: false, data: data.user || data });
+      setDetailsModal({
+        isOpen: true,
+        loading: false,
+        data: data.user || data
+      });
     } catch (err) {
       toast.error(getErrorMessage(err, 'Failed to load user details'));
       setDetailsModal({ isOpen: false, loading: false, data: null });
@@ -113,10 +128,15 @@ export default function AdminUsersPage() {
       const { data } = await api.patch(`/admin/users/${username}/role`, {
         role: newRole
       });
+
       toast.success(data.message || `Updated @${username} to ${newRole}`);
+
       setUsers((prev) =>
-        prev.map((u) => (u.username === username ? { ...u, role: newRole } : u))
+        prev.map((u) =>
+          u.username === username ? { ...u, role: newRole } : u
+        )
       );
+
       fetchStats();
     } catch (err) {
       toast.error(getErrorMessage(err, 'Failed to update user role'));
@@ -128,6 +148,7 @@ export default function AdminUsersPage() {
   // Reset user password
   const handleResetPassword = async (e) => {
     e.preventDefault();
+
     if (!resetPassModal.password || resetPassModal.password.length < 8) {
       toast.error('Password must be at least 8 characters long');
       return;
@@ -135,11 +156,24 @@ export default function AdminUsersPage() {
 
     try {
       setResetPassModal((prev) => ({ ...prev, loading: true }));
-      await api.post(`/admin/users/${resetPassModal.username}/reset-password`, {
-        newPassword: resetPassModal.password
+
+      await api.post(
+        `/admin/users/${resetPassModal.username}/reset-password`,
+        {
+          newPassword: resetPassModal.password
+        }
+      );
+
+      toast.success(
+        `Password for @${resetPassModal.username} reset successfully`
+      );
+
+      setResetPassModal({
+        isOpen: false,
+        username: null,
+        password: '',
+        loading: false
       });
-      toast.success(`Password for @${resetPassModal.username} reset successfully`);
-      setResetPassModal({ isOpen: false, username: null, password: '', loading: false });
     } catch (err) {
       toast.error(getErrorMessage(err, 'Failed to reset password'));
       setResetPassModal((prev) => ({ ...prev, loading: false }));
@@ -150,8 +184,14 @@ export default function AdminUsersPage() {
   const handleDelete = async () => {
     try {
       await api.delete(`/admin/users/${deleteModal.username}`);
+
       toast.success(`User @${deleteModal.username} deleted`);
-      setDeleteModal({ isOpen: false, username: null });
+
+      setDeleteModal({
+        isOpen: false,
+        username: null
+      });
+
       fetchUsers();
       fetchStats();
     } catch (err) {
@@ -162,6 +202,7 @@ export default function AdminUsersPage() {
   const isCurrentOrProtected = (u) => {
     const name = (u?.username || '').toLowerCase();
     const cur = (currentUser?.username || '').toLowerCase();
+
     return name === cur || name === 'deepanshu' || name === 'admin';
   };
 
@@ -169,7 +210,10 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Admin: Users & Permissions"
-        breadcrumbs={[{ label: 'Admin' }, { label: 'Users' }]}
+        breadcrumbs={[
+          { label: 'Admin' },
+          { label: 'Users' }
+        ]}
       />
 
       {/* Platform Analytics Summary Cards */}
@@ -178,54 +222,65 @@ export default function AdminUsersPage() {
           icon={Users}
           label="Total Users"
           value={stats?.users?.total ?? '—'}
-          color="#6C5CE7"
+          color="#FFFFFF"
           loading={statsLoading}
         />
+
         <StatCard
           icon={Layers}
           label="Total Ladders"
           value={stats?.ladders?.total ?? '—'}
-          color="#00B894"
+          color="#FFFFFF"
           loading={statsLoading}
         />
+
         <StatCard
           icon={HelpCircle}
           label="Catalog Questions"
           value={stats?.questions?.total ?? '—'}
-          color="#0984E3"
+          color="#FFFFFF"
           loading={statsLoading}
         />
+
         <StatCard
           icon={CheckCircle2}
           label="Platform Solves"
           value={stats?.solves?.total ?? '—'}
-          color="#EAB308"
+          color="#FFFFFF"
           loading={statsLoading}
         />
       </div>
 
       {/* Filters & Actions Bar */}
-      <div className="card-padded bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-        <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
+      <div className="card-padded bg-[#282828] rounded-xl border border-[#3E3E3E] shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex flex-1 items-center gap-2"
+        >
           <div className="relative flex-1 max-w-md">
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by username or email..."
-              icon={<Search size={18} className="text-[#6B7280]" />}
+              icon={<Search size={18} className="text-[#B3B3B3]" />}
               className="pr-8"
             />
+
             {search && (
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#777777] hover:text-white"
               >
                 <X size={16} />
               </button>
             )}
           </div>
-          <Button type="submit" className="bg-[#6C5CE7] text-white">
+
+          <Button
+            type="submit"
+            className="bg-[#3E3E3E] text-white hover:bg-[#4A4A4A]"
+          >
             Search
           </Button>
         </form>
@@ -237,7 +292,7 @@ export default function AdminUsersPage() {
               setRoleFilter(e.target.value);
               setPage(1);
             }}
-            className="border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#1E1F25] bg-white focus:outline-none focus:border-[#6C5CE7]"
+            className="border border-[#3E3E3E] rounded-lg px-3 py-2 text-sm text-white bg-[#282828] focus:outline-none focus:border-[#6B6B6B]"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admins Only</option>
@@ -250,7 +305,7 @@ export default function AdminUsersPage() {
               fetchUsers();
               fetchStats();
             }}
-            className="flex items-center gap-2 border-[#E5E7EB] text-[#6B7280] hover:text-[#1E1F25]"
+            className="flex items-center gap-2 border-[#3E3E3E] text-[#B3B3B3] hover:text-white hover:bg-[#333333]"
             title="Refresh list"
           >
             <RefreshCw size={15} />
@@ -265,191 +320,254 @@ export default function AdminUsersPage() {
           <LoadingSpinner />
         </div>
       ) : (
-        <div className="card bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center bg-[#FAFBFC]">
-            <span className="text-sm font-semibold text-[#1E1F25]">
+        <div className="card bg-[#282828] rounded-xl border border-[#3E3E3E] shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-[#3E3E3E] flex justify-between items-center bg-[#202020]">
+            <span className="text-sm font-semibold text-white">
               Registered Accounts ({totalCount})
             </span>
+
             {roleFilter && (
-              <span className="text-xs text-[#6B7280]">
-                Filtered by: <span className="font-semibold">{roleFilter}</span>
+              <span className="text-xs text-[#B3B3B3]">
+                Filtered by:{' '}
+                <span className="font-semibold text-white">
+                  {roleFilter}
+                </span>
               </span>
             )}
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="table-header bg-[#1E1F25] text-white text-xs uppercase tracking-wider">
-                  <th className="p-3.5">User</th>
-                  <th className="p-3.5">Email</th>
-                  <th className="p-3.5">Role</th>
-                  <th className="p-3.5">Registered</th>
-                  <th className="p-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E5E7EB] text-sm">
-                {users.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="p-8 text-center text-[#6B7280]">
-                      No users match the search criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  users.map((u) => {
-                    const isSelf = currentUser?.username === u.username;
-                    const isProtected = isCurrentOrProtected(u);
-                    const isAdmin = u.role === 'ADMIN';
-                    const isUpdatingThisUser = updatingRoleUser === u.username;
+          <BaseTable
+            variant="light"
+            className="bg-[#282828] border-[#3E3E3E]"
+            headerClassName="bg-[#181818] text-white text-xs font-semibold uppercase tracking-wider"
+            bodyClassName="divide-y divide-[#3E3E3E] text-sm"
+            headers={
+              <tr>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider">
+                  User
+                </th>
 
-                    return (
-                      <tr
-                        key={u._id || u.username}
-                        className="table-row hover:bg-[#F8F9FB] transition-colors"
-                      >
-                        <td className="p-3.5">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-[#6C5CE7]/10 text-[#6C5CE7] font-semibold flex items-center justify-center text-xs shrink-0">
-                              {u.username.slice(0, 2).toUpperCase()}
-                            </div>
-                            <div>
-                              <div className="font-medium text-[#1E1F25] flex items-center gap-1.5">
-                                <span>{u.username}</span>
-                                {isSelf && (
-                                  <span className="text-[10px] bg-purple-100 text-[#6C5CE7] px-1.5 py-0.5 rounded font-semibold">
-                                    You
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-48">
+                  Email
+                </th>
 
-                        <td className="p-3.5 text-[#6B7280] font-mono text-xs">
-                          {u.email || '—'}
-                        </td>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-36">
+                  Role
+                </th>
 
-                        <td className="p-3.5">
-                          <div className="flex items-center gap-2">
-                            <select
-                              value={u.role}
-                              disabled={isProtected || isUpdatingThisUser}
-                              onChange={(e) => handleDirectRoleChange(u.username, e.target.value)}
-                              title={isProtected ? 'Protected account' : 'Select role to update in backend'}
-                              className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-all ${
-                                isAdmin
-                                  ? 'bg-purple-50 text-[#6C5CE7] border-purple-200 hover:bg-purple-100'
-                                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                              } ${isProtected ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
-                            >
-                              <option value="USER">USER</option>
-                              <option value="ADMIN">ADMIN</option>
-                            </select>
-                            {isUpdatingThisUser && (
-                              <span className="text-[11px] text-[#6C5CE7] animate-pulse">
-                                Updating...
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-32">
+                  Registered
+                </th>
+
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider text-right w-44">
+                  Actions
+                </th>
+              </tr>
+            }
+            emptyMessage="No users match the search criteria."
+            footer={
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#B3B3B3]">
+                  Page {page} of {totalPages}
+                </span>
+
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            }
+          >
+            {users.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="p-8 text-center text-[#B3B3B3]"
+                >
+                  No users match the search criteria.
+                </td>
+              </tr>
+            ) : (
+              users.map((u) => {
+                const isSelf = currentUser?.username === u.username;
+                const isProtected = isCurrentOrProtected(u);
+                const isAdmin = u.role === 'ADMIN';
+                const isUpdatingThisUser =
+                  updatingRoleUser === u.username;
+
+                return (
+                  <tr
+                    key={u._id || u.username}
+                    className="h-16 min-h-[4rem] hover:bg-[#333333] transition-colors align-middle"
+                  >
+                    <td className="px-4 py-3 align-middle">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#3E3E3E] text-white font-semibold flex items-center justify-center text-xs shrink-0">
+                          {u.username.slice(0, 2).toUpperCase()}
+                        </div>
+
+                        <div>
+                          <div className="font-medium text-white flex items-center gap-1.5">
+                            <span>{u.username}</span>
+
+                            {isSelf && (
+                              <span className="text-[10px] bg-[#3E3E3E] text-white px-1.5 py-0.5 rounded font-semibold">
+                                You
                               </span>
                             )}
                           </div>
-                        </td>
+                        </div>
+                      </div>
+                    </td>
 
-                        <td className="p-3.5 text-[#6B7280] text-xs">
-                          {u.createdAt ? format(new Date(u.createdAt), 'MMM d, yyyy') : '—'}
-                        </td>
+                    <td className="px-4 py-3 text-[#B3B3B3] font-mono text-xs align-middle">
+                      {u.email || '—'}
+                    </td>
 
-                        <td className="p-3.5 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {/* Inspect user */}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleOpenDetails(u.username)}
-                              title="View user details"
-                              className="text-[#6B7280] hover:text-[#1E1F25] border-[#E5E7EB]"
-                            >
-                              <Eye size={15} />
-                            </Button>
+                    <td className="px-4 py-3 align-middle">
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={u.role}
+                          disabled={isProtected || isUpdatingThisUser}
+                          onChange={(e) =>
+                            handleDirectRoleChange(
+                              u.username,
+                              e.target.value
+                            )
+                          }
+                          title={
+                            isProtected
+                              ? 'Protected account'
+                              : 'Select role to update in backend'
+                          }
+                          className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-all ${
+                            isAdmin
+                              ? 'bg-[#3E3E3E] text-white border-[#5A5A5A] hover:bg-[#4A4A4A]'
+                              : 'bg-[#202020] text-[#B3B3B3] border-[#3E3E3E] hover:bg-[#333333]'
+                          } ${
+                            isProtected
+                              ? 'opacity-60 cursor-not-allowed'
+                              : 'cursor-pointer'
+                          }`}
+                        >
+                          <option value="USER">USER</option>
+                          <option value="ADMIN">ADMIN</option>
+                        </select>
 
-                            {/* Direct Promote/Demote Action Button */}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={isProtected || isUpdatingThisUser}
-                              onClick={() =>
-                                handleDirectRoleChange(u.username, isAdmin ? 'USER' : 'ADMIN')
-                              }
-                              title={
-                                isProtected
-                                  ? 'Protected account role cannot be modified'
-                                  : `Click to ${isAdmin ? 'demote to USER' : 'promote to ADMIN'}`
-                              }
-                              className={`border-[#E5E7EB] ${
-                                isAdmin
-                                  ? 'text-amber-600 hover:bg-amber-50'
-                                  : 'text-[#6C5CE7] hover:bg-purple-50'
-                              }`}
-                            >
-                              <Shield size={14} className="mr-1 inline" />
-                              <span>
-                                {isUpdatingThisUser
-                                  ? 'Updating...'
-                                  : isAdmin
-                                  ? 'Demote'
-                                  : 'Promote'}
-                              </span>
-                            </Button>
+                        {isUpdatingThisUser && (
+                          <span className="text-[11px] text-[#B3B3B3] animate-pulse">
+                            Updating...
+                          </span>
+                        )}
+                      </div>
+                    </td>
 
-                            {/* Reset Password */}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                setResetPassModal({
-                                  isOpen: true,
-                                  username: u.username,
-                                  password: '',
-                                  loading: false
-                                })
-                              }
-                              title="Reset Password"
-                              className="text-blue-600 border-[#E5E7EB] hover:bg-blue-50"
-                            >
-                              <Key size={15} />
-                            </Button>
+                    <td className="px-4 py-3 text-[#B3B3B3] text-xs align-middle">
+                      {u.createdAt
+                        ? format(new Date(u.createdAt), 'MMM d, yyyy')
+                        : '—'}
+                    </td>
 
-                            {/* Delete User */}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={isProtected}
-                              onClick={() => setDeleteModal({ isOpen: true, username: u.username })}
-                              title={
-                                isProtected
-                                  ? 'Your own account or protected accounts cannot be deleted'
-                                  : 'Delete user'
-                              }
-                              className={`border-red-200 text-red-500 hover:bg-red-50 ${
-                                isProtected ? 'opacity-40 cursor-not-allowed' : ''
-                              }`}
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                    <td className="px-4 py-3 text-right align-middle">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {/* Inspect user */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleOpenDetails(u.username)}
+                          title="View user details"
+                          className="text-[#B3B3B3] hover:text-white border-[#3E3E3E] hover:bg-[#333333]"
+                        >
+                          <Eye size={15} />
+                        </Button>
 
-          <div className="p-4 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="text-xs text-[#6B7280]">
-              Page {page} of {totalPages}
-            </span>
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-          </div>
+                        {/* Direct Promote/Demote Action Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isProtected || isUpdatingThisUser}
+                          onClick={() =>
+                            handleDirectRoleChange(
+                              u.username,
+                              isAdmin ? 'USER' : 'ADMIN'
+                            )
+                          }
+                          title={
+                            isProtected
+                              ? 'Protected account role cannot be modified'
+                              : `Click to ${
+                                  isAdmin
+                                    ? 'demote to USER'
+                                    : 'promote to ADMIN'
+                                }`
+                          }
+                          className={`border-[#3E3E3E] ${
+                            isAdmin
+                              ? 'text-[#B3B3B3] hover:bg-[#333333] hover:text-white'
+                              : 'text-white hover:bg-[#333333]'
+                          }`}
+                        >
+                          <Shield size={14} className="mr-1 inline" />
+
+                          <span>
+                            {isUpdatingThisUser
+                              ? 'Updating...'
+                              : isAdmin
+                              ? 'Demote'
+                              : 'Promote'}
+                          </span>
+                        </Button>
+
+                        {/* Reset Password */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setResetPassModal({
+                              isOpen: true,
+                              username: u.username,
+                              password: '',
+                              loading: false
+                            })
+                          }
+                          title="Reset Password"
+                          className="text-[#B3B3B3] border-[#3E3E3E] hover:bg-[#333333] hover:text-white"
+                        >
+                          <Key size={15} />
+                        </Button>
+
+                        {/* Delete User */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isProtected}
+                          onClick={() =>
+                            setDeleteModal({
+                              isOpen: true,
+                              username: u.username
+                            })
+                          }
+                          title={
+                            isProtected
+                              ? 'Your own account or protected accounts cannot be deleted'
+                              : 'Delete user'
+                          }
+                          className={`border-red-900 text-red-400 hover:bg-red-950 ${
+                            isProtected
+                              ? 'opacity-40 cursor-not-allowed'
+                              : ''
+                          }`}
+                        >
+                          <Trash2 size={15} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </BaseTable>
         </div>
       )}
 
@@ -457,7 +575,13 @@ export default function AdminUsersPage() {
       <Modal
         open={detailsModal.isOpen}
         isOpen={detailsModal.isOpen}
-        onClose={() => setDetailsModal({ isOpen: false, loading: false, data: null })}
+        onClose={() =>
+          setDetailsModal({
+            isOpen: false,
+            loading: false,
+            data: null
+          })
+        }
         title={`User Profile: @${detailsModal.data?.username || ''}`}
       >
         {detailsModal.loading ? (
@@ -465,30 +589,33 @@ export default function AdminUsersPage() {
             <LoadingSpinner />
           </div>
         ) : detailsModal.data ? (
-          <div className="space-y-4 text-sm text-[#1E1F25]">
-            <div className="grid grid-cols-2 gap-3 bg-[#F8F9FB] p-3 rounded-lg border border-[#E5E7EB]">
+          <div className="space-y-4 text-sm text-white">
+            <div className="grid grid-cols-2 gap-3 bg-[#202020] p-3 rounded-lg border border-[#3E3E3E]">
               <div>
-                <p className="text-xs text-[#6B7280]">Email</p>
+                <p className="text-xs text-[#B3B3B3]">Email</p>
                 <p className="font-medium font-mono text-xs mt-0.5">
                   {detailsModal.data.email || 'None'}
                 </p>
               </div>
+
               <div>
-                <p className="text-xs text-[#6B7280]">Role</p>
-                <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 border">
+                <p className="text-xs text-[#B3B3B3]">Role</p>
+                <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-semibold bg-[#3E3E3E] text-white border border-[#5A5A5A]">
                   {detailsModal.data.role}
                 </span>
               </div>
+
               <div>
-                <p className="text-xs text-[#6B7280]">Joined Date</p>
+                <p className="text-xs text-[#B3B3B3]">Joined Date</p>
                 <p className="font-medium text-xs mt-0.5">
                   {detailsModal.data.createdAt
                     ? format(new Date(detailsModal.data.createdAt), 'PPP')
                     : '—'}
                 </p>
               </div>
+
               <div>
-                <p className="text-xs text-[#6B7280]">Last Updated</p>
+                <p className="text-xs text-[#B3B3B3]">Last Updated</p>
                 <p className="font-medium text-xs mt-0.5">
                   {detailsModal.data.updatedAt
                     ? format(new Date(detailsModal.data.updatedAt), 'PPP')
@@ -499,57 +626,77 @@ export default function AdminUsersPage() {
 
             {/* User Statistics */}
             <div>
-              <h4 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-semibold text-[#B3B3B3] uppercase tracking-wider mb-2">
                 Activity Statistics
               </h4>
+
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg">
-                  <p className="text-xl font-bold text-[#00B894]">
+                <div className="p-3 bg-[#282828] border border-[#3E3E3E] rounded-lg">
+                  <p className="text-xl font-bold text-white">
                     {detailsModal.data.stats?.solvedCount ?? 0}
                   </p>
-                  <p className="text-[11px] text-[#6B7280] mt-0.5">Problems Solved</p>
+                  <p className="text-[11px] text-[#B3B3B3] mt-0.5">
+                    Problems Solved
+                  </p>
                 </div>
-                <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg">
-                  <p className="text-xl font-bold text-[#EAB308]">
+
+                <div className="p-3 bg-[#282828] border border-[#3E3E3E] rounded-lg">
+                  <p className="text-xl font-bold text-white">
                     {detailsModal.data.stats?.starredCount ?? 0}
                   </p>
-                  <p className="text-[11px] text-[#6B7280] mt-0.5">Starred Problems</p>
+                  <p className="text-[11px] text-[#B3B3B3] mt-0.5">
+                    Starred Problems
+                  </p>
                 </div>
-                <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg">
-                  <p className="text-xl font-bold text-[#6C5CE7]">
+
+                <div className="p-3 bg-[#282828] border border-[#3E3E3E] rounded-lg">
+                  <p className="text-xl font-bold text-white">
                     {detailsModal.data.stats?.laddersCount ?? 0}
                   </p>
-                  <p className="text-[11px] text-[#6B7280] mt-0.5">Ladders Created</p>
+                  <p className="text-[11px] text-[#B3B3B3] mt-0.5">
+                    Ladders Created
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Connected Platform Handles */}
             <div>
-              <h4 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-semibold text-[#B3B3B3] uppercase tracking-wider mb-2">
                 Connected Handles
               </h4>
+
               {detailsModal.data.platformAccounts?.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2">
                   {detailsModal.data.platformAccounts.map((pa) => (
                     <div
                       key={pa.platform}
-                      className="p-2 border border-[#E5E7EB] rounded-md bg-white flex justify-between items-center text-xs"
+                      className="p-2 border border-[#3E3E3E] rounded-md bg-[#282828] flex justify-between items-center text-xs text-white"
                     >
                       <Badge>{pa.platform}</Badge>
-                      <span className="font-mono font-medium">{pa.handle}</span>
+                      <span className="font-mono font-medium">
+                        {pa.handle}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-[#6B7280] italic">No competitive programming handles linked.</p>
+                <p className="text-xs text-[#B3B3B3] italic">
+                  No competitive programming handles linked.
+                </p>
               )}
             </div>
 
             <div className="flex justify-end pt-2">
               <Button
                 variant="outline"
-                onClick={() => setDetailsModal({ isOpen: false, loading: false, data: null })}
+                onClick={() =>
+                  setDetailsModal({
+                    isOpen: false,
+                    loading: false,
+                    data: null
+                  })
+                }
               >
                 Close
               </Button>
@@ -563,26 +710,38 @@ export default function AdminUsersPage() {
         open={resetPassModal.isOpen}
         isOpen={resetPassModal.isOpen}
         onClose={() =>
-          setResetPassModal({ isOpen: false, username: null, password: '', loading: false })
+          setResetPassModal({
+            isOpen: false,
+            username: null,
+            password: '',
+            loading: false
+          })
         }
         title={`Reset Password for @${resetPassModal.username}`}
       >
         <form onSubmit={handleResetPassword} className="space-y-4">
-          <p className="text-sm text-[#6B7280]">
-            Set a new password for <strong>@{resetPassModal.username}</strong>. They will be able to
-            log in with this new password immediately.
+          <p className="text-sm text-[#B3B3B3]">
+            Set a new password for{' '}
+            <strong className="text-white">
+              @{resetPassModal.username}
+            </strong>
+            . They will be able to log in with this new password immediately.
           </p>
 
           <div>
-            <label className="block text-xs font-medium text-[#1E1F25] mb-1">
+            <label className="block text-xs font-medium text-white mb-1">
               New Password (minimum 8 characters)
             </label>
+
             <Input
               type="text"
               placeholder="Enter new password..."
               value={resetPassModal.password}
               onChange={(e) =>
-                setResetPassModal((prev) => ({ ...prev, password: e.target.value }))
+                setResetPassModal((prev) => ({
+                  ...prev,
+                  password: e.target.value
+                }))
               }
               required
               minLength={8}
@@ -594,18 +753,29 @@ export default function AdminUsersPage() {
               type="button"
               variant="outline"
               onClick={() =>
-                setResetPassModal({ isOpen: false, username: null, password: '', loading: false })
+                setResetPassModal({
+                  isOpen: false,
+                  username: null,
+                  password: '',
+                  loading: false
+                })
               }
               disabled={resetPassModal.loading}
             >
               Cancel
             </Button>
+
             <Button
               type="submit"
-              disabled={resetPassModal.loading || resetPassModal.password.length < 8}
-              className="bg-[#6C5CE7] text-white"
+              disabled={
+                resetPassModal.loading ||
+                resetPassModal.password.length < 8
+              }
+              className="bg-[#3E3E3E] text-white hover:bg-[#4A4A4A]"
             >
-              {resetPassModal.loading ? 'Resetting...' : 'Save New Password'}
+              {resetPassModal.loading
+                ? 'Resetting...'
+                : 'Save New Password'}
             </Button>
           </div>
         </form>
@@ -615,26 +785,43 @@ export default function AdminUsersPage() {
       <Modal
         open={deleteModal.isOpen}
         isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, username: null })}
+        onClose={() =>
+          setDeleteModal({
+            isOpen: false,
+            username: null
+          })
+        }
         title="Delete User Account"
       >
-        <div className="space-y-4 text-sm text-[#1E1F25]">
+        <div className="space-y-4 text-sm text-white">
           <p>
             Are you sure you want to permanently delete user{' '}
             <strong>@{deleteModal.username}</strong>?
           </p>
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800">
-            This will permanently remove the user, all ladders they created, their ladder memberships,
-            solve logs, and connected accounts. This action cannot be reversed.
+
+          <div className="p-3 bg-red-950 border border-red-900 rounded-lg text-xs text-red-300">
+            This will permanently remove the user, all ladders they created,
+            their ladder memberships, solve logs, and connected accounts.
+            This action cannot be reversed.
           </div>
+
           <div className="flex justify-end gap-2 pt-2">
             <Button
               variant="outline"
-              onClick={() => setDeleteModal({ isOpen: false, username: null })}
+              onClick={() =>
+                setDeleteModal({
+                  isOpen: false,
+                  username: null
+                })
+              }
             >
               Cancel
             </Button>
-            <Button className="bg-red-500 text-white hover:bg-red-600" onClick={handleDelete}>
+
+            <Button
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={handleDelete}
+            >
               Delete Account
             </Button>
           </div>

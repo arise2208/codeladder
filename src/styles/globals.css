@@ -1,0 +1,37 @@
+:root {
+  --bg-primary: #1a1a1a;
+  --bg-surface: #282828;
+  --bg-subtle: #333333;
+  --text-primary: #eff2f6;
+  --text-muted: #8b949e;
+  --text-subtle: #6e7681;
+  --border-primary: #383838;
+  --border-subtle: #2d2d2d;
+  --accent: #ffa116;
+  --accent-hover: #ffb84d;
+  --accent-subtle: rgba(255, 161, 22, 0.15);
+}
+
+.bg-leetcode-bg {
+  background-color: var(--bg-primary);
+}
+
+.bg-leetcode-surface {
+  background-color: var(--bg-surface);
+}
+
+.bg-leetcode-subtle {
+  background-color: var(--bg-subtle);
+}
+
+.text-leetcode-text {
+  color: var(--text-primary);
+}
+
+.text-leetcode-accent {
+  color: var(--accent);
+}
+
+.border-leetcode-border {
+  border-color: var(--border-primary);
+}

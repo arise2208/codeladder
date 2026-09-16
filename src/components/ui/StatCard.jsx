@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function StatCard({ icon, label, title, value, color = '#6C5CE7', loading = false }) {
+export default function StatCard({ icon, label, title, value, color = '#ffa116', loading = false }) {
   const displayLabel = label || title;
 
   const renderIcon = () => {
@@ -18,10 +18,10 @@ export default function StatCard({ icon, label, title, value, color = '#6C5CE7',
         {renderIcon()}
       </div>
       <div>
-        <p className="text-2xl font-bold text-[#1E1F25]">
+        <p className="text-2xl font-bold text-[#eff2f6]">
           {loading ? '...' : (value ?? 0)}
         </p>
-        <p className="text-xs text-[#6B7280] font-medium">{displayLabel}</p>
+        <p className="text-xs text-[#8b949e] font-medium">{displayLabel}</p>
       </div>
     </div>
   );

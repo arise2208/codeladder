@@ -26,7 +26,18 @@ export default function ProblemRatingsChart({
       Hard: 0
     };
 
+    const seenProblems = new Set();
     (solvedQuestions || []).forEach((q) => {
+      // Ignore non-OK or generic submission attempts
+      if (q.verdict && q.verdict !== 'OK') return;
+      if (q.isGenericSubmission) return;
+
+      const key = q.problemKey || q.url || q.title;
+      if (key) {
+        if (seenProblems.has(key)) return;
+        seenProblems.add(key);
+      }
+
       const rating = q.metadata?.rating || (typeof q.rating === 'number' ? q.rating : null);
       if (rating && rating >= 500) {
         foundNumericRating = true;
@@ -91,16 +102,16 @@ export default function ProblemRatingsChart({
   const yTicks = [0, 0.25, 0.5, 0.75, 1.0].map((pct) => Math.round(maxCount * pct));
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-xs relative">
+    <div className="bg-[#282828] rounded-xl border border-[#383838] p-6 shadow-xs relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-base font-bold text-[#1E1F25]">
+        <h3 className="text-base font-bold text-[#eff2f6]">
           Problem Ratings
         </h3>
 
         {/* Legend */}
-        <div className="flex items-center gap-2 select-none text-xs text-gray-600">
-          <div className="w-6 h-3 bg-gray-300 border border-gray-600 rounded-xs" />
+        <div className="flex items-center gap-2 select-none text-xs text-[#8b949e]">
+          <div className="w-6 h-3 bg-[#4f4f4f] border border-[#666666] rounded-xs" />
           <span>Problems Solved</span>
         </div>
       </div>
@@ -119,14 +130,14 @@ export default function ProblemRatingsChart({
                     y1={y}
                     x2="100%"
                     y2={y}
-                    stroke="#E5E7EB"
+                    stroke="#383838"
                     strokeDasharray={val === 0 ? '0' : '3 3'}
                   />
                   <text
                     x={38}
                     y={y + 4}
                     textAnchor="end"
-                    className="fill-gray-400 text-[11px] font-mono"
+                    className="fill-[#8b949e] text-[11px] font-mono"
                   >
                     {val}
                   </text>
@@ -151,7 +162,7 @@ export default function ProblemRatingsChart({
                     y={20}
                     width={barWidth + 12}
                     height={chartHeight}
-                    fill={isHovered ? '#F8F9FA' : 'transparent'}
+                    fill={isHovered ? 'rgba(255, 255, 255, 0.05)' : 'transparent'}
                     rx={4}
                     onMouseEnter={(e) => {
                       const rect = e.target.getBoundingClientRect();
@@ -200,7 +211,7 @@ export default function ProblemRatingsChart({
                       x={x + barWidth / 2}
                       y={Math.max(16, y - 5)}
                       textAnchor="middle"
-                      className="fill-gray-600 text-[10px] font-semibold font-mono"
+                      className="fill-gray-300 text-[10px] font-semibold font-mono"
                     >
                       {d.count}
                     </text>
@@ -211,7 +222,7 @@ export default function ProblemRatingsChart({
                     x={x + barWidth / 2}
                     y={chartHeight + 36}
                     textAnchor="middle"
-                    className="fill-gray-500 text-[11px] font-mono"
+                    className="fill-[#8b949e] text-[11px] font-mono"
                   >
                     {d.label}
                   </text>
@@ -225,7 +236,7 @@ export default function ProblemRatingsChart({
               y1={chartHeight + 20}
               x2="100%"
               y2={chartHeight + 20}
-              stroke="#9CA3AF"
+              stroke="#4f4f4f"
             />
           </svg>
         </div>

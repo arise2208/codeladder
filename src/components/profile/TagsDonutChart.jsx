@@ -33,7 +33,18 @@ export default function TagsDonutChart({
   // Calculate tag counts
   const { tagList, totalOccurrences } = useMemo(() => {
     const counts = {};
+    const seenProblems = new Set();
     (solvedQuestions || []).forEach((q) => {
+      // Ignore non-OK or generic submission attempts
+      if (q.verdict && q.verdict !== 'OK') return;
+      if (q.isGenericSubmission) return;
+
+      const key = q.problemKey || q.url || q.title;
+      if (key) {
+        if (seenProblems.has(key)) return;
+        seenProblems.add(key);
+      }
+
       const tags = q.tags || q.metadata?.tags || [];
       tags.forEach((t) => {
         let tagStr = '';
@@ -41,6 +52,22 @@ export default function TagsDonutChart({
         else if (t && typeof t.name === 'string') tagStr = t.name.trim();
 
         if (tagStr) {
+          const lower = tagStr.toLowerCase();
+          if (
+            lower === 'codechef' ||
+            lower === 'leetcode' ||
+            lower === 'codeforces' ||
+            lower === 'atcoder' ||
+            lower === 'practice' ||
+            lower === 'rated' ||
+            lower === 'attempt' ||
+            lower === 'knight' ||
+            lower === 'guardian' ||
+            lower.startsWith('rating-') ||
+            lower.endsWith('★')
+          ) {
+            return;
+          }
           counts[tagStr] = (counts[tagStr] || 0) + 1;
         }
       });
@@ -107,18 +134,18 @@ export default function TagsDonutChart({
   }, [tagList, totalOccurrences]);
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-xs relative">
+    <div className="bg-[#282828] rounded-xl border border-[#383838] p-6 shadow-xs relative">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-[#1E1F25]">
+        <h3 className="text-base font-bold text-[#eff2f6]">
           {title}
         </h3>
-        <span className="text-xs text-gray-500 font-medium">
+        <span className="text-xs text-[#8b949e] font-medium">
           {tagList.length} distinct tags • {totalOccurrences} total
         </span>
       </div>
 
       {tagList.length === 0 ? (
-        <div className="py-12 text-center text-gray-400 text-xs italic">
+        <div className="py-12 text-center text-[#8b949e] text-xs italic">
           No tags found for solved problems.
         </div>
       ) : (
@@ -134,8 +161,8 @@ export default function TagsDonutChart({
                       key={slice.name}
                       d={slice.pathData}
                       fill={slice.color}
-                      stroke="#FFFFFF"
-                      strokeWidth={1}
+                      stroke="#282828"
+                      strokeWidth={1.5}
                       className="transition-all duration-150 cursor-pointer"
                       style={{
                         opacity: isHovered ? 1 : hoveredTag ? 0.65 : 0.92,
@@ -161,22 +188,22 @@ export default function TagsDonutChart({
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center px-4">
               {hoveredTag ? (
                 <>
-                  <span className="text-xs font-bold text-[#1E1F25] line-clamp-1 max-w-[110px]">
+                  <span className="text-xs font-bold text-[#eff2f6] line-clamp-1 max-w-[110px]">
                     {hoveredTag.name}
                   </span>
-                  <span className="text-base font-extrabold text-[#6C5CE7]">
+                  <span className="text-base font-extrabold text-[#A29BFE]">
                     {hoveredTag.count}
                   </span>
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-[10px] text-[#8b949e]">
                     {hoveredTag.percentage}%
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="text-xl font-bold text-[#1E1F25]">
+                  <span className="text-xl font-bold text-[#eff2f6]">
                     {tagList.length}
                   </span>
-                  <span className="text-[11px] text-gray-500 font-medium">
+                  <span className="text-[11px] text-[#8b949e] font-medium">
                     Tags
                   </span>
                 </>
@@ -185,7 +212,7 @@ export default function TagsDonutChart({
           </div>
 
           {/* Scrollable Legend List matching Image 4 */}
-          <div className="w-full md:w-64 max-h-64 overflow-y-auto pr-2 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-4 space-y-1.5 custom-scrollbar">
+          <div className="w-full md:w-64 max-h-64 overflow-y-auto pr-2 border-t md:border-t-0 md:border-l border-[#383838] pt-4 md:pt-0 md:pl-4 space-y-1.5 custom-scrollbar">
             {tagList.map((tag) => {
               const isHovered = hoveredTag?.name === tag.name;
               return (
@@ -194,16 +221,16 @@ export default function TagsDonutChart({
                   onMouseEnter={() => setHoveredTag(tag)}
                   onMouseLeave={() => setHoveredTag(null)}
                   className={`flex items-center gap-2.5 px-2 py-1 rounded cursor-pointer transition-all ${
-                    isHovered ? 'bg-gray-100 font-semibold' : 'hover:bg-gray-50'
+                    isHovered ? 'bg-[#1a1a1a] text-[#eff2f6] font-semibold' : 'hover:bg-[#333333]/50 text-gray-300'
                   }`}
                 >
                   <span
-                    className="w-3.5 h-3.5 rounded-xs shrink-0 border border-gray-400"
+                    className="w-3.5 h-3.5 rounded-xs shrink-0 border border-gray-600"
                     style={{ backgroundColor: tag.color }}
                   />
-                  <div className="flex-1 flex items-center justify-between text-xs text-gray-700 truncate">
+                  <div className="flex-1 flex items-center justify-between text-xs text-gray-300 truncate">
                     <span className="truncate">{tag.name}</span>
-                    <span className="font-mono text-gray-500 ml-2 shrink-0">
+                    <span className="font-mono text-[#8b949e] ml-2 shrink-0">
                       : {tag.count}
                     </span>
                   </div>

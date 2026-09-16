@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PageHeader from '../../components/layout/PageHeader';
 import { Input, Button, Badge, LoadingSpinner, Modal, Pagination } from '../../components/ui';
+import BaseTable from '../../components/shared/BaseTable';
+import StatusBadge from '../../components/shared/StatusBadge';
 import api, { getErrorMessage } from '../../lib/api';
 import toast from 'react-hot-toast';
 import {
@@ -65,6 +67,7 @@ function parseCSV(text) {
     else if (['title', 'name', 'problemname', 'problemtitle'].includes(h)) headerMap.title = idx;
     else if (['url', 'link', 'problemlink'].includes(h)) headerMap.url = idx;
     else if (['difficulty', 'diff', 'level'].includes(h)) headerMap.difficulty = idx;
+    else if (['rating', 'rate', 'elo', 'points', 'score'].includes(h)) headerMap.rating = idx;
     else if (['tags', 'tag', 'topics', 'categories'].includes(h)) headerMap.tags = idx;
   });
 
@@ -80,8 +83,12 @@ function parseCSV(text) {
     const externalId = getVal('externalId');
     const title = getVal('title');
     const url = getVal('url');
+    const ratingRaw = getVal('rating');
+    const rating = ratingRaw && !isNaN(Number(ratingRaw)) ? Number(ratingRaw) : undefined;
     const diffRaw = getVal('difficulty').toUpperCase();
-    const difficulty = ['EASY', 'MEDIUM', 'HARD'].includes(diffRaw) ? diffRaw : undefined;
+    const difficulty = platform === 'LEETCODE'
+      ? (['EASY', 'MEDIUM', 'HARD'].includes(diffRaw) ? diffRaw : undefined)
+      : 'N/A';
     const tagsRaw = getVal('tags');
     const tags = tagsRaw
       ? tagsRaw
@@ -105,6 +112,7 @@ function parseCSV(text) {
       title,
       url,
       difficulty,
+      rating,
       tags,
       isValid: errors.length === 0,
       errors
@@ -132,7 +140,8 @@ export default function AdminQuestionsPage() {
     title: '',
     url: '',
     tags: '',
-    difficulty: 'EASY'
+    difficulty: 'EASY',
+    rating: ''
   });
 
   // CSV Import Modal state
@@ -192,8 +201,14 @@ export default function AdminQuestionsPage() {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
+      const isLC = formData.platform === 'LEETCODE';
       await api.post('/questions', {
-        ...formData,
+        platform: formData.platform,
+        externalId: formData.externalId,
+        title: formData.title,
+        url: formData.url,
+        difficulty: isLC ? formData.difficulty : 'N/A',
+        rating: !isLC && formData.rating ? Number(formData.rating) : undefined,
         tags: formData.tags
           .split(',')
           .map((t) => t.trim())
@@ -206,7 +221,8 @@ export default function AdminQuestionsPage() {
         title: '',
         url: '',
         tags: '',
-        difficulty: 'EASY'
+        difficulty: 'EASY',
+        rating: ''
       });
       setIsCreating(false);
       fetchQuestions();
@@ -219,8 +235,11 @@ export default function AdminQuestionsPage() {
     e.preventDefault();
     const qId = editModal.data?._id || editModal.data?.id;
     try {
+      const isLC = editModal.data.platform === 'LEETCODE';
       await api.put(`/questions/${qId}`, {
         ...editModal.data,
+        difficulty: isLC ? editModal.data.difficulty : 'N/A',
+        rating: !isLC && editModal.data.rating ? Number(editModal.data.rating) : undefined,
         tags:
           typeof editModal.data.tags === 'string'
             ? editModal.data.tags
@@ -300,7 +319,8 @@ export default function AdminQuestionsPage() {
         externalId: r.externalId,
         title: r.title,
         url: r.url,
-        difficulty: r.difficulty,
+        difficulty: r.platform === 'LEETCODE' ? r.difficulty : 'N/A',
+        rating: r.platform !== 'LEETCODE' && r.rating ? Number(r.rating) : undefined,
         tags: r.tags
       }));
   }, [parsedRows]);
@@ -345,7 +365,7 @@ export default function AdminQuestionsPage() {
             setIsCreating(!isCreating);
             if (!isCreating) setCsvModalOpen(false);
           }}
-          className="bg-[#6C5CE7] text-white flex gap-2 items-center"
+          className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold flex gap-2 items-center"
         >
           <Plus size={16} /> {isCreating ? 'Cancel Manual Entry' : 'Create Single Question'}
         </Button>
@@ -356,7 +376,7 @@ export default function AdminQuestionsPage() {
             setCsvModalOpen(true);
             setIsCreating(false);
           }}
-          className="flex items-center gap-2 border-[#6C5CE7] text-[#6C5CE7] hover:bg-purple-50"
+          className="flex items-center gap-2 border-[#ffa116] text-[#ffa116] hover:bg-[#ffa116]/10"
         >
           <FileSpreadsheet size={16} /> Import via CSV
         </Button>
@@ -364,7 +384,7 @@ export default function AdminQuestionsPage() {
         <Button
           variant="outline"
           onClick={downloadSampleCSV}
-          className="flex items-center gap-2 border-[#E5E7EB] text-[#6B7280] hover:text-[#1E1F25]"
+          className="flex items-center gap-2 border-[#383838] text-gray-400 hover:text-[#eff2f6] hover:bg-[#282828]"
           title="Download Sample CSV Template"
         >
           <Download size={15} /> Sample CSV Template
@@ -373,13 +393,13 @@ export default function AdminQuestionsPage() {
 
       {/* Single Question Manual Form */}
       {isCreating && (
-        <div className="card-padded bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 animate-fadeIn">
-          <h3 className="font-semibold text-sm text-[#1E1F25] mb-3">Add New Question</h3>
+        <div className="card-padded bg-[#282828] rounded-xl border border-[#383838] shadow-sm p-4 animate-fadeIn">
+          <h3 className="font-semibold text-sm text-[#eff2f6] mb-3">Add New Question</h3>
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select
               value={formData.platform}
               onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-              className="border border-[#E5E7EB] rounded-md p-2 text-sm"
+              className="border border-[#383838] bg-[#1a1a1a] text-[#eff2f6] rounded-md p-2 text-sm"
             >
               <option value="LEETCODE">LeetCode</option>
               <option value="CODEFORCES">Codeforces</option>
@@ -410,20 +430,29 @@ export default function AdminQuestionsPage() {
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
             />
-            <select
-              value={formData.difficulty}
-              onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-              className="border border-[#E5E7EB] rounded-md p-2 text-sm"
-            >
-              <option value="EASY">Easy</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HARD">Hard</option>
-            </select>
+            {formData.platform === 'LEETCODE' ? (
+              <select
+                value={formData.difficulty}
+                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                className="border border-[#383838] bg-[#1a1a1a] text-[#eff2f6] rounded-md p-2 text-sm"
+              >
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+              </select>
+            ) : (
+              <Input
+                type="number"
+                placeholder="Rating (e.g. 1200)"
+                value={formData.rating}
+                onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
+              />
+            )}
             <div className="col-span-full flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
+              <Button type="button" variant="outline" onClick={() => setIsCreating(false)} className="border-[#383838] text-gray-300 hover:bg-[#383838]">
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#00B894] text-white">
+              <Button type="submit" className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold">
                 Submit Question
               </Button>
             </div>
@@ -432,27 +461,27 @@ export default function AdminQuestionsPage() {
       )}
 
       {/* Filter & Search Bar */}
-      <div className="card-padded bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+      <div className="card-padded bg-[#282828] rounded-xl border border-[#383838] shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
         <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
           <div className="relative flex-1 max-w-md">
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search title or question ID..."
-              icon={<Search size={18} className="text-[#6B7280]" />}
+              icon={<Search size={18} className="text-gray-500" />}
               className="pr-8"
             />
             {search && (
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
               >
                 <X size={16} />
               </button>
             )}
           </div>
-          <Button type="submit" className="bg-[#6C5CE7] text-white">
+          <Button type="submit" className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold">
             Search
           </Button>
         </form>
@@ -464,7 +493,7 @@ export default function AdminQuestionsPage() {
               setPlatformFilter(e.target.value);
               setPage(1);
             }}
-            className="border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#1E1F25] bg-white focus:outline-none focus:border-[#6C5CE7]"
+            className="border border-[#383838] rounded-lg px-3 py-2 text-sm text-[#eff2f6] bg-[#1a1a1a] focus:outline-none focus:border-[#ffa116]"
           >
             <option value="">All Platforms</option>
             <option value="LEETCODE">LeetCode</option>
@@ -479,7 +508,7 @@ export default function AdminQuestionsPage() {
               setDifficultyFilter(e.target.value);
               setPage(1);
             }}
-            className="border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#1E1F25] bg-white focus:outline-none focus:border-[#6C5CE7]"
+            className="border border-[#383838] rounded-lg px-3 py-2 text-sm text-[#eff2f6] bg-[#1a1a1a] focus:outline-none focus:border-[#ffa116]"
           >
             <option value="">All Difficulties</option>
             <option value="EASY">Easy</option>
@@ -490,7 +519,7 @@ export default function AdminQuestionsPage() {
           <Button
             variant="outline"
             onClick={fetchQuestions}
-            className="flex items-center gap-2 border-[#E5E7EB] text-[#6B7280] hover:text-[#1E1F25]"
+            className="flex items-center gap-2 border-[#383838] text-gray-400 hover:text-[#eff2f6] hover:bg-[#1a1a1a]"
             title="Refresh questions"
           >
             <RefreshCw size={15} />
@@ -504,126 +533,137 @@ export default function AdminQuestionsPage() {
           <LoadingSpinner />
         </div>
       ) : (
-        <div className="card bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center bg-[#FAFBFC]">
-            <span className="text-sm font-semibold text-[#1E1F25]">
+        <div className="card bg-[#282828] rounded-xl border border-[#383838] shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-[#383838] flex justify-between items-center bg-[#1a1a1a]">
+            <span className="text-sm font-semibold text-[#eff2f6]">
               Catalog Questions ({totalCount})
             </span>
             {(platformFilter || difficultyFilter || search) && (
-              <span className="text-xs text-[#6B7280]">
+              <span className="text-xs text-gray-400">
                 Filtered results
               </span>
             )}
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="table-header bg-[#1E1F25] text-white text-xs uppercase tracking-wider">
-                  <th className="p-3.5">Title</th>
-                  <th className="p-3.5">Platform</th>
-                  <th className="p-3.5">External ID</th>
-                  <th className="p-3.5">Difficulty</th>
-                  <th className="p-3.5">Tags</th>
-                  <th className="p-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E5E7EB] text-sm">
-                {questions.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-[#6B7280]">
-                      No questions found. Use "Create Single Question" or "Import via CSV" to add problems.
+          <BaseTable
+            variant="dark"
+            className="border-[#383838]"
+            headerClassName="bg-[#1a1a1a] border-b border-[#383838] text-gray-300 text-xs uppercase tracking-wider"
+            bodyClassName="divide-y divide-[#383838] text-sm"
+            headers={
+              <tr>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider">Title</th>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-32">Platform</th>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-28">External ID</th>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider w-28">Difficulty</th>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider">Tags</th>
+                <th className="px-4 py-3.5 font-semibold text-xs tracking-wider text-right w-28">Actions</th>
+              </tr>
+            }
+            emptyMessage='No questions found. Use "Create Single Question" or "Import via CSV" to add problems.'
+            footer={
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400">
+                  Page {page} of {totalPages}
+                </span>
+                <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+              </div>
+            }
+          >
+            {questions.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-gray-400">
+                  No questions found. Use "Create Single Question" or "Import via CSV" to add problems.
+                </td>
+              </tr>
+            ) : (
+              questions.map((q) => {
+                const questionId = q._id || q.id;
+                return (
+                  <tr
+                    key={questionId}
+                    className="h-16 min-h-[4rem] hover:bg-[#323232] transition-colors align-middle"
+                  >
+                    <td className="px-4 py-3 font-medium text-[#ffa116] align-middle">
+                      <a
+                        href={q.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline flex items-center gap-1"
+                      >
+                        <span className="truncate max-w-md">{q.title}</span>
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 align-middle whitespace-nowrap">
+                      <StatusBadge type="platform" platform={q.platform} />
+                    </td>
+                    <td className="px-4 py-3 text-sm font-mono text-gray-400 align-middle whitespace-nowrap">{q.externalId}</td>
+                    <td className="px-4 py-3 align-middle whitespace-nowrap">
+                      {q.platform === 'LEETCODE' ? (
+                        <StatusBadge type="difficulty" difficulty={q.difficulty} />
+                      ) : (q.rating || q.metadata?.rating) ? (
+                        <StatusBadge type="rating" platform={q.platform} rating={q.rating || q.metadata?.rating} />
+                      ) : (
+                        <span className="text-xs text-[#8b949e] font-mono px-2 py-0.5 rounded bg-[#30363d]/30 border border-[#30363d]">N/A</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 align-middle">
+                      <div className="flex flex-wrap gap-1.5 max-w-xs">
+                        {q.tags && q.tags.length > 0 ? (
+                          q.tags.slice(0, 3).map((t) => (
+                            <span
+                              key={t}
+                              className="inline-flex items-center text-[11px] bg-[#1a1a1a] text-gray-300 border border-[#383838] hover:border-[#ffa116]/50 hover:text-[#ffa116] hover:bg-[#ffa116]/10 px-2 py-0.5 rounded-full transition-all cursor-pointer"
+                            >
+                              {t}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-500 text-xs">—</span>
+                        )}
+                        {q.tags && q.tags.length > 3 && (
+                          <span className="text-[11px] text-gray-500 self-center">
+                            +{q.tags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right align-middle whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setEditModal({
+                              isOpen: true,
+                              data: {
+                                ...q,
+                                rating: q.rating ?? q.metadata?.rating ?? '',
+                                tags: q.tags ? q.tags.join(', ') : ''
+                              }
+                            })
+                          }
+                          title="Edit Question"
+                          className="border-[#383838] text-gray-300 hover:bg-[#383838]"
+                        >
+                          <Edit size={15} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-rose-400 border-rose-900/50 hover:bg-rose-950/30"
+                          onClick={() => setDeleteModal({ isOpen: true, id: questionId })}
+                          title="Delete Question"
+                        >
+                          <Trash2 size={15} />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  questions.map((q) => {
-                    const questionId = q._id || q.id;
-                    return (
-                      <tr
-                        key={questionId}
-                        className="table-row hover:bg-[#F8F9FB] transition-colors"
-                      >
-                        <td className="p-3.5 font-medium text-[#6C5CE7]">
-                          <a
-                            href={q.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="hover:underline flex items-center gap-1"
-                          >
-                            <span>{q.title}</span>
-                          </a>
-                        </td>
-                        <td className="p-3.5">
-                          <Badge>{q.platform}</Badge>
-                        </td>
-                        <td className="p-3.5 text-sm font-mono text-[#6B7280]">{q.externalId}</td>
-                        <td className="p-3.5">
-                          <Badge>{q.difficulty || '—'}</Badge>
-                        </td>
-                        <td className="p-3.5">
-                          <div className="flex flex-wrap gap-1 max-w-xs">
-                            {q.tags && q.tags.length > 0 ? (
-                              q.tags.slice(0, 3).map((t) => (
-                                <span
-                                  key={t}
-                                  className="text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
-                                >
-                                  {t}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-xs text-gray-400">—</span>
-                            )}
-                            {q.tags && q.tags.length > 3 && (
-                              <span className="text-[10px] text-gray-500">
-                                +{q.tags.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="p-3.5 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                setEditModal({
-                                  isOpen: true,
-                                  data: {
-                                    ...q,
-                                    tags: q.tags ? q.tags.join(', ') : ''
-                                  }
-                                })
-                              }
-                              title="Edit Question"
-                            >
-                              <Edit size={15} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-red-500 border-red-200 hover:bg-red-50"
-                              onClick={() => setDeleteModal({ isOpen: true, id: questionId })}
-                              title="Delete Question"
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="p-4 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="text-xs text-[#6B7280]">
-              Page {page} of {totalPages}
-            </span>
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-          </div>
+                );
+              })
+            )}
+          </BaseTable>
         </div>
       )}
 
@@ -640,12 +680,12 @@ export default function AdminQuestionsPage() {
         }}
         title="Import Questions via CSV"
       >
-        <div className="space-y-4 text-sm text-[#1E1F25]">
+        <div className="space-y-4 text-sm text-[#eff2f6]">
           {/* Subheader & template info */}
-          <div className="flex justify-between items-center bg-[#F8F9FB] p-3 rounded-lg border border-[#E5E7EB]">
+          <div className="flex justify-between items-center bg-[#1a1a1a] p-3 rounded-lg border border-[#383838]">
             <div>
-              <p className="font-semibold text-xs text-[#1E1F25]">Required Columns:</p>
-              <p className="text-[11px] text-[#6B7280] font-mono mt-0.5">
+              <p className="font-semibold text-xs text-[#eff2f6]">Required Columns:</p>
+              <p className="text-[11px] text-gray-400 font-mono mt-0.5">
                 platform, externalId, title, url, difficulty, tags
               </p>
             </div>
@@ -653,7 +693,7 @@ export default function AdminQuestionsPage() {
               size="sm"
               variant="outline"
               onClick={downloadSampleCSV}
-              className="text-xs flex items-center gap-1.5 text-[#6C5CE7] border-purple-200 hover:bg-purple-50 shrink-0"
+              className="text-xs flex items-center gap-1.5 text-[#ffa116] border-[#ffa116]/30 hover:bg-[#ffa116]/10 shrink-0"
             >
               <Download size={13} />
               <span>Template</span>
@@ -661,23 +701,23 @@ export default function AdminQuestionsPage() {
           </div>
 
           {/* Mode switch */}
-          <div className="flex border-b border-[#E5E7EB] text-xs font-medium">
+          <div className="flex border-b border-[#383838] text-xs font-medium">
             <button
               onClick={() => setCsvInputMode('upload')}
-              className={`pb-2 px-3 border-b-2 transition-colors ${
+              className={`pb-2 px-3 border-b-2 transition-colors cursor-pointer ${
                 csvInputMode === 'upload'
-                  ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                  : 'border-transparent text-[#6B7280] hover:text-[#1E1F25]'
+                  ? 'border-[#ffa116] text-[#ffa116] font-bold'
+                  : 'border-transparent text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
               Upload .CSV File
             </button>
             <button
               onClick={() => setCsvInputMode('paste')}
-              className={`pb-2 px-3 border-b-2 transition-colors ${
+              className={`pb-2 px-3 border-b-2 transition-colors cursor-pointer ${
                 csvInputMode === 'paste'
-                  ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                  : 'border-transparent text-[#6B7280] hover:text-[#1E1F25]'
+                  ? 'border-[#ffa116] text-[#ffa116] font-bold'
+                  : 'border-transparent text-gray-400 hover:text-[#eff2f6]'
               }`}
             >
               Paste CSV Content
@@ -686,12 +726,12 @@ export default function AdminQuestionsPage() {
 
           {csvInputMode === 'upload' ? (
             <div>
-              <label className="border-2 border-dashed border-[#E5E7EB] hover:border-[#6C5CE7] rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAFBFC]">
-                <UploadCloud size={32} className="text-[#6C5CE7] mb-2" />
-                <span className="font-medium text-xs text-[#1E1F25]">
+              <label className="border-2 border-dashed border-[#383838] hover:border-[#ffa116] rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#1a1a1a]">
+                <UploadCloud size={32} className="text-[#ffa116] mb-2" />
+                <span className="font-medium text-xs text-[#eff2f6]">
                   {fileName ? fileName : 'Click to browse or drop a CSV file here'}
                 </span>
-                <span className="text-[11px] text-[#6B7280] mt-1">Supports UTF-8 formatted .csv files</span>
+                <span className="text-[11px] text-gray-400 mt-1">Supports UTF-8 formatted .csv files</span>
                 <input
                   type="file"
                   accept=".csv,text/csv"
@@ -707,7 +747,7 @@ export default function AdminQuestionsPage() {
                 placeholder="platform,externalId,title,url,difficulty,tags&#10;LEETCODE,1,Two Sum,https://leetcode.com/problems/two-sum/,EASY,array&#10;CODEFORCES,4A,Watermelon,https://codeforces.com/problemset/problem/4/A,EASY,math"
                 value={rawCsvText}
                 onChange={handleTextChange}
-                className="w-full font-mono text-xs p-3 border border-[#E5E7EB] rounded-lg focus:outline-none focus:border-[#6C5CE7] resize-none"
+                className="w-full font-mono text-xs p-3 border border-[#383838] bg-[#1a1a1a] text-[#eff2f6] rounded-lg focus:outline-none focus:border-[#ffa116] resize-none placeholder:text-gray-500"
               />
             </div>
           )}
@@ -716,56 +756,54 @@ export default function AdminQuestionsPage() {
           {parsedRows.length > 0 && (
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-[#1E1F25]">
+                <span className="font-semibold text-[#eff2f6]">
                   Parsed Rows Preview ({parsedRows.length} found)
                 </span>
-                <span className="text-[#6B7280]">
-                  <strong className="text-emerald-600">{validQuestionsToImport.length} valid</strong>,{' '}
-                  <strong className="text-rose-600">
+                <span className="text-gray-400">
+                  <strong className="text-emerald-400">{validQuestionsToImport.length} valid</strong>,{' '}
+                  <strong className="text-rose-400">
                     {parsedRows.length - validQuestionsToImport.length} invalid
                   </strong>
                 </span>
               </div>
 
-              <div className="max-h-48 overflow-y-auto border border-[#E5E7EB] rounded-lg text-xs">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-[#F8F9FB] sticky top-0 text-[11px] text-[#6B7280]">
-                    <tr className="border-b border-[#E5E7EB]">
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Platform</th>
-                      <th className="p-2">ID</th>
+              <div className="max-h-48 overflow-y-auto">
+                <BaseTable
+                  variant="dark"
+                  stickyHeader={true}
+                  className="rounded-lg text-xs"
+                  headers={
+                    <tr className="bg-[#1a1a1a] text-[11px] text-gray-400 border-b border-[#383838]">
+                      <th className="p-2 w-28">Status</th>
+                      <th className="p-2 w-24">Platform</th>
+                      <th className="p-2 w-20">ID</th>
                       <th className="p-2">Title</th>
-                      <th className="p-2">Diff</th>
+                      <th className="p-2 w-16">Diff</th>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E5E7EB]">
-                    {parsedRows.slice(0, 50).map((r) => (
-                      <tr
-                        key={r.rowNum}
-                        className={r.isValid ? 'bg-white' : 'bg-red-50/50'}
-                      >
-                        <td className="p-2">
-                          {r.isValid ? (
-                            <span className="inline-flex items-center text-emerald-600 gap-1 font-medium">
-                              <CheckCircle2 size={13} /> Valid
-                            </span>
-                          ) : (
-                            <span
-                              className="inline-flex items-center text-rose-600 gap-1 font-medium"
-                              title={r.errors.join(', ')}
-                            >
-                              <AlertCircle size={13} /> {r.errors[0]}
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-2 font-mono text-[11px]">{r.platform || '—'}</td>
-                        <td className="p-2 font-mono text-[11px]">{r.externalId || '—'}</td>
-                        <td className="p-2 truncate max-w-[140px]">{r.title || '—'}</td>
-                        <td className="p-2 text-[11px]">{r.difficulty || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  }
+                >
+                  {parsedRows.slice(0, 50).map((r) => (
+                    <tr
+                      key={r.rowNum}
+                      className={`min-h-[2.5rem] align-middle ${r.isValid ? 'bg-[#282828] hover:bg-[#323232]' : 'bg-rose-950/30 text-rose-200'}`}
+                    >
+                      <td className="p-2 align-middle">
+                        <StatusBadge
+                          type="validation"
+                          isValid={r.isValid}
+                          error={r.errors?.[0]}
+                          size="xs"
+                        />
+                      </td>
+                      <td className="p-2 font-mono text-[11px] text-gray-300 align-middle">{r.platform || '—'}</td>
+                      <td className="p-2 font-mono text-[11px] text-gray-300 align-middle">{r.externalId || '—'}</td>
+                      <td className="p-2 truncate max-w-[140px] text-[#eff2f6] align-middle">{r.title || '—'}</td>
+                      <td className="p-2 text-[11px] text-gray-300 align-middle">
+                        {r.platform === 'LEETCODE' ? (r.difficulty || '—') : (r.rating ? `Rating: ${r.rating}` : 'N/A')}
+                      </td>
+                    </tr>
+                  ))}
+                </BaseTable>
               </div>
               {parsedRows.length > 50 && (
                 <p className="text-[11px] text-gray-500 text-center">
@@ -775,32 +813,22 @@ export default function AdminQuestionsPage() {
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-[#E5E7EB]">
+          <div className="flex justify-end gap-2 pt-2 border-t border-[#383838]">
             <Button
-              type="button"
               variant="outline"
-              onClick={() => {
-                setCsvModalOpen(false);
-                setParsedRows([]);
-                setRawCsvText('');
-              }}
-              disabled={importing}
+              onClick={() => setCsvModalOpen(false)}
+              className="border-[#383838] text-gray-300 hover:bg-[#383838]"
             >
               Cancel
             </Button>
             <Button
               onClick={handleBulkImportSubmit}
               disabled={importing || validQuestionsToImport.length === 0}
-              className="bg-[#6C5CE7] text-white flex items-center gap-1.5"
+              className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold"
             >
-              {importing ? (
-                <>
-                  <LoadingSpinner className="w-3.5 h-3.5" />
-                  <span>Importing...</span>
-                </>
-              ) : (
-                <span>Import {validQuestionsToImport.length} Questions</span>
-              )}
+              {importing
+                ? 'Importing...'
+                : `Import ${validQuestionsToImport.length} Questions`}
             </Button>
           </div>
         </div>
@@ -808,15 +836,14 @@ export default function AdminQuestionsPage() {
 
       {/* Edit Question Modal */}
       <Modal
-        open={editModal.isOpen}
         isOpen={editModal.isOpen}
         onClose={() => setEditModal({ isOpen: false, data: null })}
         title="Edit Question"
       >
         {editModal.data && (
-          <form onSubmit={handleEdit} className="space-y-4 text-sm">
+          <form onSubmit={handleEdit} className="space-y-4">
             <Input
-              placeholder="Title"
+              label="Title"
               value={editModal.data.title}
               onChange={(e) =>
                 setEditModal({
@@ -827,7 +854,19 @@ export default function AdminQuestionsPage() {
               required
             />
             <Input
-              placeholder="URL"
+              label="External ID"
+              value={editModal.data.externalId}
+              onChange={(e) =>
+                setEditModal({
+                  ...editModal,
+                  data: { ...editModal.data, externalId: e.target.value }
+                })
+              }
+              required
+            />
+            <Input
+              label="URL"
+              type="url"
               value={editModal.data.url}
               onChange={(e) =>
                 setEditModal({
@@ -838,6 +877,7 @@ export default function AdminQuestionsPage() {
               required
             />
             <Input
+              label="Tags (comma separated)"
               placeholder="Tags (comma separated)"
               value={editModal.data.tags}
               onChange={(e) =>
@@ -847,29 +887,45 @@ export default function AdminQuestionsPage() {
                 })
               }
             />
-            <select
-              value={editModal.data.difficulty}
-              onChange={(e) =>
-                setEditModal({
-                  ...editModal,
-                  data: { ...editModal.data, difficulty: e.target.value }
-                })
-              }
-              className="w-full border border-[#E5E7EB] rounded-md p-2 text-sm"
-            >
-              <option value="EASY">Easy</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HARD">Hard</option>
-            </select>
+            {editModal.data.platform === 'LEETCODE' ? (
+              <select
+                value={editModal.data.difficulty || 'EASY'}
+                onChange={(e) =>
+                  setEditModal({
+                    ...editModal,
+                    data: { ...editModal.data, difficulty: e.target.value }
+                  })
+                }
+                className="w-full border border-[#383838] bg-[#1a1a1a] text-[#eff2f6] rounded-md p-2 text-sm"
+              >
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+              </select>
+            ) : (
+              <Input
+                label="Rating (Elo)"
+                type="number"
+                placeholder="Rating (e.g. 1200)"
+                value={editModal.data.rating ?? ''}
+                onChange={(e) =>
+                  setEditModal({
+                    ...editModal,
+                    data: { ...editModal.data, rating: e.target.value }
+                  })
+                }
+              />
+            )}
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setEditModal({ isOpen: false, data: null })}
+                className="border-[#383838] text-gray-300 hover:bg-[#383838]"
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#6C5CE7] text-white">
+              <Button type="submit" className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold">
                 Save
               </Button>
             </div>
@@ -884,14 +940,14 @@ export default function AdminQuestionsPage() {
         onClose={() => setDeleteModal({ isOpen: false, id: null })}
         title="Delete Question"
       >
-        <p className="mb-4 text-[#1E1F25] text-sm">
+        <p className="mb-4 text-[#eff2f6] text-sm">
           Are you sure you want to delete this question? This cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleteModal({ isOpen: false, id: null })}>
+          <Button variant="outline" onClick={() => setDeleteModal({ isOpen: false, id: null })} className="border-[#383838] text-gray-300 hover:bg-[#383838]">
             Cancel
           </Button>
-          <Button className="bg-red-500 text-white hover:bg-red-600" onClick={handleDelete}>
+          <Button className="bg-rose-600 hover:bg-rose-700 text-white font-bold" onClick={handleDelete}>
             Delete
           </Button>
         </div>

@@ -13,7 +13,7 @@ export default function SidebarLink({ to, icon: Icon, label, badge, onClick }) {
         {Icon && <Icon size={18} />}
         <span className="flex-1">{label}</span>
         {badge !== undefined && (
-          <span className="ml-auto bg-[#6C5CE7] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+          <span className="ml-auto bg-[#ffa116] text-[#1a1a1a] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
             {badge}
           </span>
         )}
@@ -30,7 +30,7 @@ export default function SidebarLink({ to, icon: Icon, label, badge, onClick }) {
       {Icon && <Icon size={18} />}
       <span className="flex-1">{label}</span>
       {badge !== undefined && (
-        <span className="ml-auto bg-[#6C5CE7] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+        <span className="ml-auto bg-[#ffa116] text-[#1a1a1a] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
           {badge}
         </span>
       )}

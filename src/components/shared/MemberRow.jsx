@@ -1,24 +1,15 @@
 import React from 'react';
 import { User, Trash2 } from 'lucide-react';
-import Badge from '../ui/Badge';
+import StatusBadge from './StatusBadge';
 
 export default function MemberRow({ member, isOwner, onRoleChange, onRemove }) {
-  const getRoleBadgeColor = (role) => {
-    switch(role) {
-      case 'OWNER': return 'primary';
-      case 'WRITE': return 'info';
-      case 'READ': return 'neutral';
-      default: return 'neutral';
-    }
-  };
-
   return (
-    <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] last:border-0 hover:bg-[#F8F9FB] transition-colors">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-[#383838] last:border-0 hover:bg-[#333333] transition-colors h-16 min-h-[4rem] text-[#eff2f6]">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-          <User size={16} className="text-gray-500" />
+        <div className="w-8 h-8 rounded-full bg-[#1e1e1e] border border-[#383838] flex items-center justify-center shrink-0">
+          <User size={16} className="text-[#8b949e]" />
         </div>
-        <span className="font-medium text-[#1E1F25]">{member.username}</span>
+        <span className="font-medium text-[#eff2f6] text-sm">{member.username}</span>
       </div>
 
       <div className="flex items-center gap-4">
@@ -26,24 +17,22 @@ export default function MemberRow({ member, isOwner, onRoleChange, onRemove }) {
           <select
             value={member.role}
             onChange={(e) => onRoleChange(member.username, e.target.value)}
-            className="rounded-md border border-[#E5E7EB] px-2 py-1 text-sm focus:border-[#6C5CE7] focus:outline-none focus:ring-1 focus:ring-[#6C5CE7]"
+            className="rounded-md border border-[#383838] bg-[#1e1e1e] text-[#eff2f6] px-2 py-1 text-xs focus:border-[#ffa116] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116] cursor-pointer"
           >
             <option value="READ">READ</option>
             <option value="WRITE">WRITE</option>
           </select>
         ) : (
-          <Badge variant={getRoleBadgeColor(member.role)}>
-            {member.role}
-          </Badge>
+          <StatusBadge type="role" role={member.role} />
         )}
 
         {isOwner && member.role !== 'OWNER' && onRemove && (
           <button
             onClick={() => onRemove(member.username)}
-            className="text-gray-400 hover:text-red-500 transition-colors"
+            className="text-[#8b949e] hover:text-red-400 transition-colors cursor-pointer p-1 rounded"
             title="Remove Member"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
         )}
       </div>

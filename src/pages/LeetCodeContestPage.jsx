@@ -1,18 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import PageHeader from '../components/layout/PageHeader';
-import Input from '../components/ui/Input';
-import Pagination from '../components/ui/Pagination';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import {
-  Search,
-  ExternalLink,
-  CheckCircle2,
-  Check,
-  Trophy,
-  Filter,
-} from 'lucide-react';
+import ContestUpsolverView, { UpsolverProblemCard } from '../components/shared/ContestUpsolverView';
+import AddToLadderModal from '../components/shared/AddToLadderModal';
+import toast from 'react-hot-toast';
 import { useLeetCodeData } from '../hooks/useContestData';
+import { fetchLeetCodeUserSolved } from '../lib/leetcodeSync';
+import { LeetCodeIcon } from '../components/ui/PlatformIcon';
 import api from '../lib/api';
+import { useStarred } from '../context/StarredContext';
 
 function parseContestInfo(url) {
   if (!url) return { title: 'LeetCode Contest', type: 'other', num: 0, slug: '' };
@@ -53,24 +47,107 @@ const CATEGORIES = [
 
 const COLUMNS = ['Q1', 'Q2', 'Q3', 'Q4'];
 
+export const DIFFICULTY_LEVELS = {
+  EASY: 1,
+  MEDIUM: 2,
+  HARD: 3,
+};
+
+export function getLeetCodeDifficulty(prob) {
+  if (prob?.difficulty) {
+    const d = String(prob.difficulty).toUpperCase();
+    if (d.includes('EASY')) return 'EASY';
+    if (d.includes('HARD')) return 'HARD';
+    if (d.includes('MED')) return 'MEDIUM';
+  }
+  const rating = Number(prob?.rating);
+  if (rating && rating > 0) {
+    if (rating < 1550) return 'EASY';
+    if (rating < 2000) return 'MEDIUM';
+    return 'HARD';
+  }
+  const points = Number(prob?.points);
+  if (points && points > 0) {
+    if (points <= 3) return 'EASY';
+    if (points <= 5) return 'MEDIUM';
+    return 'HARD';
+  }
+  const col = String(prob?.index || prob?.colKey || '').toUpperCase();
+  if (col.includes('1') || col === 'Q1') return 'EASY';
+  if (col.includes('4') || col === 'Q4') return 'HARD';
+  return 'MEDIUM';
+}
+
+export function getLeetCodeDifficultyStyle(difficulty) {
+  const d = String(difficulty || '').toUpperCase();
+  if (d === 'EASY') {
+    return { label: 'Easy', color: '#00B8A3', bg: 'rgba(0, 184, 163, 0.1)' };
+  }
+  if (d === 'HARD') {
+    return { label: 'Hard', color: '#EF4743', bg: 'rgba(239, 71, 67, 0.1)' };
+  }
+  return { label: 'Medium', color: '#FFC01E', bg: 'rgba(255, 192, 30, 0.1)' };
+}
+
 export default function LeetCodeContestPage() {
   const { contests, loading, error } = useLeetCodeData();
-  const [handle, setHandle] = useState('');
+  const [handle, setHandle] = useState(() => localStorage.getItem('lc_handle') || '');
   const [solvedSet, setSolvedSet] = useState(new Set());
+  const [isFetching, setIsFetching] = useState(false);
+  const [userStats, setUserStats] = useState(null);
+
+  // Centralized global backend starring
+  const { isStarred: checkStarred, toggleStar } = useStarred();
+
+  const [ladderModal, setLadderModal] = useState({ isOpen: false, question: null });
 
   // Filter controls
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
   const [hideCompleted, setHideCompleted] = useState(false);
-  const [showPoints, setShowPoints] = useState(true);
+  const [minDifficulty, setMinDifficulty] = useState('EASY');
+  const [maxDifficulty, setMaxDifficulty] = useState('HARD');
   const [page, setPage] = useState(1);
   const limit = 25;
+
+  const handleMinDifficultyChange = (newMin) => {
+    setMinDifficulty(newMin);
+    if ((DIFFICULTY_LEVELS[newMin] || 1) > (DIFFICULTY_LEVELS[maxDifficulty] || 3)) {
+      setMaxDifficulty(newMin);
+    }
+    setPage(1);
+  };
+
+  const handleMaxDifficultyChange = (newMax) => {
+    setMaxDifficulty(newMax);
+    if ((DIFFICULTY_LEVELS[newMax] || 3) < (DIFFICULTY_LEVELS[minDifficulty] || 1)) {
+      setMinDifficulty(newMax);
+    }
+    setPage(1);
+  };
+
+  const handlePresetSelect = (preset) => {
+    if (preset === 'ALL') {
+      setMinDifficulty('EASY');
+      setMaxDifficulty('HARD');
+    } else if (preset === 'EASY_MEDIUM') {
+      setMinDifficulty('EASY');
+      setMaxDifficulty('MEDIUM');
+    } else if (preset === 'MEDIUM_HARD') {
+      setMinDifficulty('MEDIUM');
+      setMaxDifficulty('HARD');
+    }
+    setPage(1);
+  };
 
   // Load saved handle
   useEffect(() => {
     const savedHandle = localStorage.getItem('lc_handle');
     if (savedHandle) {
       setHandle(savedHandle);
+      if (solvedSet.size === 0) {
+        handleSync(savedHandle, true);
+      }
       return;
     }
     api
@@ -80,6 +157,9 @@ export default function LeetCodeContestPage() {
         if (lcAcc?.handle) {
           setHandle(lcAcc.handle);
           localStorage.setItem('lc_handle', lcAcc.handle);
+          if (solvedSet.size === 0) {
+            handleSync(lcAcc.handle, true);
+          }
         }
       })
       .catch(() => {});
@@ -103,19 +183,57 @@ export default function LeetCodeContestPage() {
     }
   }, []);
 
-  // Toggle solve state
+  // Toggle solve state manually
   const toggleSolved = (slug) => {
     if (!slug) return;
+    const s = slug.toLowerCase();
     setSolvedSet((prev) => {
       const next = new Set(prev);
-      if (next.has(slug)) {
-        next.delete(slug);
+      if (next.has(s)) {
+        next.delete(s);
       } else {
-        next.add(slug);
+        next.add(s);
       }
       localStorage.setItem('lc_solved_problems', JSON.stringify([...next]));
       return next;
     });
+  };
+
+  // Sync LeetCode submissions & contest history
+  const handleSync = async (targetHandle = handle, silent = false) => {
+    const clean = targetHandle?.trim();
+    if (!clean) {
+      if (!silent) toast.error('Please enter a LeetCode username to sync');
+      return;
+    }
+
+    setIsFetching(true);
+    const toastId = !silent ? toast.loading(`Syncing LeetCode submissions for @${clean}...`) : null;
+    try {
+      const res = await fetchLeetCodeUserSolved(clean);
+      const newSolved = new Set((res.solvedSlugs || []).map((s) => s.toLowerCase()));
+      setSolvedSet(newSolved);
+      setUserStats({
+        rating: res.userRating,
+        ranking: res.globalRanking,
+        badge: res.badge,
+        count: newSolved.size,
+        attended: res.attendedContests,
+      });
+      localStorage.setItem('lc_handle', clean);
+      localStorage.setItem('lc_solved_problems', JSON.stringify([...newSolved]));
+
+      if (!silent) {
+        toast.success(
+          `Synced ${res.solvedSlugs?.length || 0} solved problems for @${clean}!`,
+          { id: toastId }
+        );
+      }
+    } catch (err) {
+      if (!silent) toast.error(err.message || 'Failed to sync LeetCode submissions.', { id: toastId });
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   // Transform and filter contest rows
@@ -138,12 +256,16 @@ export default function LeetCodeContestPage() {
         const q = search.toLowerCase();
         const matchesName = info.title.toLowerCase().includes(q) || info.slug.includes(q);
         const matchesProblem = problemsList.some((p) => {
-          const pName = formatProblemTitle(p.link || p.url || '');
+          const pName = p.title || formatProblemTitle(p.link || p.url || '');
           const pSlug = getProblemSlug(p.link || p.url || '');
           return pName.toLowerCase().includes(q) || pSlug.toLowerCase().includes(q);
         });
         if (!matchesName && !matchesProblem) return;
       }
+
+      const minLevel = DIFFICULTY_LEVELS[minDifficulty] || 1;
+      const maxLevel = DIFFICULTY_LEVELS[maxDifficulty] || 3;
+      const isDiffFiltered = minLevel > 1 || maxLevel < 3;
 
       // Build column mappings
       const columns = { Q1: null, Q2: null, Q3: null, Q4: null };
@@ -151,12 +273,19 @@ export default function LeetCodeContestPage() {
 
       problemsList.forEach((p, pIdx) => {
         const pUrl = p.link || p.url || '';
-        const slug = getProblemSlug(pUrl);
-        const title = formatProblemTitle(pUrl);
+        const slug = getProblemSlug(pUrl).toLowerCase();
+        const title = p.title || formatProblemTitle(pUrl);
         const colKey = COLUMNS[pIdx] || `Q${pIdx + 1}`;
         const isSolved = solvedSet.has(slug);
 
         if (isSolved) solvedCount++;
+
+        const diff = getLeetCodeDifficulty(p);
+        const diffLevel = DIFFICULTY_LEVELS[diff] || 2;
+
+        if (isDiffFiltered && (diffLevel < minLevel || diffLevel > maxLevel)) {
+          return;
+        }
 
         const probObj = {
           ...p,
@@ -165,6 +294,8 @@ export default function LeetCodeContestPage() {
           title,
           isSolved,
           points: p.points || '',
+          rating: p.rating || null,
+          difficulty: diff,
         };
 
         if (columns[colKey] !== undefined) {
@@ -176,6 +307,7 @@ export default function LeetCodeContestPage() {
       const isCompleted = totalProblems > 0 && solvedCount === totalProblems;
 
       if (hideCompleted && isCompleted) return;
+      if (isDiffFiltered && Object.values(columns).filter(Boolean).length === 0) return;
 
       rows.push({
         id: info.slug || `lc-${idx}`,
@@ -191,7 +323,7 @@ export default function LeetCodeContestPage() {
     });
 
     return rows;
-  }, [contests, category, search, hideCompleted, solvedSet]);
+  }, [contests, category, search, hideCompleted, solvedSet, minDifficulty, maxDifficulty]);
 
   const totalPages = Math.ceil(matrixRows.length / limit);
   const paginatedRows = useMemo(() => {
@@ -199,283 +331,137 @@ export default function LeetCodeContestPage() {
   }, [matrixRows, page, limit]);
 
   return (
-    <div className="w-full max-w-[1550px] mx-auto space-y-6">
-      <PageHeader
-        title="LeetCode Contest Upsolver"
-        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'LeetCode Upsolver' }]}
-      />
-
-      {/* Top Controls Card */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-5 space-y-4">
-        {/* Handle and Stats */}
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 w-full max-w-md">
-            <Input
-              label="LeetCode Handle"
-              placeholder="e.g. your_leetcode_username"
-              value={handle}
-              onChange={(e) => handleHandleChange(e.target.value)}
-            />
-          </div>
-
-          {handle && (
-            <div className="text-xs font-semibold text-[#6C5CE7] bg-[#6C5CE7]/10 px-3 py-2 rounded-lg">
-              Tracking: @{handle}
-            </div>
-          )}
-
-          {solvedSet.size > 0 && (
-            <div className="flex items-center gap-2 text-sm text-[#00B894] font-semibold bg-[#00B894]/10 px-3 py-2 rounded-lg">
-              <Check size={16} />
-              <span>{solvedSet.size} problems solved</span>
-            </div>
-          )}
-        </div>
-
-        {/* Filters and Toggles Row */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#E5E7EB]">
-          {/* Search */}
-          <div className="w-full sm:w-72">
-            <Input
-              placeholder="Search contest (e.g. 456, Weekly) or problem..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          {/* Toggles */}
-          <div className="flex items-center gap-5">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={hideCompleted}
-                onChange={(e) => {
-                  setHideCompleted(e.target.checked);
-                  setPage(1);
-                }}
-                className="w-4 h-4 rounded text-[#6C5CE7] focus:ring-[#6C5CE7] border-gray-300"
-              />
-              <span className="text-xs font-medium text-[#1E1F25]">Hide Completed</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showPoints}
-                onChange={(e) => setShowPoints(e.target.checked)}
-                className="w-4 h-4 rounded text-[#6C5CE7] focus:ring-[#6C5CE7] border-gray-300"
-              />
-              <span className="text-xs font-medium text-[#1E1F25]">Show Points</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#E5E7EB]">
-          <span className="text-xs font-semibold text-[#6B7280] mr-2 flex items-center gap-1">
-            <Filter size={13} /> Contests:
-          </span>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setCategory(cat.id);
-                setPage(1);
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                category === cat.id
-                  ? 'bg-[#1E1F25] text-white shadow-xs'
-                  : 'bg-[#F3F4F6] text-[#4B5563] hover:bg-[#E5E7EB]'
+    <>
+      <ContestUpsolverView
+      title={
+        <span className="flex items-center gap-2.5">
+          <LeetCodeIcon size={26} />
+          <span>LeetCode Contest Upsolver</span>
+        </span>
+      }
+      breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'LeetCode Upsolver' }]}
+      handle={handle}
+      onHandleChange={handleHandleChange}
+      onSync={() => handleSync()}
+      isSyncing={isFetching}
+      handleLabel="LeetCode Handle"
+      handlePlaceholder="e.g. your_leetcode_username"
+      syncButtonText="Sync Solved"
+      trackingText={
+        handle
+          ? userStats?.rating
+            ? `Tracking: @${handle} · ${userStats.rating} ${userStats.badge ? `(${userStats.badge})` : ''}`
+            : `Tracking: @${handle}`
+          : null
+      }
+      solvedCount={solvedSet.size}
+      search={search}
+      onSearchChange={(val) => {
+        setSearch(val);
+        setPage(1);
+      }}
+      searchPlaceholder="Search contest (e.g. 456, Weekly) or problem..."
+      showRatingFilter={false}
+      showDifficultyFilter={true}
+      minDifficulty={minDifficulty}
+      maxDifficulty={maxDifficulty}
+      onMinDifficultyChange={handleMinDifficultyChange}
+      onMaxDifficultyChange={handleMaxDifficultyChange}
+      onPresetSelect={handlePresetSelect}
+      hideCompleted={hideCompleted}
+      onHideCompletedChange={(val) => {
+        setHideCompleted(val);
+        setPage(1);
+      }}
+      categories={CATEGORIES}
+      selectedCategory={category}
+      onCategoryChange={(cat) => {
+        setCategory(cat);
+        setPage(1);
+      }}
+      columns={COLUMNS}
+      contests={paginatedRows}
+      totalContests={matrixRows.length}
+      loading={loading}
+      loadingText="Loading LeetCode contests and problems..."
+      error={error}
+      emptyMessage="No contests matched the selected filters."
+      page={page}
+      totalPages={totalPages}
+      onPageChange={setPage}
+      renderContestInfo={(contest) => (
+        <div className="flex flex-col gap-1">
+          <a
+            href={contest.url}
+            target="_blank"
+            rel="noreferrer"
+            className="font-bold text-[#e6edf3] hover:text-[#58a6ff] hover:underline transition-colors leading-tight"
+          >
+            {contest.title}
+          </a>
+          <div className="flex items-center gap-2 mt-1">
+            <span
+              className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                contest.type === 'weekly'
+                  ? 'bg-[#58a6ff]/10 text-[#58a6ff]'
+                  : 'bg-[#a371f7]/10 text-[#a371f7]'
               }`}
             >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Kenkoooo Matrix Table */}
-      {loading ? (
-        <div className="py-24 flex justify-center">
-          <LoadingSpinner text="Loading LeetCode contests dataset..." />
-        </div>
-      ) : error ? (
-        <div className="py-20 text-center text-red-500 font-medium">{error}</div>
-      ) : matrixRows.length === 0 ? (
-        <div className="bg-white p-12 text-center rounded-xl border border-[#E5E7EB]">
-          <p className="text-sm text-[#6B7280]">No LeetCode contests matched your filters.</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              {/* Table Header */}
-              <thead>
-                <tr className="bg-[#1E1F25] text-white">
-                  <th className="p-3 font-bold border-r border-[#2D2E36] min-w-[220px] max-w-[260px]">
-                    Contest
-                  </th>
-                  {COLUMNS.map((col) => (
-                    <th
-                      key={col}
-                      className="p-3 font-bold text-center border-r border-[#2D2E36] min-w-[170px]"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              {/* Table Rows with Simple Partition */}
-              <tbody>
-                {paginatedRows.map((contest) => (
-                  <tr
-                    key={contest.id}
-                    className={`border-b border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors ${
-                      contest.isCompleted ? 'bg-green-50/30' : ''
-                    }`}
-                  >
-                    {/* Contest Column */}
-                    <td className="p-3 border-r border-[#E5E7EB] align-top bg-white">
-                      <div className="flex flex-col gap-1">
-                        <a
-                          href={contest.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-bold text-[#1E1F25] hover:text-[#6C5CE7] hover:underline transition-colors text-sm leading-tight line-clamp-2"
-                          title={contest.title}
-                        >
-                          {contest.title}
-                        </a>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                              contest.type === 'weekly'
-                                ? 'bg-[#3B82F6]/10 text-[#3B82F6]'
-                                : 'bg-[#8B5CF6]/10 text-[#8B5CF6]'
-                            }`}
-                          >
-                            {contest.type === 'weekly' ? 'Weekly' : 'Biweekly'}
-                          </span>
-                          <span className="text-[10px] text-[#6B7280]">
-                            {contest.solvedCount}/{contest.totalProblems} solved
-                          </span>
-                          {contest.isCompleted && (
-                            <span className="inline-flex items-center text-[10px] text-[#00B894] font-bold">
-                              <CheckCircle2 size={12} className="mr-0.5" /> Done
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Problem Columns (Q1, Q2, Q3, Q4) */}
-                    {COLUMNS.map((col) => {
-                      const prob = contest.columns[col];
-                      if (!prob) {
-                        return (
-                          <td
-                            key={col}
-                            className="p-2 border-r border-[#E5E7EB] text-center text-gray-300 align-middle bg-[#FAFBFC]"
-                          >
-                            -
-                          </td>
-                        );
-                      }
-
-                      const isSolved = prob.isSolved;
-
-                      return (
-                        <td
-                          key={col}
-                          className={`p-2 border-r border-[#E5E7EB] align-top transition-colors ${
-                            isSolved ? 'bg-[#00B894]/10' : 'bg-white'
-                          }`}
-                        >
-                          <div
-                            className={`p-2.5 rounded-lg border transition-all h-full flex flex-col justify-between ${
-                              isSolved
-                                ? 'bg-[#00B894]/15 border-[#00B894]/50 shadow-xs'
-                                : 'bg-white border-[#E5E7EB] hover:border-gray-400 hover:shadow-xs'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between gap-1.5">
-                              <div className="flex items-start gap-2 min-w-0 flex-1">
-                                {/* Solved Toggle Button */}
-                                <button
-                                  type="button"
-                                  onClick={() => toggleSolved(prob.slug)}
-                                  className="shrink-0 mt-0.5"
-                                  title={isSolved ? 'Mark as Unsolved' : 'Mark as Solved'}
-                                >
-                                  {isSolved ? (
-                                    <CheckCircle2
-                                      size={15}
-                                      className="text-[#00B894] fill-[#00B894]/20"
-                                    />
-                                  ) : (
-                                    <span className="w-3.5 h-3.5 rounded-full border border-gray-300 hover:border-[#6C5CE7] bg-gray-50 transition-colors block" />
-                                  )}
-                                </button>
-
-                                {/* Problem Link */}
-                                <a
-                                  href={prob.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className={`font-semibold hover:underline leading-snug line-clamp-2 text-xs ${
-                                    isSolved ? 'text-[#00B894] font-bold line-through' : 'text-[#1E1F25]'
-                                  }`}
-                                  title={prob.title}
-                                >
-                                  {prob.title}
-                                </a>
-                              </div>
-
-                              <a
-                                href={prob.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-gray-400 hover:text-gray-600 shrink-0 p-0.5 mt-0.5"
-                                title="Open on LeetCode"
-                              >
-                                <ExternalLink size={12} />
-                              </a>
-                            </div>
-
-                            {/* Points Row (Only shows real points, no guessed difficulty tags) */}
-                            {showPoints && prob.points && (
-                              <div className="flex items-center justify-end mt-2 pt-1.5 border-t border-gray-100 text-[10px]">
-                                <span className="font-mono font-medium text-[#4B5563] bg-[#F3F4F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
-                                  {prob.points} pts
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="p-4 border-t border-[#E5E7EB] flex items-center justify-between">
-              <span className="text-xs text-[#6B7280]">
-                Showing {(page - 1) * limit + 1} -{' '}
-                {Math.min(page * limit, matrixRows.length)} of {matrixRows.length} contests
+              {contest.type === 'weekly' ? 'Weekly' : 'Biweekly'}
+            </span>
+            <span className="text-[10px] text-[#8b949e]">
+              {contest.solvedCount}/{contest.totalProblems} solved
+            </span>
+            {contest.isCompleted && (
+              <span className="inline-flex items-center text-[10px] text-[#3fb950] font-bold">
+                All Solved
               </span>
-              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
-    </div>
+      renderProblemCell={(prob) => {
+        const diff = getLeetCodeDifficulty(prob);
+        const diffStyle = getLeetCodeDifficultyStyle(diff);
+        const cleanTags = (prob.tags || []).filter((t) => !t.startsWith('rating-')).join(', ');
+        const questionObj = {
+          _id: prob.questionId || undefined,
+          platform: 'LEETCODE',
+          code: prob.slug,
+          externalId: prob.externalId || prob.slug,
+          title: prob.title,
+          url: prob.url,
+          rating: prob.rating,
+          difficulty: diff,
+          tags: prob.tags || [],
+        };
+        const isStarred = checkStarred(questionObj);
+        return (
+          <UpsolverProblemCard
+            key={prob.slug || prob.url}
+            title={prob.title}
+            url={prob.url}
+            isSolved={prob.isSolved}
+            isStarred={isStarred}
+            onStar={() => toggleStar(questionObj)}
+            onBookmark={() =>
+              setLadderModal({
+                isOpen: true,
+                question: questionObj,
+              })
+            }
+            titleColor={diffStyle.color}
+            cardBg={diffStyle.bg}
+            badgeTitle={`LeetCode ${diffStyle.label}${cleanTags ? ` · ${cleanTags}` : ''}${prob.rating ? ` · Rating: ${prob.rating}` : prob.points ? ` · ${prob.points} pts` : ''}`}
+          />
+        );
+      }}
+    />
+    <AddToLadderModal
+      isOpen={ladderModal.isOpen}
+      onClose={() => setLadderModal({ isOpen: false, question: null })}
+      question={ladderModal.question}
+    />
+    </>
   );
 }

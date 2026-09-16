@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Modal, Button, Input, Badge, LoadingSpinner, Pagination } from '../ui';
 import api, { getErrorMessage } from '../../lib/api';
 import { getCfRatingStyle } from '../../lib/ratingStyles';
+import BaseTable from './BaseTable';
+import ProblemRow from './ProblemRow';
 import { Search, ExternalLink, Check, CheckSquare, Square, RefreshCw, X } from 'lucide-react';
 
 export default function AddQuestionsModal({
@@ -220,14 +222,14 @@ export default function AddQuestionsModal({
       footer={
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-[#1E1F25]">
+            <span className="text-sm font-medium text-[#eff2f6]">
               <strong className="text-[#6C5CE7]">{selectedIds.size}</strong> question{selectedIds.size === 1 ? '' : 's'} selected
             </span>
             {selectedIds.size > 0 && (
               <button
                 type="button"
                 onClick={handleClearSelection}
-                className="text-xs text-[#6B7280] hover:text-red-500 underline transition-colors"
+                className="text-xs text-[#8b949e] hover:text-red-400 underline transition-colors cursor-pointer"
               >
                 Clear all
               </button>
@@ -266,7 +268,7 @@ export default function AddQuestionsModal({
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search problems by title, problem code, or tag..."
-              icon={<Search size={16} className="text-[#9CA3AF]" />}
+              icon={<Search size={16} className="text-[#8b949e]" />}
             />
             {searchInput && (
               <button
@@ -276,7 +278,7 @@ export default function AddQuestionsModal({
                   setActiveSearch('');
                   setPage(1);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b949e] hover:text-[#eff2f6] p-1 cursor-pointer"
                 title="Clear search"
               >
                 <X size={14} />
@@ -287,7 +289,7 @@ export default function AddQuestionsModal({
             <select
               value={platform}
               onChange={handlePlatformChange}
-              className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#1E1F25] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]"
+              className="rounded-lg border border-[#383838] bg-[#1e1e1e] px-3 py-2 text-sm text-[#eff2f6] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116]"
             >
               <option value="ALL">All Platforms</option>
               <option value="LEETCODE">LeetCode</option>
@@ -296,8 +298,8 @@ export default function AddQuestionsModal({
             </select>
 
             {platform === 'CODEFORCES' || platform === 'CODECHEF' ? (
-              <div className="flex items-center gap-1.5 bg-gray-50 border border-[#E5E7EB] rounded-lg px-2.5 py-1.5">
-                <span className="text-xs font-semibold text-gray-600">
+              <div className="flex items-center gap-1.5 bg-[#1e1e1e] border border-[#383838] rounded-lg px-2.5 py-1.5">
+                <span className="text-xs font-semibold text-[#8b949e]">
                   {platform === 'CODEFORCES' ? 'CF Rating:' : 'CC Rating:'}
                 </span>
                 <input
@@ -311,9 +313,9 @@ export default function AddQuestionsModal({
                     setMinRating(e.target.value);
                     setPage(1);
                   }}
-                  className="w-16 rounded border border-gray-200 bg-white px-2 py-0.5 text-xs text-[#1E1F25] focus:outline-none focus:ring-1 focus:ring-[#6C5CE7]"
+                  className="w-16 rounded border border-[#383838] bg-[#282828] px-2 py-0.5 text-xs text-[#eff2f6] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116]"
                 />
-                <span className="text-gray-400 text-xs">–</span>
+                <span className="text-[#8b949e] text-xs">–</span>
                 <input
                   type="number"
                   placeholder="Max"
@@ -325,7 +327,7 @@ export default function AddQuestionsModal({
                     setMaxRating(e.target.value);
                     setPage(1);
                   }}
-                  className="w-16 rounded border border-gray-200 bg-white px-2 py-0.5 text-xs text-[#1E1F25] focus:outline-none focus:ring-1 focus:ring-[#6C5CE7]"
+                  className="w-16 rounded border border-[#383838] bg-[#282828] px-2 py-0.5 text-xs text-[#eff2f6] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116]"
                 />
                 {(minRating || maxRating) && (
                   <button
@@ -335,7 +337,7 @@ export default function AddQuestionsModal({
                       setMaxRating('');
                       setPage(1);
                     }}
-                    className="text-gray-400 hover:text-red-500 p-0.5 ml-0.5"
+                    className="text-[#8b949e] hover:text-red-400 p-0.5 ml-0.5 cursor-pointer"
                     title="Reset rating filter"
                   >
                     <X size={13} />
@@ -346,7 +348,7 @@ export default function AddQuestionsModal({
               <select
                 value={difficulty}
                 onChange={handleDifficultyChange}
-                className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#1E1F25] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]"
+                className="rounded-lg border border-[#383838] bg-[#1e1e1e] px-3 py-2 text-sm text-[#eff2f6] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116]"
               >
                 <option value="ALL">All Difficulties</option>
                 <option value="EASY">Easy</option>
@@ -360,10 +362,10 @@ export default function AddQuestionsModal({
               <select
                 value={tag}
                 onChange={handleTagChange}
-                className={`rounded-lg border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] max-w-[150px] truncate ${
+                className={`rounded-lg border px-3 py-2 text-sm bg-[#1e1e1e] focus:outline-hidden focus:ring-1 focus:ring-[#ffa116] max-w-[150px] truncate ${
                   tag && tag !== 'ALL'
-                    ? 'border-[#6C5CE7] font-semibold text-[#6C5CE7] pr-7 bg-purple-50/40'
-                    : 'border-[#E5E7EB] text-[#1E1F25]'
+                    ? 'border-[#6C5CE7] font-semibold text-[#6C5CE7] pr-7 bg-[#6C5CE7]/10'
+                    : 'border-[#383838] text-[#eff2f6]'
                 }`}
                 title="Filter by Topic / Tag"
               >
@@ -385,7 +387,7 @@ export default function AddQuestionsModal({
                     setTag('ALL');
                     setPage(1);
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 p-0.5"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8b949e] hover:text-red-400 p-0.5 cursor-pointer"
                   title="Clear tag filter"
                 >
                   <X size={13} />
@@ -396,149 +398,74 @@ export default function AddQuestionsModal({
         </div>
 
         {/* Question List Table */}
-        <div className="border border-[#E5E7EB] rounded-xl overflow-hidden bg-white shadow-sm">
+        <div className="border border-[#383838] rounded-xl overflow-hidden bg-[#282828] shadow-sm">
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center gap-3">
               <LoadingSpinner />
-              <span className="text-sm text-[#6B7280]">Loading questions...</span>
+              <span className="text-sm text-[#8b949e]">Loading questions...</span>
             </div>
           ) : error ? (
-            <div className="p-8 text-center text-red-500 text-sm">
+            <div className="p-8 text-center text-red-400 text-sm">
               <p>{error}</p>
               <Button size="sm" variant="outline" className="mt-3" onClick={fetchQuestions}>
                 <RefreshCw size={14} className="mr-1" /> Retry
               </Button>
             </div>
           ) : questions.length === 0 ? (
-            <div className="p-10 text-center text-[#6B7280]">
+            <div className="p-10 text-center text-[#8b949e]">
               <p className="text-sm">No questions found matching your filter criteria.</p>
             </div>
           ) : (
             <div className="max-h-[380px] overflow-y-auto">
-              <table className="w-full text-left border-collapse text-sm">
-                <thead className="sticky top-0 bg-[#1E1F25] text-white z-10 select-none">
+              <BaseTable
+                variant="dark"
+                stickyHeader={true}
+                className="bg-[#282828] border-[#383838] shadow-xs"
+                headerClassName="bg-[#1a1a1a] text-gray-300 border-b border-[#383838] text-xs font-semibold uppercase tracking-wider"
+                bodyClassName="divide-y divide-[#383838] text-sm text-[#eff2f6]"
+                headers={
                   <tr>
-                    <th className="p-3 w-12 text-center">
+                    <th className="px-4 py-3.5 w-12 text-center">
                       <button
                         type="button"
                         onClick={toggleSelectAllCurrent}
                         disabled={availableOnCurrentPage.length === 0}
                         title={allCurrentSelected ? 'Deselect all on page' : 'Select all available on page'}
-                        className="inline-flex items-center justify-center hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       >
                         {allCurrentSelected ? (
                           <CheckSquare size={18} className="text-[#6C5CE7]" />
                         ) : (
-                          <Square size={18} className="text-gray-400" />
+                          <Square size={18} className="text-[#8b949e]" />
                         )}
                       </button>
                     </th>
-                    <th className="p-3 font-semibold">Title</th>
-                    <th className="p-3 font-semibold w-28">Platform</th>
-                    <th className="p-3 font-semibold w-32">
+                    <th className="px-4 py-3.5 font-semibold">Title</th>
+                    <th className="px-4 py-3.5 font-semibold w-28">Platform</th>
+                    <th className="px-4 py-3.5 font-semibold w-32">
                       {platform === 'CODEFORCES' || platform === 'CODECHEF' ? 'Rating' : platform === 'ALL' ? 'Difficulty / Rating' : 'Difficulty'}
                     </th>
-                    <th className="p-3 font-semibold w-28 text-center">Status</th>
+                    <th className="px-4 py-3.5 font-semibold w-28 text-center">Status</th>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E5E7EB]">
-                  {questions.map((q) => {
-                    const qId = String(q._id);
-                    const isAlreadyInLadder = existingSet.has(qId);
-                    const isSelected = selectedIds.has(qId);
+                }
+              >
+                {questions.map((q) => {
+                  const qId = String(q._id);
+                  const isAlreadyInLadder = existingSet.has(qId);
+                  const isSelected = selectedIds.has(qId);
 
-                    return (
-                      <tr
-                        key={qId}
-                        onClick={() => !isAlreadyInLadder && toggleSelect(qId)}
-                        className={`transition-colors ${
-                          isAlreadyInLadder
-                            ? 'bg-gray-50/60 opacity-60 cursor-not-allowed'
-                            : isSelected
-                            ? 'bg-[#6C5CE7]/5 hover:bg-[#6C5CE7]/10 cursor-pointer'
-                            : 'hover:bg-[#F8F9FB] cursor-pointer'
-                        }`}
-                      >
-                        <td className="p-3 text-center" onClick={(e) => e.stopPropagation()}>
-                          {isAlreadyInLadder ? (
-                            <span title="Already in ladder" className="inline-flex text-gray-400">
-                              <Check size={16} />
-                            </span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => toggleSelect(qId)}
-                              className="inline-flex items-center justify-center text-[#6C5CE7] hover:scale-110 transition-transform"
-                            >
-                              {isSelected ? (
-                                <CheckSquare size={18} className="text-[#6C5CE7] fill-[#6C5CE7]/10" />
-                              ) : (
-                                <Square size={18} className="text-gray-400" />
-                              )}
-                            </button>
-                          )}
-                        </td>
-                        <td className="p-3 font-medium text-[#1E1F25]">
-                          <div className="flex items-center gap-2">
-                            <span>{q.title}</span>
-                            {q.url && (
-                              <a
-                                href={q.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                title="Open problem link"
-                                className="text-[#9CA3AF] hover:text-[#6C5CE7] transition-colors inline-flex"
-                              >
-                                <ExternalLink size={13} />
-                              </a>
-                            )}
-                          </div>
-                        </td>
-                        <td className="p-3">{getPlatformBadge(q.platform)}</td>
-                        <td className="p-3">
-                          {q.platform === 'CODEFORCES' && q.metadata?.rating ? (
-                            (() => {
-                              const style = getCfRatingStyle(q.metadata.rating);
-                              return (
-                                <span
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border"
-                                  style={{ backgroundColor: style.bg, color: style.text, borderColor: style.border }}
-                                  title={`Codeforces Rating: ${q.metadata.rating} (${style.label})`}
-                                >
-                                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: style.dot }} />
-                                  {q.metadata.rating}
-                                </span>
-                              );
-                            })()
-                          ) : q.platform === 'CODECHEF' && q.metadata?.rating ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-800 border border-orange-200">
-                              ★ {q.metadata.rating}
-                            </span>
-                          ) : (
-                            <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-md border ${getDifficultyBadgeColor(q.difficulty)}`}>
-                              {q.difficulty || 'Medium'}
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-3 text-center">
-                          {isAlreadyInLadder ? (
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                              In Ladder
-                            </span>
-                          ) : isSelected ? (
-                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#6C5CE7] bg-[#6C5CE7]/10 px-2 py-0.5 rounded-full">
-                              Selected
-                            </span>
-                          ) : (
-                            <span className="text-xs text-gray-400">Available</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                  return (
+                    <ProblemRow
+                      key={qId}
+                      mode="modal"
+                      question={q}
+                      isSelected={isSelected}
+                      isAlreadyInLadder={isAlreadyInLadder}
+                      onSelect={() => toggleSelect(qId)}
+                    />
+                  );
+                })}
+              </BaseTable>
             </div>
           )}
         </div>
@@ -546,8 +473,8 @@ export default function AddQuestionsModal({
         {/* Bottom Pagination & Counts */}
         {!loading && questions.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
-            <span className="text-xs text-[#6B7280]">
-              Showing page <strong>{page}</strong> of <strong>{totalPages}</strong> ({totalCount} total questions)
+            <span className="text-xs text-[#8b949e]">
+              Showing page <strong className="text-[#eff2f6]">{page}</strong> of <strong className="text-[#eff2f6]">{totalPages}</strong> ({totalCount} total questions)
             </span>
             <Pagination
               page={page}

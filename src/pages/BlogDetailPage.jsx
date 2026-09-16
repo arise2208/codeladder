@@ -205,10 +205,10 @@ export default function BlogDetailPage() {
     return (
       <div className="max-w-md mx-auto py-16 text-center space-y-4">
         <AlertCircle size={40} className="mx-auto text-rose-500" />
-        <h2 className="text-xl font-bold text-gray-800">Blog Post Not Found</h2>
-        <p className="text-xs text-gray-500">This blog may have been deleted or the link is incorrect.</p>
+        <h2 className="text-xl font-bold text-[#eff2f6]">Blog Post Not Found</h2>
+        <p className="text-xs text-gray-400">This blog may have been deleted or the link is incorrect.</p>
         <Link to="/blogs">
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="sm" className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold">
             ← Return to Blogs
           </Button>
         </Link>
@@ -230,7 +230,7 @@ export default function BlogDetailPage() {
       <div className="flex items-center justify-between gap-4">
         <Link
           to="/blogs"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#6C5CE7] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#ffa116] transition-colors"
         >
           <ArrowLeft size={14} />
           <span>Back to Blogs</span>
@@ -241,7 +241,7 @@ export default function BlogDetailPage() {
             variant="outline"
             size="sm"
             onClick={handleShare}
-            className="text-xs flex items-center gap-1.5"
+            className="text-xs flex items-center gap-1.5 border-[#383838] text-gray-300 hover:bg-[#282828] hover:text-[#eff2f6]"
           >
             <Share2 size={13} />
             <span>Share</span>
@@ -250,7 +250,7 @@ export default function BlogDetailPage() {
           {canEdit && (
             <>
               <Link to={`/blogs/${blog._id}/edit`}>
-                <Button variant="outline" size="sm" className="text-xs flex items-center gap-1.5 text-[#6C5CE7] border-[#6C5CE7]/40">
+                <Button variant="outline" size="sm" className="text-xs flex items-center gap-1.5 text-[#ffa116] border-[#ffa116]/40 hover:bg-[#ffa116]/10">
                   <Edit size={13} />
                   <span>Edit</span>
                 </Button>
@@ -259,7 +259,7 @@ export default function BlogDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setDeleteModalOpen(true)}
-                className="text-xs flex items-center gap-1.5 text-rose-600 border-rose-200 hover:bg-rose-50"
+                className="text-xs flex items-center gap-1.5 text-rose-400 border-rose-900/50 hover:bg-rose-950/30"
               >
                 <Trash2 size={13} />
                 <span>Delete</span>
@@ -270,14 +270,14 @@ export default function BlogDetailPage() {
       </div>
 
       {/* 2. Article Header Card */}
-      <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-10 shadow-xs space-y-6">
+      <div className="bg-[#282828] rounded-3xl border border-[#383838] p-6 sm:p-10 shadow-xs space-y-6">
         {/* Category Tags */}
         {blog.tags && blog.tags.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             {blog.tags.map((t) => (
               <span
                 key={t}
-                className="px-2.5 py-1 rounded-md bg-[#6C5CE7]/10 text-[#6C5CE7] text-xs font-bold uppercase tracking-wider"
+                className="px-2.5 py-1 rounded-md bg-[#ffa116]/10 text-[#ffa116] border border-[#ffa116]/30 text-xs font-bold uppercase tracking-wider"
               >
                 #{t}
               </span>
@@ -286,33 +286,33 @@ export default function BlogDetailPage() {
         )}
 
         {/* Title */}
-        <h1 className="text-2xl sm:text-4xl font-black text-[#1E1F25] tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-4xl font-black text-[#eff2f6] tracking-tight leading-tight">
           {blog.title}
         </h1>
 
         {/* Author & Meta Line */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#383838] text-xs text-gray-400">
           <div className="flex items-center gap-3">
             <Link
               to={`/profile/${blog.authorUsername}`}
-              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#A29BFE] text-white font-bold flex items-center justify-center text-sm shadow-xs hover:opacity-90"
+              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#ffa116] to-[#ffbe5b] text-[#1a1a1a] font-bold flex items-center justify-center text-sm shadow-xs hover:opacity-90"
             >
               {blog.authorUsername.charAt(0).toUpperCase()}
             </Link>
             <div>
               <Link
                 to={`/profile/${blog.authorUsername}`}
-                className="font-bold text-gray-900 hover:text-[#6C5CE7] hover:underline"
+                className="font-bold text-[#eff2f6] hover:text-[#ffa116] hover:underline"
               >
                 @{blog.authorUsername}
               </Link>
-              <div className="text-[11px] text-gray-400">
+              <div className="text-[11px] text-gray-500">
                 Published {publishedDateStr} ({relativeTime})
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-gray-400 text-xs">
+          <div className="flex items-center gap-4 text-gray-500 text-xs">
             <span className="flex items-center gap-1">
               <Clock size={13} /> {readTimeMin} min read
             </span>
@@ -323,12 +323,12 @@ export default function BlogDetailPage() {
         </div>
 
         {/* Floating/Integrated Upvote & Downvote Widget */}
-        <div className="flex items-center justify-between p-3.5 bg-gray-50/80 rounded-2xl border border-gray-200/80">
+        <div className="flex items-center justify-between p-3.5 bg-[#1a1a1a] rounded-2xl border border-[#383838]">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-700">Was this article helpful?</span>
+            <span className="text-xs font-bold text-gray-300">Was this article helpful?</span>
           </div>
 
-          <div className="inline-flex items-center bg-white p-1 rounded-xl border border-gray-200 shadow-2xs">
+          <div className="inline-flex items-center bg-[#282828] p-1 rounded-xl border border-[#383838] shadow-2xs">
             <button
               type="button"
               onClick={() => handleVote('UPVOTE')}
@@ -336,7 +336,7 @@ export default function BlogDetailPage() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 blog.userVote === 'UPVOTE'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-gray-700 hover:text-emerald-700 hover:bg-gray-50'
+                  : 'text-gray-300 hover:text-emerald-400 hover:bg-[#383838]'
               }`}
               title={blog.userVote === 'UPVOTE' ? 'Remove Upvote' : 'Upvote this blog'}
             >
@@ -345,7 +345,7 @@ export default function BlogDetailPage() {
             </button>
 
             {/* Score display */}
-            <span className="px-2.5 text-xs font-black text-gray-800">
+            <span className="px-2.5 text-xs font-black text-[#eff2f6]">
               {blog.score > 0 ? `+${blog.score}` : blog.score}
             </span>
 
@@ -356,7 +356,7 @@ export default function BlogDetailPage() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 blog.userVote === 'DOWNVOTE'
                   ? 'bg-rose-600 text-white shadow-xs'
-                  : 'text-gray-700 hover:text-rose-700 hover:bg-gray-50'
+                  : 'text-gray-300 hover:text-rose-400 hover:bg-[#383838]'
               }`}
               title={blog.userVote === 'DOWNVOTE' ? 'Remove Downvote' : 'Downvote this blog'}
             >
@@ -368,28 +368,28 @@ export default function BlogDetailPage() {
 
         {/* Table of Contents (if >= 2 headings) */}
         {headings.length >= 2 && (
-          <div className="bg-[#F8F9FC] border border-[#E5E7EB] rounded-2xl p-4 sm:p-5">
+          <div className="bg-[#1a1a1a] border border-[#383838] rounded-2xl p-4 sm:p-5">
             <button
               type="button"
               onClick={() => setTocOpen(!tocOpen)}
-              className="flex items-center justify-between w-full text-left font-bold text-xs sm:text-sm text-gray-800 hover:text-[#6C5CE7] transition-colors cursor-pointer"
+              className="flex items-center justify-between w-full text-left font-bold text-xs sm:text-sm text-gray-300 hover:text-[#ffa116] transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2">
-                <ListTree size={16} className="text-[#6C5CE7]" />
+                <ListTree size={16} className="text-[#ffa116]" />
                 <span>Table of Contents</span>
-                <span className="text-[11px] font-mono text-gray-400">({headings.length} sections)</span>
+                <span className="text-[11px] font-mono text-gray-500">({headings.length} sections)</span>
               </div>
               {tocOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
             </button>
 
             {tocOpen && (
-              <nav className="mt-3 pt-3 border-t border-gray-200/60 space-y-1.5 text-xs">
+              <nav className="mt-3 pt-3 border-t border-[#383838] space-y-1.5 text-xs">
                 {headings.map((h, i) => (
                   <a
                     key={i}
                     href={`#${h.id}`}
-                    className={`block text-gray-600 hover:text-[#6C5CE7] hover:underline transition-colors py-0.5 ${
-                      h.level === 1 ? 'font-bold text-gray-800' : h.level === 2 ? 'pl-4 font-medium' : 'pl-7 text-gray-500'
+                    className={`block text-gray-400 hover:text-[#ffa116] hover:underline transition-colors py-0.5 ${
+                      h.level === 1 ? 'font-bold text-[#eff2f6]' : h.level === 2 ? 'pl-4 font-medium text-gray-300' : 'pl-7 text-gray-500'
                     }`}
                   >
                     {h.text}
@@ -401,38 +401,38 @@ export default function BlogDetailPage() {
         )}
 
         {/* 3. Article Content (Rendered via NotionRenderer) */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-t border-[#383838]">
           <NotionRenderer content={blog.content} />
         </div>
       </div>
 
       {/* 4. Author Signature Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+      <div className="bg-[#282828] rounded-2xl border border-[#383838] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#6C5CE7]/15 text-[#6C5CE7] flex items-center justify-center font-bold text-lg shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#ffa116]/15 text-[#ffa116] flex items-center justify-center font-bold text-lg shrink-0">
             {blog.authorUsername.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h4 className="text-sm font-bold text-gray-900">Written by @{blog.authorUsername}</h4>
-            <p className="text-xs text-gray-500">
+            <h4 className="text-sm font-bold text-[#eff2f6]">Written by @{blog.authorUsername}</h4>
+            <p className="text-xs text-gray-400">
               Community contributor on CodeLadder.
             </p>
           </div>
         </div>
 
         <Link to={`/profile/${blog.authorUsername}`}>
-          <Button variant="outline" size="sm" className="text-xs">
+          <Button variant="outline" size="sm" className="text-xs border-[#383838] text-gray-300 hover:bg-[#383838]">
             View Profile →
           </Button>
         </Link>
       </div>
 
       {/* 5. Complete Comments Section */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 space-y-6 shadow-xs">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div className="bg-[#282828] rounded-2xl border border-[#383838] p-6 sm:p-8 space-y-6 shadow-xs">
+        <div className="flex items-center justify-between border-b border-[#383838] pb-3">
           <div className="flex items-center gap-2">
-            <MessageSquare size={18} className="text-[#6C5CE7]" />
-            <h3 className="text-base font-bold text-gray-900">
+            <MessageSquare size={18} className="text-[#ffa116]" />
+            <h3 className="text-base font-bold text-[#eff2f6]">
               Discussion ({blog.comments ? blog.comments.length : 0})
             </h3>
           </div>
@@ -446,14 +446,14 @@ export default function BlogDetailPage() {
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="Share your thoughts, ask questions, or contribute additional context..."
-              className="w-full text-xs sm:text-sm p-3 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#6C5CE7] text-gray-800 placeholder:text-gray-400"
+              className="w-full text-xs sm:text-sm p-3 border border-[#383838] bg-[#1a1a1a] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#ffa116] text-[#eff2f6] placeholder:text-gray-500"
             />
             <div className="flex justify-end">
               <Button
                 type="submit"
                 size="sm"
                 disabled={submittingComment || !commentText.trim()}
-                className="bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-bold text-xs flex items-center gap-1.5"
+                className="bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold text-xs flex items-center gap-1.5"
               >
                 <Send size={12} />
                 <span>{submittingComment ? 'Posting...' : 'Post Comment'}</span>
@@ -461,10 +461,10 @@ export default function BlogDetailPage() {
             </div>
           </form>
         ) : (
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-center space-y-2">
-            <p className="text-xs text-gray-500">Sign in to participate in the discussion and leave a comment.</p>
+          <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#383838] text-center space-y-2">
+            <p className="text-xs text-gray-400">Sign in to participate in the discussion and leave a comment.</p>
             <Link to="/login" className="inline-block">
-              <Button size="sm" variant="primary" className="text-xs">
+              <Button size="sm" variant="primary" className="text-xs bg-[#ffa116] hover:bg-[#e59114] text-[#1a1a1a] font-bold">
                 Sign In
               </Button>
             </Link>
@@ -472,9 +472,9 @@ export default function BlogDetailPage() {
         )}
 
         {/* Comments List */}
-        <div className="divide-y divide-gray-100 space-y-3">
+        <div className="divide-y divide-[#383838] space-y-3">
           {(!blog.comments || blog.comments.length === 0) ? (
-            <p className="text-xs text-gray-400 text-center py-6">
+            <p className="text-xs text-gray-500 text-center py-6">
               No comments yet. Start the conversation!
             </p>
           ) : (
@@ -494,17 +494,17 @@ export default function BlogDetailPage() {
                     <div className="flex items-center gap-2 text-xs">
                       <Link
                         to={`/profile/${c.authorUsername}`}
-                        className="font-bold text-[#6C5CE7] hover:underline"
+                        className="font-bold text-[#ffa116] hover:underline"
                       >
                         @{c.authorUsername}
                       </Link>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-400 text-[11px]">{commentTime}</span>
+                      <span className="text-gray-600">•</span>
+                      <span className="text-gray-500 text-[11px]">{commentTime}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       {/* Comment Upvote / Downvote */}
-                      <div className="inline-flex items-center bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-bold">
+                      <div className="inline-flex items-center bg-[#1a1a1a] border border-[#383838] rounded-lg text-[11px] font-bold">
                         <button
                           type="button"
                           onClick={() => handleVoteComment(c._id, 'UPVOTE')}
@@ -512,13 +512,13 @@ export default function BlogDetailPage() {
                           className={`px-1.5 py-0.5 rounded-l-md transition-colors cursor-pointer ${
                             c.userVote === 'UPVOTE'
                               ? 'bg-emerald-600 text-white'
-                              : 'text-gray-500 hover:text-emerald-700 hover:bg-gray-100'
+                              : 'text-gray-400 hover:text-emerald-400 hover:bg-[#282828]'
                           }`}
                           title={c.userVote === 'UPVOTE' ? 'Remove Upvote' : 'Upvote comment'}
                         >
                           <ThumbsUp size={11} className={c.userVote === 'UPVOTE' ? 'fill-white' : ''} />
                         </button>
-                        <span className="px-1 text-[11px] font-semibold text-gray-700">
+                        <span className="px-1 text-[11px] font-semibold text-[#eff2f6]">
                           {c.score > 0 ? `+${c.score}` : c.score ?? 0}
                         </span>
                         <button
@@ -528,7 +528,7 @@ export default function BlogDetailPage() {
                           className={`px-1.5 py-0.5 rounded-r-md transition-colors cursor-pointer ${
                             c.userVote === 'DOWNVOTE'
                               ? 'bg-rose-600 text-white'
-                              : 'text-gray-500 hover:text-rose-700 hover:bg-gray-100'
+                              : 'text-gray-400 hover:text-rose-400 hover:bg-[#282828]'
                           }`}
                           title={c.userVote === 'DOWNVOTE' ? 'Remove Downvote' : 'Downvote comment'}
                         >
@@ -540,7 +540,7 @@ export default function BlogDetailPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteComment(c._id)}
-                          className="text-gray-400 hover:text-rose-600 p-1 rounded-md transition-colors cursor-pointer"
+                          className="text-gray-500 hover:text-rose-400 p-1 rounded-md transition-colors cursor-pointer"
                           title="Delete comment"
                         >
                           <Trash2 size={12} />
@@ -548,7 +548,7 @@ export default function BlogDetailPage() {
                       )}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-800 leading-relaxed pl-1 whitespace-pre-wrap">
+                  <p className="text-xs text-gray-300 leading-relaxed pl-1 whitespace-pre-wrap">
                     {c.content}
                   </p>
                 </div>
@@ -560,10 +560,10 @@ export default function BlogDetailPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 space-y-4">
-            <h3 className="text-base font-bold text-gray-900">Delete Blog Post?</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="bg-[#282828] rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-[#383838] space-y-4">
+            <h3 className="text-base font-bold text-[#eff2f6]">Delete Blog Post?</h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
               Are you sure you want to permanently delete <strong>"{blog.title}"</strong>? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-2 pt-2">
@@ -571,7 +571,7 @@ export default function BlogDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setDeleteModalOpen(false)}
-                className="text-xs"
+                className="text-xs border-[#383838] text-gray-300 hover:bg-[#383838]"
               >
                 Cancel
               </Button>
