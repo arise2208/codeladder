@@ -141,13 +141,10 @@ export default function ContestUpsolverView({
 
   // User Profile / Sync Bar
   handle = '',
-  onHandleChange,
   onSync,
   isSyncing = false,
   handleLabel = 'Handle',
-  handlePlaceholder = 'Enter handle...',
   syncButtonText = 'Sync Solved',
-  trackingText = null,
   solvedCount = 0,
 
   // Search & Filters
@@ -208,40 +205,37 @@ export default function ContestUpsolverView({
       {/* 2. Top Controls & Sync Card */}
       <div className="bg-[#161b22] dark:bg-[#161b22] rounded-xl border border-[#30363d] shadow-sm p-5 space-y-4">
         {/* Handle Sync Row */}
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex gap-2 w-full max-w-lg items-end">
-            <div className="flex-1">
-              <Input
-                label={handleLabel}
-                placeholder={handlePlaceholder}
-                value={handle}
-                onChange={(e) => onHandleChange?.(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && onSync?.()}
-              />
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          {handle ? (
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                <span className="text-xs font-medium text-[#8b949e]">{handleLabel}:</span>
+                <span className="text-sm font-bold text-[#e6edf3]">{handle}</span>
+              </div>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={onSync}
+                disabled={isSyncing}
+                className="h-[42px] px-4 whitespace-nowrap flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <RefreshCw size={15} className={isSyncing ? 'animate-spin' : ''} />
+                <span>{isSyncing ? 'Syncing...' : syncButtonText}</span>
+              </Button>
+              {/* Solved Problems Counter */}
+              {solvedCount > 0 && (
+                <div className="text-xs font-semibold text-[#3fb950] bg-[#238636]/15 border border-[#238636]/30 px-3 py-2.5 rounded-lg flex items-center gap-1.5">
+                  <span>{solvedCount} solved</span>
+                </div>
+              )}
             </div>
-            <Button
-              type="button"
-              variant="primary"
-              onClick={onSync}
-              disabled={isSyncing}
-              className="h-[42px] px-4 whitespace-nowrap flex items-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <RefreshCw size={15} className={isSyncing ? 'animate-spin' : ''} />
-              <span>{isSyncing ? 'Syncing...' : syncButtonText}</span>
-            </Button>
-          </div>
-
-          {/* Tracking Status Pill */}
-          {trackingText && (
-            <div className="text-xs font-semibold text-[#58a6ff] bg-[#58a6ff]/10 border border-[#58a6ff]/20 px-3 py-2.5 rounded-lg flex items-center gap-1.5">
-              {trackingText}
-            </div>
-          )}
-
-          {/* Solved Problems Counter */}
-          {solvedCount > 0 && (
-            <div className="text-xs font-semibold text-[#3fb950] bg-[#238636]/15 border border-[#238636]/30 px-3 py-2.5 rounded-lg flex items-center gap-1.5">
-              <span>{solvedCount} solved</span>
+          ) : (
+            <div className="flex items-center gap-2 px-4 py-3 bg-[#21262d] border border-[#30363d] rounded-lg w-full">
+              <span className="text-xs text-[#8b949e]">
+                Connect your <span className="font-semibold text-[#e6edf3]">{handleLabel.replace(' Handle', '').replace(' Username', '')}</span> account in{' '}
+                <a href="/settings" className="text-[#58a6ff] hover:underline font-semibold">Settings</a>
+                {' '}to sync solved problems.
+              </span>
             </div>
           )}
         </div>

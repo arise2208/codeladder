@@ -165,11 +165,7 @@ export default function LeetCodeContestPage() {
       .catch(() => {});
   }, []);
 
-  // Save handle change
-  const handleHandleChange = (val) => {
-    setHandle(val);
-    localStorage.setItem('lc_handle', val);
-  };
+
 
   // Load solved problems from localStorage
   useEffect(() => {
@@ -341,19 +337,10 @@ export default function LeetCodeContestPage() {
       }
       breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'LeetCode Upsolver' }]}
       handle={handle}
-      onHandleChange={handleHandleChange}
       onSync={() => handleSync()}
       isSyncing={isFetching}
       handleLabel="LeetCode Handle"
-      handlePlaceholder="e.g. your_leetcode_username"
       syncButtonText="Sync Solved"
-      trackingText={
-        handle
-          ? userStats?.rating
-            ? `Tracking: @${handle} · ${userStats.rating} ${userStats.badge ? `(${userStats.badge})` : ''}`
-            : `Tracking: @${handle}`
-          : null
-      }
       solvedCount={solvedSet.size}
       search={search}
       onSearchChange={(val) => {

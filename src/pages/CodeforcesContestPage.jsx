@@ -317,13 +317,10 @@ export default function CodeforcesContestPage() {
       }
       breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Codeforces Upsolver' }]}
       handle={handle}
-      onHandleChange={setHandle}
       onSync={() => handleFetch()}
       isSyncing={isFetching}
       handleLabel="Codeforces Handle"
-      handlePlaceholder="e.g. tourist, Benq, arose"
       syncButtonText="Fetch Submissions"
-      trackingText={handle ? `Tracking: @${handle}` : null}
       solvedCount={solvedSet.size}
       search={search}
       onSearchChange={(val) => {

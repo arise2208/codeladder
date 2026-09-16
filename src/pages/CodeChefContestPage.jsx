@@ -391,19 +391,10 @@ export default function CodeChefContestPage() {
       }
       breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'CodeChef Upsolver' }]}
       handle={handle}
-      onHandleChange={setHandle}
       onSync={() => handleSync()}
       isSyncing={isFetching}
       handleLabel="CodeChef Handle"
-      handlePlaceholder="e.g. your_codechef_username"
       syncButtonText="Sync Solved"
-      trackingText={
-        handle
-          ? userStats?.rating
-            ? `Tracking: @${handle} · ${userStats.rating} (${userStats.stars || 'Rated'})`
-            : `Tracking: @${handle}`
-          : null
-      }
       solvedCount={solvedCodes.size}
       search={search}
       onSearchChange={(val) => {
